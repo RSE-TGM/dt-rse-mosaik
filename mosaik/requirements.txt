@@ -1,3 +1,9 @@
-mosaik==3.1.1
-mosaik-api-v3
+#mosaik==3.1.1
+#mosaik-api-v3
+#mosaik-csv
+mosaik==3.2.0
+#mosaik-api==3.0.3
+mosaik-api-v3==3.0.5
+mosaik-csv==2.0.0
+
 #  import-ipynb

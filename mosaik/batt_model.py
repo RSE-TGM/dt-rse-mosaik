@@ -83,9 +83,10 @@ class Model:
         
     def step(self, sampling_time, current_time):
         """Perform a simulation step."""
-#       self.val += self.delta
+        self.val = self.delta
+        self.load_current = self.delta
 #self.output_current = self.load_current
-        self.battery.simulation_step(load=self.load_current, dt=sampling_time, k=self.k)
+        self.battery.simulation_step(load=self.val, dt=sampling_time, k=self.k)
  #       self.output_voltage = self.battery.simulation_step(load=self.load_current, dt=sampling_time, k=self.k)
   #      self.output_voltage = self.battery.results.pop('voltage')
         self.output_voltage = self.battery.results['voltage'][-1]

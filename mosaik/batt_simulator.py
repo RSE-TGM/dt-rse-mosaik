@@ -4,7 +4,7 @@ Mosaik interface for the example simulator.
 """
 
 #import import_ipynb
-import mosaik_api
+import mosaik_api_v3 as mosaik_api
 import batt_model
 
 META = {
@@ -13,7 +13,8 @@ META = {
         'ExampleModel': {
             'public': True,
             'params': ['init_val'],
-            'attrs': ['load_current', 'output_voltage'],
+            'attrs': ['load_current', 
+                      'output_voltage'],
         },
     },
 }

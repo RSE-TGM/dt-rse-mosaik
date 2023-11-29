@@ -10,9 +10,12 @@
 
 # %%
 import mosaik
-import mosaik.util
+import mosaik_api_v3 as mosaik_api
+#import mosaik.util
+from mosaik.util import connect_randomly, connect_many_to_one
 from batt_simulator import *
 from batt_collector import *
+
 
 #import import_ipynb
 
@@ -23,6 +26,9 @@ SIM_CONFIG = {
     },
     'Collector': {
         'python': 'batt_collector:Collector',
+    },
+        'CSV': {
+        'python': 'mosaik_csv:CSV'
     },
 }
 END = 10  # 10 seconds
@@ -47,9 +53,15 @@ world = mosaik.World(SIM_CONFIG)
 # Before we can instantiate any simulation models, we first need to start the respective simulators. This can be done by calling World.start(). It takes the name of the simulator to start and, optionally, some simulator parameters which will be passed to the simulators `init()` method. So lets start the example simulator and the data collector:
 
 # %%
+# Add PV data file
+#END = 1 * 24 * 60 * 60 # one day in seconds
+START = '2023-01-01 01:00:00'
+INPUT_DATA = 'mosaik/configuration/data/input_data.csv' # .csv in your setup
+
 # Start simulators
 examplesim = world.start('ExampleSim', eid_prefix='Model_')
 collector  = world.start('Collector')
+BATTplug = world.start('CSV', sim_start=START, datafile=INPUT_DATA)
 
 # %% [markdown]
 # We also set the eid_prefix for our example simulator. What gets returned by `World.start()` is called a model factory.
@@ -64,6 +76,7 @@ collector  = world.start('Collector')
 #model = examplesim.ExampleModel(init_val=2)
 model   = examplesim.ExampleModel()
 monitor = collector.Monitor()
+LCUdata = BATTplug.Current.create(1)
 
 # %% [markdown]
 # The init_val parameter that we passed to `ExampleModel` is the same as in the `create()` method of our Sim API implementation.
@@ -72,8 +85,12 @@ monitor = collector.Monitor()
 
 # %%
 # Connect entities
+world.connect(LCUdata[0], model, ('LCU', 'load_current'))
+#world.connect(inpdata[0], monitor, 'LCU')
 #world.connect(model, monitor, 'val', 'delta')
 world.connect(model, monitor, 'load_current', 'output_voltage')
+#world.connect(model, monitor, 'output_voltage')
+
 
 # %% [markdown]
 # The method `World.connect()` takes one entity pair – the source and the destination entity, as well as a list of attributes or attribute tuples. If you only provide single attribute names, mosaik assumes that the source and destination use the same attribute name. If they differ, you can instead pass a tuple like `('val_out', 'val_in')`.
