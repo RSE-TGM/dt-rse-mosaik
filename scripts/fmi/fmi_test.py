@@ -1,5 +1,7 @@
 import numpy as np
-from tqdm import tqdm
+#from tqdm import tqdm
+import os
+
 
 import shutil
 import datetime
@@ -8,15 +10,17 @@ from pythonfmu.builder import FmuBuilder
 
 
 if __name__ == '__main__':
-    fmu_to_build = './fmu_mockup.py'
+    cwd = os.getcwd()
+    fmu_to_build = './scripts/fmi/fmu_script/fmu_mockup.py'
     dest_folder = '.'
-    project_files = ['../digital_twin/bess.py']
+ #   project_files = ['./src/digital_twin/bess.py']
+    project_files = ['./src', './scripts/fmi/fmu_script/configuration']
     FmuBuilder.build_FMU(script_file=fmu_to_build, dest=dest_folder, project_files=project_files)
 
 
 
 
-    filename = 'fmu/DTMockup_new.fmu'
+    filename = './DTMockup.fmu'
     """
     #initial_inputs = {'soc': 0., 'temp': 0., 'delta_dod': 0., 't': 0, 'curr_iter': 0, 'change_dir': False}
     input_current = np.random.uniform(low=0, high=4, size=3600)
@@ -40,7 +44,7 @@ if __name__ == '__main__':
     print(output[:10])
     """
 
-    fmu_filename = 'fmu/DTMockup_new.fmu'
+    fmu_filename = './DTMockup.fmu'
     model_description = fmi.read_model_description(fmu_filename)
     stop_time = 3600
     step_size = 1.0

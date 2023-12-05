@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fmiModelDescription fmiVersion="2.0" modelName="Resistor" guid="ff5cbb62-9294-11ee-8f08-00155dca4467" generationTool="PythonFMU 0.6.2" generationDateAndTime="2023-12-04T11:05:14+00:00" variableNamingConvention="structured" description="A simple description" author="John Doe">
+	<CoSimulation needsExecutionTool="true" canHandleVariableCommunicationStepSize="true" canInterpolateInputs="false" canBeInstantiatedOnlyOncePerProcess="false" canGetAndSetFMUstate="false" canSerializeFMUstate="false" modelIdentifier="Resistor" canNotUseMemoryManagementFunctions="true">
+		<SourceFiles>
+			<File name="headers/cppfmu/cppfmu_common.hpp"/>
+			<File name="headers/cppfmu/cppfmu_cs.hpp"/>
+			<File name="headers/pythonfmu/PySlaveInstance.hpp"/>
+			<File name="headers/pythonfmu/PyState.hpp"/>
+			<File name="cpp/cppfmu_cs.cpp"/>
+			<File name="cpp/PySlaveInstance.cpp"/>
+			<File name="cpp/fmi_functions.cpp"/>
+			<File name="CMakeLists.txt"/>
+		</SourceFiles>
+	</CoSimulation>
+	<LogCategories>
+		<Category name="logStatusWarning" description="Log messages with fmi2Warning status."/>
+		<Category name="logStatusDiscard" description="Log messages with fmi2Discard status."/>
+		<Category name="logStatusError" description="Log messages with fmi2Error status."/>
+		<Category name="logStatusFatal" description="Log messages with fmi2Fatal status."/>
+		<Category name="logAll" description="Log all messages."/>
+	</LogCategories>
+	<ModelVariables>
+		<ScalarVariable name="R" valueReference="0" causality="parameter" variability="tunable">
+			<Real start="10000"/>
+		</ScalarVariable>
+		<ScalarVariable name="positive_pin_v" valueReference="1" causality="input">
+			<Real start="20"/>
+		</ScalarVariable>
+		<ScalarVariable name="positive_pin_i" valueReference="2" causality="output">
+			<Real/>
+		</ScalarVariable>
+		<ScalarVariable name="negative_pin_v" valueReference="3" causality="input">
+			<Real start="10"/>
+		</ScalarVariable>
+		<ScalarVariable name="negative_pin_i" valueReference="4" causality="output">
+			<Real/>
+		</ScalarVariable>
+		<ScalarVariable name="delta_v" valueReference="5" causality="local">
+			<Real/>
+		</ScalarVariable>
+		<ScalarVariable name="i" valueReference="6" causality="local">
+			<Real/>
+		</ScalarVariable>
+	</ModelVariables>
+	<ModelStructure>
+		<Outputs>
+			<Unknown index="3"/>
+			<Unknown index="5"/>
+		</Outputs>
+	</ModelStructure>
+</fmiModelDescription>

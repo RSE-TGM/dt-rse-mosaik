@@ -10,7 +10,7 @@ import batt_model
 META = {
     'type': 'time-based',
     'models': {
-        'ExampleModel': {
+        'BattModel': {
             'public': True,
             'params': ['init_val'],
             'attrs': ['load_current', 
@@ -20,7 +20,7 @@ META = {
 }
 
 
-class ExampleSim(mosaik_api.Simulator):
+class ModelSim(mosaik_api.Simulator):
     def __init__(self):
         super().__init__(META)
         self.eid_prefix = 'Model_'
@@ -29,7 +29,7 @@ class ExampleSim(mosaik_api.Simulator):
 
     def init(self, sid, time_resolution, eid_prefix=None):
         if float(time_resolution) != 1.:
-            raise ValueError('ExampleSim only supports time_resolution=1., but'
+            raise ValueError('ModelSim only supports time_resolution=1., but'
                              ' %s was set.' % time_resolution)
         if eid_prefix is not None:
             self.eid_prefix = eid_prefix
@@ -71,7 +71,7 @@ class ExampleSim(mosaik_api.Simulator):
             data['time'] = self.time
             data[eid] = {}
             for attr in attrs:
-                if attr not in self.meta['models']['ExampleModel']['attrs']:
+                if attr not in self.meta['models']['BattModel']['attrs']:
                     raise ValueError('Unknown output attribute: %s' % attr)
 
                 # Get model.val or model.delta:
@@ -81,11 +81,11 @@ class ExampleSim(mosaik_api.Simulator):
 
 
 def main():
-    return mosaik_api.start_simulation(ExampleSim())
+    return mosaik_api.start_simulation(ModelSim())
 
 
-# if __name__ == '__main__':
-#     main()
+if __name__ == '__main__':
+     main()
 
 
 

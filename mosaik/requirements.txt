@@ -5,5 +5,7 @@ mosaik==3.2.0
 #mosaik-api==3.0.3
 mosaik-api-v3==3.0.5
 mosaik-csv==2.0.0
+pythonfmu
+
 
 #  import-ipynb
