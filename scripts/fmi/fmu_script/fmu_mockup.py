@@ -19,7 +19,7 @@ class DTMockup(Fmi2Slave):
         super().__init__(**kwargs)
 #        cwd = os.getcwd()
         models = ['thevenin', 'rc_thermal']
-        os.chdir("./scripts/fmi/fmu_script")
+       # os.chdir("./resources")
         config_data_path = "./configuration"
    ##       config_data_path = "./scripts/fmi/fmu_script/configuration"
  #       config_data_path = "./fmu_script/configuration"
