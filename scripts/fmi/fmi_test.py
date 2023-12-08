@@ -12,21 +12,7 @@ from pythonfmu.builder import FmuBuilder
 if __name__ == '__main__':
 
     FMI_DIR = os.path.dirname(os.path.abspath(__file__))
-   # sys.path.append(os.path.dirname(SCRIPT_DIR))
-
-    cwd = os.getcwd() # e' la directory base  /home/ubuntu/dt-rse-mosaik
-    project_files = ['./src', './scripts/fmi/fmu_script/configuration']
-   # os.chdir(FMI_DIR)
-    fmu_to_build = './fmu_script/fmu_mockup.py'
-    dest_folder = FMI_DIR
- #   project_files = ['./src/digital_twin/bess.py']
  
-    FmuBuilder.build_FMU(script_file=fmu_to_build, dest=dest_folder, project_files=project_files)
-
-
-
-   #  os.chdir("/home/ubuntu/dt-rse-mosaik")
-    filename = './DTMockup.fmu'
     """
     #initial_inputs = {'soc': 0., 'temp': 0., 'delta_dod': 0., 't': 0, 'curr_iter': 0, 'change_dir': False}
     input_current = np.random.uniform(low=0, high=4, size=3600)
@@ -35,7 +21,7 @@ if __name__ == '__main__':
     dtype = [('time', np.double), ('load_current', np.double)]
     signals = np.array([(0., 4.), (1., 5.0), (2., 1.1), (3., 2.0)], dtype=dtype)
 
-    output = fmi.simulate_fmu(filename=filename,
+    output = fmi.simulate_fmu(filename=fmu_filename,
                           validate=True,
                           start_time=0,
                           step_size=1.,
@@ -50,7 +36,7 @@ if __name__ == '__main__':
     print(output[:10])
     """
 
-    fmu_filename = './DTMockup.fmu'
+    fmu_filename = FMI_DIR+'/DTMockup.fmu'
     model_description = fmi.read_model_description(fmu_filename)
     stop_time = 3600
     step_size = 1.0

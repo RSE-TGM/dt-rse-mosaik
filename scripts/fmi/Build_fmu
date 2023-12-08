@@ -1,0 +1,3 @@
+cd ../..
+pythonfmu build -d ./scripts/fmi -f ./scripts/fmi/fmu_script/fmu_mockup.py ./src ./scripts/fmi/fmu_script/resources/configuration ./mosaik/requirements.txt
+
