@@ -36,7 +36,7 @@ if __name__ == '__main__':
     print(output[:10])
     """
 
-    fmu_filename = FMI_DIR+'/DTMockup.fmu'
+    fmu_filename = FMI_DIR+'/fmu/DTMockup.fmu'
     model_description = fmi.read_model_description(fmu_filename)
     stop_time = 3600
     step_size = 1.0
