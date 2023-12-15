@@ -1,3 +1,14 @@
 cd ../..
 pythonfmu build -d ./scripts/fmi/fmu -f ./scripts/fmi/fmu_script/fmu_mockup.py ./src ./mosaik/configuration ./mosaik/requirements.txt
 
+if [[ $? -eq 0 ]]
+then
+echo ""
+echo "      Prodotto nuovo fmu:"
+readlink -f ./scripts/fmi/fmu/* | head -1
+echo ""
+else
+echo ""
+echo "Errore!!!"
+echo ""
+fi

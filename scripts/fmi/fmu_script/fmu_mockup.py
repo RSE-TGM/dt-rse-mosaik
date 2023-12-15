@@ -17,17 +17,15 @@ class DTMockup(Fmi2Slave):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-#        cwd = os.getcwd()
+        # cwd = os.getcwd()
         # Check if building or initializing
         parent_path = pathlib.Path(__file__).parent
         if parent_path.name == "resources":
             # __init__ called from within FMU (probably)
             # Path relative to "resources" directory root within the FMU
             models = ['thevenin', 'rc_thermal']
-           # os.chdir("./resources")
+            # os.chdir("./resources")
             config_data_path = parent_path / "configuration"
-       ##       config_data_path = "./scripts/fmi/fmu_script/configuration"
-     #       config_data_path = "./fmu_script/configuration"
             experiment_config = "experiment_config.yaml"
 
             try:
@@ -46,9 +44,7 @@ class DTMockup(Fmi2Slave):
                 models_config_files=models_config_files,
                 battery_options=self.experiment_config['battery'],
                 input_var=self.experiment_config['load']['var'],
-     #           output_var=self.experiment_config['ground']['var'],
                 sign_convention=self.experiment_config['sign_convention']
-     #           units_checker=self.experiment_config['use_data_units']
                 )
 
             self.battery.reset_data()
@@ -78,7 +74,6 @@ class DTMockup(Fmi2Slave):
         """
 
         """
-        #self.output_current = self.load_current
         self.battery.simulation_step(load=self.load_current, dt=step_size, k=self.k)
         self.output_voltage = self.battery.results['voltage'][-1]
         self.load_current = self.battery.results['current'][-1]

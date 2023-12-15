@@ -36,10 +36,8 @@ class Model:
 
     """
     def __init__(self, **kwargs):
-    #    super().__init__()
+        super().__init__()
         models = ['thevenin', 'rc_thermal']
-#    config_data_path = "./fmu_script/configuration"
-#        config_data_path = "../scripts/fmi/fmu_script/configuration/"
         config_data_path = "mosaik/configuration/"
         experiment_config = "experiment_config.yaml"
 
@@ -70,8 +68,6 @@ class Model:
             models_config_files=models_config_files,
             battery_options=self.experiment_config['battery'],
             input_var=self.experiment_config['load']['var'],
-#            output_var=self.experiment_config['ground']['var'],
-#            units_checker=self.experiment_config['use_data_units'],
             sign_convention=self.experiment_config['sign_convention']         
         )
 
@@ -80,22 +76,18 @@ class Model:
 
         self.load_current = 0.
         self.output_voltage = 0.
-        #self.output_current = 0.
+        
         self.k = 1
         self.sampling_time = self.experiment_config['time']['sampling_time']
         self.delta = 0.
         
     def step(self, sampling_time, current_time):
         """Perform a simulation step."""
-        self.val = self.delta # valore dell'ingresso (input)
-        #self.load_current = self.delta
-        #self.output_current = self.load_current
-        self.battery.simulation_step(load=self.val, dt=sampling_time, k=self.k)
-#       self.output_voltage = self.battery.simulation_step(load=self.load_current, dt=sampling_time, k=self.k)
-#       self.output_voltage = self.battery.results.pop('voltage')
+        #  self.delta valore dell'ingresso (input). Eseguo uno step di calcolo ...
+        self.battery.simulation_step(load=self.delta, dt=sampling_time, k=self.k)
+        # carico i risultati dello step di calcolo 
         self.output_voltage = self.battery.results['voltage'][-1]
         self.load_current = self.battery.results['current'][-1]
-        #= self.battery.results.pop('current')
         self.battery.t_series.append(current_time)
         self.k += 1
         return True
