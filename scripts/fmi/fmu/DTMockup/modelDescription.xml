@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fmiModelDescription fmiVersion="2.0" modelName="DTMockup" guid="c76dac96-9a98-11ee-830a-a3b539a88fa1" generationTool="PythonFMU 0.6.3" generationDateAndTime="2023-12-14T15:52:26+00:00" variableNamingConvention="structured">
+	<CoSimulation needsExecutionTool="true" canHandleVariableCommunicationStepSize="true" canInterpolateInputs="false" canBeInstantiatedOnlyOncePerProcess="false" canGetAndSetFMUstate="false" canSerializeFMUstate="false" modelIdentifier="DTMockup" canNotUseMemoryManagementFunctions="true">
+		<SourceFiles>
+			<File name="src/cppfmu/cppfmu_cs.hpp"/>
+			<File name="src/cppfmu/cppfmu_common.hpp"/>
+			<File name="src/pythonfmu/PySlaveInstance.hpp"/>
+			<File name="src/pythonfmu/PyState.hpp"/>
+			<File name="src/cppfmu/cppfmu_cs.cpp"/>
+			<File name="src/cppfmu/fmi_functions.cpp"/>
+			<File name="src/pythonfmu/PySlaveInstance.cpp"/>
+			<File name="CMakeLists.txt"/>
+			<File name="src/CMakeLists.txt"/>
+		</SourceFiles>
+	</CoSimulation>
+	<LogCategories>
+		<Category name="logStatusWarning" description="Log messages with fmi2Warning status."/>
+		<Category name="logStatusDiscard" description="Log messages with fmi2Discard status."/>
+		<Category name="logStatusError" description="Log messages with fmi2Error status."/>
+		<Category name="logStatusFatal" description="Log messages with fmi2Fatal status."/>
+		<Category name="logAll" description="Log all messages."/>
+	</LogCategories>
+	<ModelVariables>
+		<ScalarVariable name="load_current" valueReference="0" causality="input" variability="continuous">
+			<Real start="0"/>
+		</ScalarVariable>
+		<ScalarVariable name="output_voltage" valueReference="1" causality="output" variability="continuous" initial="exact">
+			<Real start="0"/>
+		</ScalarVariable>
+		<ScalarVariable name="k" valueReference="2" causality="output" variability="discrete" initial="exact">
+			<Real start="1"/>
+		</ScalarVariable>
+	</ModelVariables>
+	<ModelStructure>
+		<Outputs>
+			<Unknown index="2"/>
+			<Unknown index="3"/>
+		</Outputs>
+	</ModelStructure>
+</fmiModelDescription>
