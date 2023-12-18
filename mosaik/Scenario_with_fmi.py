@@ -2,16 +2,17 @@ import os
 import mosaik
 import mosaik_api_v3 as mosaik_api
 from mosaik_fmi.mosaik_fmi import FmuAdapter
-
 from mosaik.util import connect_randomly, connect_many_to_one
+
 from batt_simulator import *
 from batt_collector import *
 
-# Sim config. and other parameters
+# Lo start di questo script deve essere eseguito nella home del package:  dt-rse-mosaik/
 
+# Sim config. and other parameters
 SIM_CONFIG = {
     'ModelSimFmu': {
-        'python': 'mosaik_fmi.mosaik_fmi:FmuAdapter',
+        'python': 'mosaik_fmi.mosaik_fmi:FmuAdapter',    # mosaik_fmi è un component di mosaik, usa la fmu DTMockup.fmu
     },
     'ModelSim': {
        'python': 'batt_simulator:ModelSim',
@@ -20,57 +21,54 @@ SIM_CONFIG = {
         'python': 'batt_collector:Collector',
     },
         'CSV': {
-        'python': 'mosaik_csv:CSV'
+        'python': 'mosaik_csv:CSV'                        # mosaik_csv è un component di mosaik, legge il file data/input_data.csv con un profilo di corrente del carico
     },
 
 }
-END = 10  # 10 seconds
-
+END = 10  # imposto 10 secondi di simulazione
+#END = 1 * 24 * 60 * 60 # one day in seconds
 
 # Create World
 world = mosaik.World(SIM_CONFIG)
 
-
 # Add PV data file
-#END = 1 * 24 * 60 * 60 # one day in seconds
 START = '2023-01-01 01:00:00'
 INPUT_DATA = 'mosaik/configuration/data/input_data.csv' # .csv in your setup
-fmupath_rel ='./scripts/fmi/fmu'
-fmupath_abs= os.path.realpath(fmupath_rel)
 
 
 # Start simulators
-modelsimFmu= world.start('ModelSimFmu',
+fmupath_rel ='./scripts/fmi/fmu'
+fmupath_abs = os.path.realpath(fmupath_rel)  # path assoluto della fmu
+modelsimFmu = world.start('ModelSimFmu',
                     work_dir=fmupath_abs,
-                    fmu_name='DTMockup',
+                    fmu_name='DTMockup',     # è la DTMockup.fmu
                     fmi_version='2',
                     fmi_type='cs',
                     logging_on=False,
                     instance_name='DTMockup',
                     step_size=1
 )
-modelsim = world.start('ModelSim', eid_prefix='Model_')
-collector  = world.start('Collector')
-BATTplug = world.start('CSV', sim_start=START, datafile=INPUT_DATA)
+modelsim  = world.start('ModelSim', eid_prefix='Model_')
+collector = world.start('Collector')
+BATTplug  = world.start('CSV', sim_start=START, datafile=INPUT_DATA)
 
 
 # Instantiate models
-modelFmu   = modelsimFmu.DTMockup.create(1,load_current=2107.0)
-model   = modelsim.BattModel()
-monitor = collector.Monitor()
-LCUdata = BATTplug.Current.create(1)
+modelFmu = modelsimFmu.DTMockup.create(1,load_current=2107.0)
+model    = modelsim.BattModel()
+monitor  = collector.Monitor()
+LCUdata  = BATTplug.Current.create(1)
 
 # Connect entities
-world.connect(LCUdata[0], model, ('LCU', 'load_current'))
+world.connect(LCUdata[0], model, ('LCU', 'load_current')) # se hanno lo stesso nome:  world.connect(LCUdata[0], model, 'nome_var')
+world.connect(LCUdata[0], modelFmu[0], ('LCU', 'load_current'))
+
 #world.connect(inpdata[0], monitor, 'LCU')
 #world.connect(model, monitor, 'val', 'delta')
 
+
 world.connect(model, monitor, 'load_current', 'output_voltage')
-#world.connect(model, monitor, 'load_current')
 world.connect(modelFmu[0], monitor,'output_voltage')
-#world.connect(model, monitor, 'output_voltage')
-
-
 #
 # The method `World.connect()` takes one entity pair – the source and the destination entity, as well as a list of attributes or attribute tuples. If you only provide single attribute names, mosaik assumes that the source and destination use the same attribute name. If they differ, you can instead pass a tuple like `('val_out', 'val_in')`.
 # 
@@ -83,7 +81,6 @@ world.connect(modelFmu[0], monitor,'output_voltage')
 #more_models = examplesim.ExampleModel.create(2, init_val=3)
 #####################   more_models = examplesim.ExampleModel.create(2)
 #####################   mosaik.util.connect_many_to_one(world, more_models, monitor, 'val', 'delta')
-
 
 # Instead of instantiating the example model directly, we called its static method `create()` and passed the number of instances to it. 
 # It returns a list of entities (two in this case). 
@@ -100,13 +97,9 @@ world.connect(modelFmu[0], monitor,'output_voltage')
 # </div>
 # In order to start the simulation, we call `World.run()` and specify for how long we want our simulation to run and get the following output:
 
-
+#----------------------
 # Run simulation
 world.run(until=END)
-
-
-# This was the first part of the mosaik tutorial.
-# In the second part, a [control mechanism](../02_Integrate_Contoller/_01_controller.ipynb) is added to the scenario described here.
-
+#----------------------
 
 
