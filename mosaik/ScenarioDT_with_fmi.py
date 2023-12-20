@@ -29,7 +29,7 @@ END = 10  # imposto 10 secondi di simulazione
 #END = 1 * 24 * 60 * 60 # one day in seconds
 
 # Create World
-world = mosaik.World(SIM_CONFIG)
+world = mosaik.World(SIM_CONFIG, debug=True)
 
 # Add PV data file
 START = '2023-01-01 01:00:00'
@@ -101,5 +101,9 @@ world.connect(modelFmu[0], monitor,'output_voltage')
 # Run simulation
 world.run(until=END)
 #----------------------
+mosaik.util.plot_dataflow_graph(world, folder='util_figures')
+mosaik.util.plot_execution_graph(world, folder='util_figures')
+mosaik.util.plot_execution_time(world, folder='util_figures')
+mosaik.util.plot_execution_time_per_simulator(world, folder='util_figures')
 
 

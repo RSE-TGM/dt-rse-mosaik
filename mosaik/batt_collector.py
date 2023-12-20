@@ -1,8 +1,7 @@
-# %% [markdown]
+
 # ## Data Collector
 # Here is the complete file of the data collector:
 
-# %%
 """
 A simple data collector that prints all data when the simulation finishes.
 
