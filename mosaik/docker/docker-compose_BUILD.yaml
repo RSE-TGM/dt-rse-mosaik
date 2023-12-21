@@ -1,0 +1,6 @@
+services:
+  fmu:
+    build:
+      context: .
+      dockerfile: Dockerfile
+

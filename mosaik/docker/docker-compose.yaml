@@ -3,4 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-
+    image: aguagliardi/dtsda:latest
+    container_name: DTSDA
+    volumes:
+            - /home/ubuntu/dt-rse-mosaik:/home/dt-rse-mosaik
