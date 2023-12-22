@@ -14,6 +14,9 @@ RUN apt-get update -y && apt install ca-certificates -y && apt-get install curl 
 
 RUN pip install -r requirements.txt
 
+# per le GUI...
+RUN apt-get update -y && apt-get install python3-tk -y
+
 RUN mkdir /home/dt-rse-mosaik
 WORKDIR /home/dt-rse-mosaik
 CMD tail -f /dev/null

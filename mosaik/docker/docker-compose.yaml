@@ -1,9 +1,14 @@
+version: '2.0'
 services:
-  fmu:
+  DTSDAServ:
     build:
       context: .
-      dockerfile: Dockerfile
-    image: aguagliardi/dtsda:latest
+      dockerfile: Dockerfile_python38
+    #image: localname
+    image: aguagliardi/dtsda:1.0
     container_name: DTSDA
+    environment:
+      - DISPLAY
     volumes:
-            - /home/ubuntu/dt-rse-mosaik:/home/dt-rse-mosaik
+      - $PWD/../..:/home/dt-rse-mosaik
+      - /tmp/.X11-unix:/tmp/.X11-unix

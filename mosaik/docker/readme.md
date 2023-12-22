@@ -11,3 +11,7 @@ docker push aguagliardi/dtsda:latest
 sudo docker run --name DTsda -it   --rm aguagliardi/dtsda bash
 ## attach ad un container in run
 sudo docker exec -it DTSDA bash
+## test
+python3 mosaik/ScenarioDT_with_fmi.py
+## pulizia dei container stoppati
+docker rm $(docker ps --filter status=exited -q)
