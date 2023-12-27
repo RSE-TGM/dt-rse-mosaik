@@ -40,3 +40,9 @@ sudo apt-get install python3-dev
 
 pythonfmu per fmu 3.x
 https://pypi.org/project/pythonfmu3/
+
+-----------------
+-------------------
+pip freeze senza numero versione:
+pip list --format=json | jq -r ".[].name"
+---------------
