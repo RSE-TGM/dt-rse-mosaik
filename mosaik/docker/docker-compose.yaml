@@ -4,8 +4,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile_python38
-    #image: dtsda38
     image: aguagliardi/dtsda:2.0
+    #image: dtsda38
     container_name: DTSDA
     environment:
       - DISPLAY

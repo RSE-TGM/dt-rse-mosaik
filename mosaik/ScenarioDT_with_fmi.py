@@ -48,7 +48,7 @@ modelsimFmu = world.start('ModelSimFmu',
                     instance_name='DTMockup',
                     step_size=1
 )
-modelsim  = world.start('ModelSim', eid_prefix='Model_')
+modelsim  = world.start('ModelSim', eid_prefix='Model_,b')
 collector = world.start('Collector')
 BATTplug  = world.start('CSV', sim_start=START, datafile=INPUT_DATA)
 

@@ -8,7 +8,8 @@ import mosaik_api_v3 as mosaik_api
 import batt_model
 
 META = {
-    'type': 'time-based',
+#    'type': 'time-based',
+    'type': 'hybrid',
     'models': {
         'BattModel': {
             'public': True,
