@@ -56,3 +56,4 @@ tqdm
 types-python-dateutil
 typing_extensions
 zipp
+redis

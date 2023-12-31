@@ -1,0 +1,127 @@
+*2
+$6
+SELECT
+$1
+0
+*3
+$3
+SET
+$3
+foo
+$15
+Redis Funziona!
+*3
+$3
+SET
+$3
+foo
+$15
+Redis Funziona!
+*3
+$3
+SET
+$3
+foo
+$15
+Redis Funziona!
+*3
+$3
+SET
+$3
+foo
+$15
+Redis Funziona!
+*3
+$3
+SET
+$3
+foo
+$15
+Redis Funziona!
+*3
+$3
+SET
+$3
+foo
+$15
+Redis Funziona!
+*3
+$3
+SET
+$3
+foo
+$15
+Redis Funziona!
+*3
+$3
+SET
+$8
+testOggi
+$19
+31/12/2023 17:57:20
+*3
+$3
+SET
+$3
+foo
+$15
+Redis Funziona!
+*3
+$3
+SET
+$8
+testOggi
+$19
+31/12/2023 17:00:50
+*2
+$6
+SELECT
+$1
+0
+*3
+$3
+SET
+$3
+foo
+$15
+Redis Funziona!
+*3
+$3
+SET
+$8
+testOggi
+$19
+31/12/2023 18:13:19
+*3
+$3
+SET
+$3
+foo
+$15
+Redis Funziona!
+*3
+$3
+SET
+$8
+testOggi
+$19
+31/12/2023 18:14:35
+*2
+$6
+SELECT
+$1
+0
+*3
+$3
+SET
+$3
+foo
+$15
+Redis Funziona!
+*3
+$3
+SET
+$8
+testOggi
+$19
+31/12/2023 17:25:04
