@@ -15,29 +15,9 @@ services:
     volumes:
       - $PWD/redis_data:/bitnami/redis/data
 # con redis occorre cambiare i diritti di accesso alla directory: "chmod 777 redis-data" e owner l'utente host
-
-  DTSDAServ:
-    build:
-      context: .
-      dockerfile: Dockerfile_python38
-    image: aguagliardi/dtsda:2.0
-    #image: dtsda38
-    container_name: DTSDA
-    depends_on:
-      - DTredis
-    networks:
-      - DT-net
-    environment:
-      DISPLAY: $DISPLAY
-      REDIS_HOST: DTredis
-      REDIS_PORT: 6380
-      REDIS_PASSWORD: mypassw
-    volumes:
-      - "../..:/home/dt-rse-mosaik"
-      - "/tmp/.X11-unix:/tmp/.X11-unix"
+    command: tail -f /dev/null
 
 networks:
   DT-net:
-#    driver: bridge  
     external: true
 

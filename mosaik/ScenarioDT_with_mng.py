@@ -4,6 +4,7 @@ import mosaik_api_v3 as mosaik_api
 from mosaik.util import connect_randomly, connect_many_to_one
 from batt_simulator import *
 from batt_collector import *
+from batt_mng import *
 
 # Sim config. and other parameters
 SIM_CONFIG = {
@@ -13,11 +14,16 @@ SIM_CONFIG = {
     'Collector': {
         'python': 'batt_collector:Collector',
     },
-        'CSV': {
+    'CSV': {
         'python': 'mosaik_csv:CSV'
     },
+    'DTSDA_Mng': {
+        'python': 'batt_mng:DTSDA_Mng'
+    },
+
 }
-END = 10  # 10 seconds
+
+END = 10000000  # 10 seconds
 
 
 # Create World
@@ -33,6 +39,7 @@ INPUT_DATA = 'mosaik/configuration/data/input_data.csv' # .csv in your setup
 modelsim = world.start('ModelSim', eid_prefix='Model_')
 collector  = world.start('Collector')
 BATTplug = world.start('CSV', sim_start=START, datafile=INPUT_DATA)
+DTSDAMNG= world.start('DTSDA_Mng')
 
 
 # Instantiate models
@@ -40,6 +47,7 @@ BATTplug = world.start('CSV', sim_start=START, datafile=INPUT_DATA)
 model   = modelsim.BattModel()
 monitor = collector.Monitor()
 LCUdata = BATTplug.Current.create(1)
+dtsdamng = DTSDAMNG.DTSDAMng()
 
 # Connect entities
 world.connect(LCUdata[0], model, ('LCU', 'load_current'))
@@ -48,6 +56,11 @@ world.connect(LCUdata[0], model, ('LCU', 'load_current'))
 world.connect(model, monitor, 'load_current', 'output_voltage')
 #world.connect(model, monitor, 'output_voltage')
 
+world.connect(model, dtsdamng, 'DTmode_set', time_shifted=True, initial_data={'DTmode_set': 0})
+#world.connect(dtsdamng, model, 'DTmode', weak=True)
+world.connect(dtsdamng, model, 'DTmode', time_shifted=True, initial_data={'DTmode': 0})
+
+world.connect(dtsdamng, monitor, 'DTmode', 'DTmode_set')
 
 #
 # The method `World.connect()` takes one entity pair – the source and the destination entity, as well as a list of attributes or attribute tuples. If you only provide single attribute names, mosaik assumes that the source and destination use the same attribute name. If they differ, you can instead pass a tuple like `('val_out', 'val_in')`.
@@ -80,7 +93,9 @@ world.connect(model, monitor, 'load_current', 'output_voltage')
 
 
 # Run simulation
-world.run(until=END )
+#world.set_initial_event(dtsdamng.sid)
+#world.run(until=END)
+world.run(until=END,rt_factor=1.)
 
 
 # This was the first part of the mosaik tutorial.

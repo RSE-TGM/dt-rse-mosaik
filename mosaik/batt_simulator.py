@@ -6,8 +6,9 @@ Mosaik interface for the example simulator.
 #import import_ipynb
 import mosaik_api_v3 as mosaik_api
 import batt_model
+from  batt_include import *
 
-META = {
+META_Battmodel = {
 #    'type': 'time-based',
     'type': 'hybrid',
     'models': {
@@ -15,7 +16,11 @@ META = {
             'public': True,
             'params': ['init_val'],
             'attrs': ['load_current', 
-                      'output_voltage'],
+                      'output_voltage',
+                      'DTmode_set',
+                      'DTmode'],
+            'trigger': ['DTmode'],                # input trigger per gli eventi
+            'non-persistent': ['DTmode_set'],     # output non-persistent per gli eventi
         },
     },
 }
@@ -23,7 +28,7 @@ META = {
 
 class ModelSim(mosaik_api.Simulator):
     def __init__(self):
-        super().__init__(META)
+        super().__init__(META_Battmodel)
         self.eid_prefix = 'Model_'
         self.entities = {}  # Maps EIDs to model instances/entities
         self.time = 0
@@ -34,6 +39,7 @@ class ModelSim(mosaik_api.Simulator):
                              ' %s was set.' % time_resolution)
         if eid_prefix is not None:
             self.eid_prefix = eid_prefix
+        
         return self.meta
 
     def create(self, num, model):
@@ -43,6 +49,8 @@ class ModelSim(mosaik_api.Simulator):
         for i in range(next_eid, next_eid + num):
 #            model_instance = batt_model.Model(init_val)
             model_instance = batt_model.Model()
+            model_instance.DTmode_set = 0
+            model_instance.DTmode = 0
             eid = '%s%d' % (self.eid_prefix, i)
             self.entities[eid] = model_instance
             entities.append({'eid': eid, 'type': model})

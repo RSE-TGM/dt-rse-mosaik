@@ -11,7 +11,7 @@ import collections
 import mosaik_api_v3 as mosaik_api
 
 
-META = {
+META_Monitor = {
     'type': 'event-based',
     'models': {
         'Monitor': {
@@ -26,7 +26,7 @@ META = {
 
 class Collector(mosaik_api.Simulator):
     def __init__(self):
-        super().__init__(META)
+        super().__init__(META_Monitor)
         self.eid = None
         self.data = collections.defaultdict(lambda:
                                             collections.defaultdict(dict))
@@ -56,8 +56,5 @@ class Collector(mosaik_api.Simulator):
             for attr, values in sorted(sim_data.items()):
                 print('  - %s: %s' % (attr, values))
 
-
-# %% [markdown]
-# As its name suggests it collects all data it receives each step in a dictionary (including the current simulation time) and simply prints everything at the end of the simulation.
-
-
+if __name__ == '__main__':
+    mosaik_api.start_simulation(Collector())
