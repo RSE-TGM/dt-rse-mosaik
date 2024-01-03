@@ -19,8 +19,8 @@ META_Battmodel = {
                       'output_voltage',
                       'DTmode_set',
                       'DTmode'],
-            'trigger': ['DTmode'],                # input trigger per gli eventi
-            'non-persistent': ['DTmode_set'],     # output non-persistent per gli eventi
+            'trigger': ['DTmode'],                # input: trigger per gli eventi
+            'non-persistent': ['DTmode_set'],     # output: non-persistent per gli eventi
         },
     },
 }
@@ -49,8 +49,8 @@ class ModelSim(mosaik_api.Simulator):
         for i in range(next_eid, next_eid + num):
 #            model_instance = batt_model.Model(init_val)
             model_instance = batt_model.Model()
-            model_instance.DTmode_set = 0
-            model_instance.DTmode = 0
+            model_instance.DTmode_set = NOFORZ  # é un'uscita per un eventuale forzamento di DTmode
+            model_instance.DTmode = None
             eid = '%s%d' % (self.eid_prefix, i)
             self.entities[eid] = model_instance
             entities.append({'eid': eid, 'type': model})
@@ -65,8 +65,10 @@ class ModelSim(mosaik_api.Simulator):
             if eid in inputs:
                 attrs = inputs[eid]
                 for attr, values in attrs.items():
-                    new_delta = sum(values.values())
-                model_instance.delta = new_delta
+                    if attr == 'DTmode':
+                        model_instance.DTmode = list(values.values())[0]
+                    if attr == 'load_current':
+                        model_instance.delta = list(values.values())[0] #  sum(values.values())
             
             sampling_time=model_instance.sampling_time
             model_instance.step(sampling_time, time)

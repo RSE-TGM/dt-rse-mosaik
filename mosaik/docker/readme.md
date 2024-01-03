@@ -21,5 +21,12 @@ sudo docker exec -it DTSDA python3 mosaik/ScenarioDT_with_fmi.py
 ### pulizia dei container stoppati
 docker rm $(docker ps --filter status=exited -q)
 ### creazione del network locale ai container
-docker network create DT-netvi
+docker network create DT-net
+### start di unsolo servizio in backgroud
+docker-compose -f docker-compose_conRedis.yaml up -d DTredis
+### attach dell'output di quel servizio
+docker-compose -f docker-compose_conRedis.yaml logs
+### restart di un servizio
+docker-compose -f docker-compose_conRedis.yaml restart DTredis
+
 

@@ -23,7 +23,7 @@ SIM_CONFIG = {
 
 }
 
-END = 10000000  # 10 seconds
+END = 10  # 10 seconds
 
 
 # Create World
@@ -56,9 +56,11 @@ world.connect(LCUdata[0], model, ('LCU', 'load_current'))
 world.connect(model, monitor, 'load_current', 'output_voltage')
 #world.connect(model, monitor, 'output_voltage')
 
-world.connect(model, dtsdamng, 'DTmode_set', time_shifted=True, initial_data={'DTmode_set': 0})
+world.connect(model, dtsdamng, 'DTmode_set', time_shifted=True, initial_data={'DTmode_set': NOFORZ})
 #world.connect(dtsdamng, model, 'DTmode', weak=True)
-world.connect(dtsdamng, model, 'DTmode', time_shifted=True, initial_data={'DTmode': 0})
+
+#world.connect(dtsdamng, model, 'DTmode', time_shifted=True, initial_data={'DTmode': None})
+world.connect(dtsdamng, model, 'DTmode')
 
 world.connect(dtsdamng, monitor, 'DTmode', 'DTmode_set')
 
@@ -94,8 +96,8 @@ world.connect(dtsdamng, monitor, 'DTmode', 'DTmode_set')
 
 # Run simulation
 #world.set_initial_event(dtsdamng.sid)
-#world.run(until=END)
-world.run(until=END,rt_factor=1.)
+world.run(until=END)
+#world.run(until=END,rt_factor=1.)
 
 
 # This was the first part of the mosaik tutorial.

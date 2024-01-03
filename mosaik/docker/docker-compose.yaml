@@ -8,7 +8,10 @@ services:
     #image: dtsda38
     container_name: DTSDA
     environment:
-      - DISPLAY
+      DISPLAY: $DISPLAY
+      REDIS_HOST: DTredis
+      REDIS_PORT: 6380
+      REDIS_PASSWORD: mypassw
     volumes:
       - "../..:/home/dt-rse-mosaik"
       - "/tmp/.X11-unix:/tmp/.X11-unix"

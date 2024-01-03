@@ -17,6 +17,8 @@ RUN apt-get update -y && apt-get install python3-tk -y
 
 RUN pip install -r requirements.txt
 
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
 RUN mkdir /home/dt-rse-mosaik
 WORKDIR /home/dt-rse-mosaik
 CMD tail -f /dev/null

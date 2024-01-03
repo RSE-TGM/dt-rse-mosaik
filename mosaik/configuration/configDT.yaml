@@ -1,0 +1,14 @@
+# ################## #
+# Comunication Options #
+# ################## #
+
+redis:
+    redis_host: 'REDIS_HOST'
+    redis_host_default: 'localhost'
+    redis_port: 'REDIS_PORT'
+    redis_port_default: 6380
+    redis_password: 'mypassw'
+
+
+
+

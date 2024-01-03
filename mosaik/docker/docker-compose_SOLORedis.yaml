@@ -14,7 +14,7 @@ services:
       - DT-net
     volumes:
       - $PWD/redis_data:/bitnami/redis/data
-# con redis occorre cambiare i diritti di accesso alla directory: "chmod 777 redis-data" e owner l'utente host
+# con redis occorre cambiare owner e i diritti di accesso alla directory: "chmod 777 redis-data" e owner dell'utente host
 
 
 networks:

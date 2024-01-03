@@ -95,3 +95,5 @@ target/
 /reports
 mosaik/tutorial
 util_figures/*
+
+redis_data/*

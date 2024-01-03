@@ -24,11 +24,15 @@ import yaml
 from pathlib import Path
 #from .. src.digital_twin.bess import BatteryEnergyStorageSystem
 
+from  batt_include import readConfig
+
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 # aggiunge nel path la directory base del package, ad esempio: /home/antonio/dtwin/dt-rse-mosaik
 sys.path.append(os.path.dirname(SCRIPT_DIR))  
 # a questo punto riesco a trovare src.digital_twin.bess
 from src.digital_twin.bess import BatteryEnergyStorageSystem
+
+
 
 class Model:
     """
@@ -37,25 +41,27 @@ class Model:
     def __init__(self, **kwargs):
         super().__init__()
         models = ['thevenin', 'rc_thermal']
+
+
         config_data_path = "mosaik/configuration/"
         experiment_config = "experiment_config.yaml"
 
-
-        try:
-            with open(Path(config_data_path) / Path(experiment_config), 'r') as fin:
-                self.experiment_config = yaml.safe_load(fin)
-
-        except Exception:
-            raise FileExistsError("Selected configuration file doesn't exist.")
+        self.experiment_config = readConfig(config_data_path, experiment_config)
 
 
-        """     
-        pathf = config_data_path / Path(experiment_config)
-        #pathf = "scripts/fmi/fmu_script/configuration/experiment_config.yaml"
-        pathf = "mosaik/configuration/experiment_config.yaml"
-        fin =   open(pathf, 'r')
-        self.experiment_config = yaml.safe_load(fin)
-        """    
+        # try:
+        #     with open(Path(config_data_path) / Path(experiment_config), 'r') as fin:
+        #         self.experiment_config = yaml.safe_load(fin)
+        # except Exception:
+        #     raise FileExistsError("Selected configuration file doesn't exist.")
+
+
+        # pathf = config_data_path / Path(experiment_config)
+        # #pathf = "scripts/fmi/fmu_script/configuration/experiment_config.yaml"
+        # pathf = "mosaik/configuration/experiment_config.yaml"
+        # fin =   open(pathf, 'r')
+        # self.experiment_config = yaml.safe_load(fin)
+    
 
         models_config_files = []
         for model in models:

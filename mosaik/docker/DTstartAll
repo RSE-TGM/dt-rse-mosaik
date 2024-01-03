@@ -1,0 +1,4 @@
+#!/bin/bash
+set -x
+docker-compose -f docker-compose_conRedis.yaml up --remove-orphans -d
+# docker-compose up --build -d

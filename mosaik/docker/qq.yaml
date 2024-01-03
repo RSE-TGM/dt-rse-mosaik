@@ -23,8 +23,6 @@ services:
     image: aguagliardi/dtsda:2.0
     #image: dtsda38
     container_name: DTSDA
-    depends_on:
-      - DTredis
     networks:
       - DT-net
     environment:

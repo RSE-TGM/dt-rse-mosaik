@@ -6,7 +6,7 @@ features of the mosaik API.
 
 """
 from loguru import logger
-
+import os
 import mosaik_api_v3
 import redis
 from  batt_include import *
@@ -17,8 +17,8 @@ META_DTSDAMng = {
     'models': {'DTSDAMng': {'public': True,
                      'params': [],
                      'attrs': ['DTmode', 'DTmode_set'],
-                     'trigger': ['DTmode_set'],                # input trigger per gli eventi
-                     'non-persistent': ['DTmode'],     # output non-persistent per gli eventi
+                     'trigger': ['DTmode_set'],                # input - trigger per gli eventi
+                     'non-persistent': ['DTmode'],     # output - non-persistent per gli eventi
 
                      },
                }
@@ -37,11 +37,32 @@ class DTSDA_Mng(mosaik_api_v3.Simulator):
         self.sid = sid
 
         #connessione a Redis, per il momento su localhost
-        self.redis  = redis.Redis(host='localhost',port=6380)   
+
+        config_data_path = "mosaik/configuration/"
+        self.configDT = "configDT.yaml"
+
+        self.configDT = readConfig(config_data_path, self.configDT)
+
+        redis_host = os.getenv(self.configDT['redis']['redis_host'])
+        if redis_host == None:
+            redis_host = self.configDT['redis']['redis_host_default']
+
+        redis_port = os.getenv(self.configDT['redis']['redis_port'])
+        if redis_port == None:
+            redis_port = self.configDT['redis']['redis_port_default']
+        
+
+        #self.redis = redis.Redis(host=redis_host, port=redis_port, charset="utf-8", decode_responses=True)
+
+        self.redis  = redis.Redis(host=redis_host,port=redis_port)   
         if self.redis.exists('DTmode') != 0:
+#            self.DTmode = self.redis.get('DTmode')
             self.DTmode = self.redis.get('DTmode').decode('utf-8') 
         else:
             self.DTmode = 'None'
+
+        logger.info('REDIS:  redis_host={redis_host} redis_port={redis_port}', redis_host=redis_host, redis_port=redis_port)
+
 
         return self.meta
 
@@ -61,7 +82,7 @@ class DTSDA_Mng(mosaik_api_v3.Simulator):
         return None
 
     def get_data(self, outputs):
-
+        logger.info('get_data with {outputs}, self.DTmode {DTmode}', outputs=outputs, DTmode=self.DTmode)
         return {self.eid: {'DTmode': self.DTmode}}
     
     def finalize(self):

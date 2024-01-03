@@ -17,7 +17,7 @@ SIM_CONFIG = {
         'python': 'mosaik_csv:CSV'
     },
 }
-END = 10  # 10 seconds
+END = 10 # un anno: 1*365*24*3600  seconds
 
 
 # Create World
@@ -81,6 +81,7 @@ world.connect(model, monitor, 'load_current', 'output_voltage')
 
 # Run simulation
 world.run(until=END )
+#world.run(until=END,rt_factor=1.)
 
 
 # This was the first part of the mosaik tutorial.
