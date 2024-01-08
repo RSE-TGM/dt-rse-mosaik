@@ -55,11 +55,18 @@ class DTSDA_Mng(mosaik_api_v3.Simulator):
         #self.redis = redis.Redis(host=redis_host, port=redis_port, charset="utf-8", decode_responses=True)
 
         self.redis  = redis.Redis(host=redis_host,port=redis_port)   
-        if self.redis.exists('DTmode') != 0:
+        try:
+            response = self.redis.client_list()
+        except redis.ConnectionError:
+            logger.info("REDIS: NON esiste  il servizio: {redis_host} {redis_port}!!",redis_host=redis_host,redis_port=redis_port )
+            exit(1)
+
+        if self.redis.exists('DT:mode') != 0:
 #            self.DTmode = self.redis.get('DTmode')
-            self.DTmode = self.redis.get('DTmode').decode('utf-8') 
+            self.DTmode = self.redis.get('DT:mode').decode('utf-8') 
         else:
-            self.DTmode = 'None'
+            self.DTmode = self.configDT['redis']['DT:mode'] # se non esiste metto il dafault letto dal configDT
+            self.redis.set('DT:mode',self.DTmode)
 
         logger.info('REDIS:  redis_host={redis_host} redis_port={redis_port}', redis_host=redis_host, redis_port=redis_port)
 
@@ -67,18 +74,34 @@ class DTSDA_Mng(mosaik_api_v3.Simulator):
         return self.meta
 
     def create(self, num, model):
-        self.eid = 'DTSDAMng1'
+        self.eid = 'DTSDAMng'
         return [{'eid': self.eid, 'type': model}]
 
     def step(self, time, inputs, max_advance):
         logger.info('step at {time} with inputs {inputs}', time=time, inputs=inputs)
         val = list(inputs[self.eid]['DTmode_set'].values())[0]
-        if val != NOFORZ :
+        # match val:
+        #     case NOFORZ:
+        #         self.DTmode = int(self.redis.get('DT:mode'))                
+        #     case FORZSIM:
+        #         self.redis.set('DT:mode',self.redis.set('DT:mode',val))
+        #     case _:
+        
+        if val == NOFORZ :
+            self.DTmode = int(self.redis.get('DT:mode'))
+        elif val == FORZSIM:
             self.DTmode = val
-            self.redis.set('DTmode',val)
-        else:
-            self.DTmode = int(self.redis.get('DTmode'))
+            self.redis.set('DT:mode',val)
+        elif val == FORZLEARN:
+            self.DTmode = val
+            self.redis.set('DT:mode',val)
+        
+        
+        # if (int(self.redis.get('DT:mode_set')) == STOP) :
+        #     logger.info('!!! STOP  !! step at {time} with inputs {inputs}', time=time, inputs=inputs)
+        #     return 1000000000
 
+        # return time + 1
         return None
 
     def get_data(self, outputs):

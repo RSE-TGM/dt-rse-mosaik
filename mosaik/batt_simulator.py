@@ -33,7 +33,7 @@ class ModelSim(mosaik_api.Simulator):
         self.entities = {}  # Maps EIDs to model instances/entities
         self.time = 0
 
-    def init(self, sid, time_resolution, eid_prefix=None):
+    def init(self, sid, time_resolution, eid_prefix=None):     # init(self, sid, time_resolution, eid_prefix=None, step_size=1):
         if float(time_resolution) != 1.:
             raise ValueError('ModelSim only supports time_resolution=1., but'
                              ' %s was set.' % time_resolution)
@@ -58,8 +58,9 @@ class ModelSim(mosaik_api.Simulator):
         return entities
 
 
-    def step(self, time, inputs, max_advance):
+    def step(self, time, inputs, max_advance):           
         self.time = time
+
        # Check for new delta and do step for each model instance:
         for eid, model_instance in self.entities.items():
             if eid in inputs:
@@ -68,12 +69,15 @@ class ModelSim(mosaik_api.Simulator):
                     if attr == 'DTmode':
                         model_instance.DTmode = list(values.values())[0]
                     if attr == 'load_current':
-                        model_instance.delta = list(values.values())[0] #  sum(values.values())
+                        model_instance.delta = list(values.values())[0] #  era sum(values.values())
             
-            sampling_time=model_instance.sampling_time
-            model_instance.step(sampling_time, time)
+            sampling_time=model_instance.sampling_time   # model_instance.sampling_time è letto dal file di config experiment
+            if model_instance.DTmode == MODSIM :
+                model_instance.step(sampling_time, time)   # sono in modo "simulazione"
+            else:
+                model_instance.learn(sampling_time, time)  # sono in modo "learn"
 
-        return time + sampling_time  # Step size is 1 second
+        return time + sampling_time  # Step size, cioè sampling_time, è normalmmente 1 secondo ed è letto dal file di config experiment
 
     def get_data(self, outputs):
         data = {}

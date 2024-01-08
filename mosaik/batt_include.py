@@ -11,6 +11,7 @@ MODLEARN = 10
 NOFORZ = 0
 FORZSIM = MODSIM
 FORZLEARN = MODLEARN
+STOP = -1
 
 def readConfig(config_path, namefile):
         # Read in memory a yalm file

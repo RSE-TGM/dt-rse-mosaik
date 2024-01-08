@@ -20,7 +20,8 @@ except ImportError:
 
 import os, sys; 
 import numpy as np
-import yaml
+#import yaml
+from loguru import logger
 from pathlib import Path
 #from .. src.digital_twin.bess import BatteryEnergyStorageSystem
 
@@ -96,6 +97,9 @@ class Model:
         self.battery.t_series.append(current_time)
         self.k += 1
         return True
+    def learn(self, sampling_time, current_time):
+        logger.info('batt_model: La batteria è in modalità LEARN, self.DTmode {DTmode}', DTmode=self.DTmode)
+        pass
 
 def test():
     model = Model()

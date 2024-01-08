@@ -66,6 +66,7 @@ initial_conditions:
     temperature: 23
     soc: 1
     soh: 1
+    
 
 # List of all the possible electrical that can be initialized for the simulation
 # ---------------------------------------------------------------------------------------
