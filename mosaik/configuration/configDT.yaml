@@ -8,7 +8,7 @@ redis:
     redis_port: 'REDIS_PORT'
     redis_port_default: 6380
     redis_password: 'mypassw'
-    DT:mode: '10'
+    DT:mode: 'SIM'
     DT:mode_set: '0'
 
     

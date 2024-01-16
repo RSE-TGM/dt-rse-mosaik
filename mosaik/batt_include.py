@@ -6,9 +6,9 @@ import yaml
 from pathlib import Path
 
 
-MODSIM = 1
-MODLEARN = 10
-NOFORZ = 0
+MODSIM = 'SIM'    # era 1
+MODLEARN = 'LRN'  # era 10
+NOFORZ = '0'      # era 0
 FORZSIM = MODSIM
 FORZLEARN = MODLEARN
 STOP = -1

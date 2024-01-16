@@ -4,6 +4,7 @@ Mosaik interface for the example simulator.
 """
 
 #import import_ipynb
+from loguru import logger
 import mosaik_api_v3 as mosaik_api
 import batt_model
 from  batt_include import *
@@ -72,12 +73,24 @@ class ModelSim(mosaik_api.Simulator):
                         model_instance.delta = list(values.values())[0] #  era sum(values.values())
             
             sampling_time=model_instance.sampling_time   # model_instance.sampling_time è letto dal file di config experiment
+            
             if model_instance.DTmode == MODSIM :
                 model_instance.step(sampling_time, time)   # sono in modo "simulazione"
             else:
                 model_instance.learn(sampling_time, time)  # sono in modo "learn"
-
-        return time + sampling_time  # Step size, cioè sampling_time, è normalmmente 1 secondo ed è letto dal file di config experiment
+               
+        
+        
+        # if time >= 5 :
+        #     extra = 10000000
+        # else:
+        #     extra = 0
+        # 
+        # next_step = time + sampling_time + extra
+        
+        next_step = time + sampling_time 
+        logger.info('batt_model: {time} La batteria è in modalità self.DTmode {DTmode}, nextstep ={next_step}', time=time, DTmode=model_instance.DTmode, next_step=next_step)
+        return next_step  # Step size, cioè sampling_time, è normalmmente 1 secondo ed è letto dal file di config experiment
 
     def get_data(self, outputs):
         data = {}

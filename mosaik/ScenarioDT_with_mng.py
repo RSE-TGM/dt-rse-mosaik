@@ -18,15 +18,17 @@ SIM_CONFIG = {
         'python': 'batt_collector:Collector',
     },
     'CSV': {
-        'python': 'mosaik_csv:CSV'
+        'python': 'mosaik_csv:CSV',
     },
     'DTSDA_Mng': {
-        'python': 'batt_mng:DTSDA_Mng'
+        'python': 'batt_mng:DTSDA_Mng',
     },
-
+    'InfluxWriter': {
+        'python': 'mosaik.components.influxdb2.writer:Simulator',
+    },
 }
 
-END = 10  # 10 seconds
+END = 20  # 10 seconds
 #END = 1 * 24 * 60 * 60 # one day in seconds
 
 # Create World
@@ -34,15 +36,29 @@ END = 10  # 10 seconds
 world = mosaik.World(SIM_CONFIG, debug=True)   # debug true abilita i grafici dell'andamento della simulazione
 
 # data load current profile:
-START = '2023-01-01 01:00:00'
+#START = '2023-01-01 01:00:00'
+now = datetime.datetime.now()
+START = f"{now}"
 INPUT_DATA = 'mosaik/configuration/data/input_data.csv' # .csv in your setup
 
 # Start simulators
 #modelsim = world.start('ModelSim', eid_prefix='Model_',step_size=2.8)
 modelsim = world.start('ModelSim', eid_prefix='Model_')
 collector  = world.start('Collector')
-BATTplug = world.start('CSV', sim_start=START, datafile=INPUT_DATA)
+
+STARTDATAFILE= '2023-01-01 01:00:00'
+BATTplug = world.start('CSV', sim_start=STARTDATAFILE, datafile=INPUT_DATA)
+
 DTsdamng= world.start('DTSDA_Mng')
+
+#INIZTIME= '2024-01-13 17:00:00'
+INIZTIME= START
+influx_sim = world.start('InfluxWriter', step_size=1,   start_date=INIZTIME)
+
+""" influx_sim = world.start('InfluxWriter',
+    step_size=900,
+    start_date=START,
+) """
 
 
 # Instantiate models
@@ -52,14 +68,27 @@ monitor = collector.Monitor()
 LCUdata = BATTplug.Current.create(1)
 dtsdamng = DTsdamng.DTSDAMng()
 
+influx = influx_sim.Database(
+    url="http://localhost:8086",
+    org='RSE',
+    bucket='nuovobuck',
+    token='aHMudy-R1gicVNWRDzVTWmw4_HPFVCdwzcUTIErKl_i2uVRpCrCpmTOtcOAg0n-qNdnuetSQfTKGHAmgsMeL4A==',
+    measurement='experiment_0001'
+)
+
+
 # Connect entities
 world.connect(LCUdata[0], model, ('LCU', 'load_current'))
 #world.connect(inpdata[0], monitor, 'LCU')
 #world.connect(model, monitor, 'val', 'delta')
 world.connect(model, monitor, 'load_current', 'output_voltage')
+world.connect(model, influx, 'load_current', 'output_voltage')
 #world.connect(model, monitor, 'output_voltage')
 
 world.connect(model, dtsdamng, 'DTmode_set', time_shifted=True, initial_data={'DTmode_set': NOFORZ})
+#world.connect(model, dtsdamng, 'DTmode_set', weak=True)
+
+
 #world.connect(dtsdamng, model, 'DTmode', weak=True)
 
 #world.connect(dtsdamng, model, 'DTmode', time_shifted=True, initial_data={'DTmode': None})
@@ -103,7 +132,7 @@ world.connect(dtsdamng, monitor, 'DTmode', 'DTmode_set')
 #world.set_initial_event(dtsdamng.sid)
 
 #world.run(until=END)
-world.run(until=END,rt_factor=1.)
+world.run(until=END,rt_factor=1.1)
 
 ## asyncio.run(scheduler.run(world,until=END,rt_factor=1.))
 

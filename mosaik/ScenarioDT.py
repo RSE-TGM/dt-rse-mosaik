@@ -20,8 +20,8 @@ SIM_CONFIG = {
         'connect': 'localhost:5678',
     },
 }
-END = 10 # un anno: 1*365*24*3600  seconds
-END = 1*365*24*3600
+END = 20 # un anno: 1*365*24*3600  seconds
+#END = 1*365*24*3600
 
 # Create World
 world = mosaik.World(SIM_CONFIG)
@@ -83,8 +83,9 @@ world.connect(model, monitor, 'load_current', 'output_voltage')
 
 
 # Run simulation
-#world.run(until=END )
-world.run(until=END,rt_factor=1.)
+
+world.run(until=END )
+#world.run(until=END,rt_factor=1.)
 
 
 
