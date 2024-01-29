@@ -1,3 +1,7 @@
+#
+# Build fmu versione 2.0 con pythonfmu -V 0.6.3
+# Installazione package con:    pip install pythonfmu   ( https://pypi.org/project/pythonfmu/ )
+#
 cd ../..
 pythonfmu build -d ./scripts/fmi/fmu -f ./scripts/fmi/fmu_script/fmu_mockup.py ./src ./mosaik/configuration ./mosaik/requirements.txt
 
