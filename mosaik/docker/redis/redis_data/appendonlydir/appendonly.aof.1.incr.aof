@@ -1,0 +1,19 @@
+*2
+$6
+SELECT
+$1
+0
+*3
+$3
+SET
+$3
+foo
+$15
+Redis Funziona!
+*3
+$3
+SET
+$8
+testOggi
+$19
+31/01/2024 10:41:53

@@ -13,8 +13,8 @@ from  batt_include import *
 
 
 META_DTSDAMng = {
-#    'type': 'hybrid',
-    'type': 'event-based',
+    'type': 'hybrid',
+#    'type': 'event-based',
     'models': {'DTSDAMng': {'public': True,
                      'params': [],
                      'attrs': ['DTmode_set','DTmode'],

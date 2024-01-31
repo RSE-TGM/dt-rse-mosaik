@@ -13,6 +13,14 @@ from threading import Thread
 from time import sleep, perf_counter
 import asyncio
 
+
+import nest_asyncio
+#        call apply()
+nest_asyncio.apply()
+
+
+
+
 SIM_CONFIG = {
         'ModelSim': {
             'python': 'batt_simulator:ModelSim',
@@ -103,7 +111,7 @@ def prepScanario(SIM_CONFIG):
 #world.run(until=END,rt_factor=1.1)
 
 def taskRun():
-    world.run(until=END,rt_factor=1.1)
+    world.run(until=END,rt_factor=1.1, print_progress=False)
 
 def taskRunInThread1(): 
     tRun = Thread(target=taskRun)
@@ -151,28 +159,37 @@ def taskRunInThread2():
 def CheckForTmax(world, model, dtsdamng, tRun, TMAX):
     tRun.join(timeout=1) # mi aggancio al thread ed aspetto max 1 secondo, se ha finito esco, se non ha finito allora vado in loop 
     while tRun.is_alive():   # se il thread è vivo, vuol dire che ho aspettato un secondo e non ha finito perchè e vivo
-        tcurrent=model.sim.last_step*world.time_resolution
+#        tcurrent=model.sim.last_step*world.time_resolution
+        tcurrent=world.sims['ModelSim-0'].last_step.time*world.time_resolution
         print(f"-----CHECK-TIMEOUT---Simulazione in RUN al secondo={tcurrent} di {world.until}-------{world.tqdm}--------------------------------------------------------------------------------->")
         if tcurrent > TMAX: 
             world.until = 1  # fermo (brutalmente) la simulazione
             #world.shutdown()
-            print(f"Fermo tutto al passo={model.sim.last_step}")
-
+            print(f"Fermo tutto al passo={world.sims['ModelSim-0'].last_step.time}")
+           
         tRun.join(timeout=1)  # mi aggancio al thread ed aspetto max 1 secondo, se ha finito esco, se non ha finito allora vado in loop
-    sleep(3)
-    print(f"SHUTDOWN!")
-    world.shutdown()
+    # sleep(5)
+    # print(f"SHUTDOWN!")
+    # world.shutdown()
 
 world, model, dtsdamng = prepScanario(SIM_CONFIG)
 #taskRun()
 #taskRunInThread1()
 tRun = taskRunInThread2()
-TMAX=30  # fermo la simulzione dopo x secondi
+TMAX=3  # fermo la simulzione dopo x secondi
 CheckForTmax(world, model, dtsdamng, tRun, TMAX)
+sleep(5)
+
+print(f"SHUTDOWN!")
+try:
+    world.shutdown()
+except Exception:
+    pass
 
 # Esempio per accedere a variabili del simulatore:
-# world.sims['ModelSim-0'].proxy.sim.entities['Model_0'].load_current
-
+# world.sims['ModelSim-0']._proxy.sim.entities['Model_0'].load_current
+# world.sims['ModelSim-0'].output_to_push[('Model_0', 'DTmode_set')][0][1]  ritorna il valore di DTmode_set
+# world.sims['ModelSim-0'].current_step.time         tempo corrente della task ModelSim-0
 
 
 ## grafici attivati con il debug mode

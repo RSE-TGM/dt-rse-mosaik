@@ -98,5 +98,6 @@ util_figures/*
 
 redis_data/*
 /proc
-/influxdb
-/mosaik/docker/proc/*
+influxdb-data/*
+mosaik/docker/proc/*
+
