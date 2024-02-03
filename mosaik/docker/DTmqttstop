@@ -1,0 +1,5 @@
+#!/bin/bash
+set -x
+cd ./mqtt
+docker-compose down
+docker ps

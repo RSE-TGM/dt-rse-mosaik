@@ -1,0 +1,6 @@
+#!/bin/bash
+# user: userDT password: userDT
+set -x
+cd ./mqtt
+docker-compose up -d
+docker ps

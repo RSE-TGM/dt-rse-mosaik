@@ -11,6 +11,18 @@ redis:
     DT:mode: 'SIM'
     DT:mode_set: '0'
 
+mqtt:
+    DTSDA:
+        BATT1:
+           temperatura: 35
+           tensione: 5.1
+           corrente: 10.2
+        SIM: True
+        LEARN: False
+        RUNSIM: True
+        STOPSIM: False
+
+
     
 
 
