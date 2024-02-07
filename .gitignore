@@ -97,7 +97,6 @@ mosaik/tutorial
 util_figures
 
 redis_data/
-/proc
-influxdb-data/
+influxdb/influxdb-data/
 mosaik/docker/proc
 
