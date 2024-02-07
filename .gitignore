@@ -96,8 +96,8 @@ target/
 mosaik/tutorial
 util_figures
 
-redis_data
+redis_data/
 /proc
-influxdb-data
+influxdb-data/
 mosaik/docker/proc
 

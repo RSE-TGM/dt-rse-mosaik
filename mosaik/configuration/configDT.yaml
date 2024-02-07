@@ -13,14 +13,22 @@ redis:
 
 mqtt:
     DTSDA:
-        BATT1:
-           temperatura: 35
-           tensione: 5.1
-           corrente: 10.2
-        SIM: True
-        LEARN: False
-        RUNSIM: True
-        STOPSIM: False
+        MISURE:
+            BATT1: 
+                temperatura: 'DTSDA/BATT1/T'
+                tensione: 'DTSDA/BATT1/V'
+                corrente: 'DTSDA/BATT1/I'
+# associazione Callback-comando_mqtt
+        CALLBACK: 
+            SetModoSIM: 'DTSDA/SET_SIM'
+            SetModoLEARN: 'DTSDA/SET_LEARN'
+            LoadSIM: 'DTSDA/LOAD_SIM'
+            RunSIM: 'DTSDA/RUN_SIM'
+            StopSIM: 'DTSDA/STOP_SIM'
+            EndProg: 'DTSDA/END'
+            PlotGraf: 'DTSDA/PLOTGRAF'
+
+
 
 
     
