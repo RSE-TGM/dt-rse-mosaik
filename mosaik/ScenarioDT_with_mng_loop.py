@@ -93,7 +93,7 @@ def taskRun():
     # run normale, nel processo del thread principale
     world.run(until=END,rt_factor=1.1)
 
-def taskRunInThread1(): 
+def taskRunInThread_and_time_check(): 
     # apertura di un thread figlio e run nel nuovo thread e check per essere fermto dopo tre iterazioni
     tRun = Thread(target=taskRun)
     tRun.start()
@@ -110,7 +110,7 @@ def taskRunInThread1():
             print(f"Fermo tutto i={i}")
         i=i+1
 
-def taskRunInThread2(): 
+def taskRunInThread(): 
     # apertura di un thread figlio e run nel nuovo thread, non apsetto la fine del nuovo thread 
     tRun = Thread(target=taskRun)
     tRun.start()
@@ -138,35 +138,38 @@ def taskRunInThread2():
 
 ## sys.exit()
 
-class DTmqtt:
-    def __init__(self, name, mqttBroker, user, passwd, config_data_path, configDTName ):
-        self.mqttBroker = mqttBroker
-        self.client = mqtt.Client(name)
-#        self.client.on_message = on_message
-        self.client.username_pw_set(user, passwd)
-        self.config_data_path = "mosaik/configuration/"
-        self.configDTName = "configDT.yaml"
-        self.configDT = readConfig(self.config_data_path, self.configDTName)
-        self.tags.callbacks = self.configDT['mqtt']['DTSDA']['CALLBACK']
-        for tag in self.tags.callbacks:
-            print(f'{self.tags.callbacks[tag]}')
-            self.client.subscribe(self.tags.callbacks[tag])
+
+
+
+# class DTmqtt:
+#     def __init__(self, name, mqttBroker, user, passwd, config_data_path, configDTName ):
+#         self.mqttBroker = mqttBroker
+#         self.client = mqtt.Client(name)
+# #        self.client.on_message = on_message
+#         self.client.username_pw_set(user, passwd)
+#         self.config_data_path = "mosaik/configuration/"
+#         self.configDTName = "configDT.yaml"
+#         self.configDT = readConfig(self.config_data_path, self.configDTName)
+#         self.tags.callbacks = self.configDT['mqtt']['DTSDA']['CALLBACK']
+#         for tag in self.tags.callbacks:
+#             print(f'{self.tags.callbacks[tag]}')
+#             self.client.subscribe(self.tags.callbacks[tag])
     
-        self.tags.misure = self.configDT['mqtt']['DTSDA']['MISURE']['BATT1']
-        for tag in self.tags.misure:
-            print(f'{self.tags.misure[tag]}')
-            self.client.subscribe(self.tags.misure[tag])
+#         self.tags.misure = self.configDT['mqtt']['DTSDA']['MISURE']['BATT1']
+#         for tag in self.tags.misure:
+#             print(f'{self.tags.misure[tag]}')
+#             self.client.subscribe(self.tags.misure[tag])
     
-    def connect(self):
-        ret= self.client.connect(self.mqttBroker)
-#        self.client.loop_start()
-        return(ret)
+#     def connect(self):
+#         ret= self.client.connect(self.mqttBroker)
+# #        self.client.loop_start()
+#         return(ret)
  
-    def disconnect(self):
-        return(self.client.loop_stop())
+#     def disconnect(self):
+#         return(self.client.loop_stop())
  
-    def subscribe(self, topic):
-        return(self.client.subscribe(topic))
+#     def subscribe(self, topic):
+#         return(self.client.subscribe(topic))
     
 
 def on_EndProg(client, userdata, message):
@@ -192,7 +195,7 @@ def on_RunSIM(client, userdata, message):
     # Per sopprime il traceback!!!!
     sys.tracebacklimit = 0
     try:
-        tRun_on_message = taskRunInThread2()
+        tRun_on_message = taskRunInThread()
     except Exception as e:
         if debug:
             raise # re-raise the exception
@@ -230,20 +233,24 @@ def on_PlotGraf(client, userdata, message):
 def on_connect(client, userdata, flags, rc):
    print(f"Connected With Result Code {rc}")
 
+def on_message(client, userdata, message):
+    # callback per messaggi MQTT
+    global world, model, dtsdamng, tRun_on_message
+    print(f'------------------------>on_message: Received con topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
+        
 
-def dt_mqtt_messloop():   
+def dt_mqtt_messloop(broker="0.0.0.0", port=1883, cli="DTSDA", user="userDT", passw="userDT", confpath="mosaik/configuration/", confname="configDT.yaml"):   
 #    mqttBroker = "mqtt.eclipseprojects.io"   # mqtt brocker free di prova
-    mqttBroker = "0.0.0.0"     # mqtt brocker in localhost
-    client = mqtt.Client("DTSDA")
+    mqttBroker = broker     # mqtt brocker in localhost
+    client = mqtt.Client(cli)
+
     client.on_connect = on_connect
     client.on_message = on_message  # callback dei messaggi
-    client.username_pw_set("userDT", "userDT")
 
-    ret = client.connect(mqttBroker)
+    client.username_pw_set(user, passw)
+    ret = client.connect(mqttBroker, port=port)
 
-    config_data_path = "mosaik/configuration/"
-    configDTName = "configDT.yaml"
-    configDT = readConfig(config_data_path, configDTName)
+    configDT = readConfig(confpath, confname)
 
 #configDT['mqtt']['DTSDA']['CALLBACK']['SetModoSIM'] ---> 'DTSDA/SET_SIM'
 #configDT['mqtt']['DTSDA']['MISURE']['BATT1']['temperatura'] ---> 'DTSDA/BATT1/T'
@@ -258,7 +265,7 @@ def dt_mqtt_messloop():
         print(f'{misure[tag]}')
         client.subscribe(misure[tag])
     
-
+# aggiunta delle callback associate ai comandi mqtt
     client.message_callback_add(callbacks['EndProg'], on_EndProg)
     client.message_callback_add(callbacks['SetModoSIM'], on_SetModoSIM)
     client.message_callback_add(callbacks['SetModoLEARN'], on_SetModoLEARN)
@@ -304,10 +311,6 @@ def CheckForTmax(world, model, dtsdamng, tRun, TMAX):
         return False
     
 
-#taskRun()
-#taskRunInThread1()
-
-
 def SIMtest():
     # Viene eseguito un transitorio in batch e visulaizzati i plot di prestazione
     taskRun()
@@ -317,13 +320,6 @@ def SIMtest():
     mosaik.util.plot_execution_time(world, folder='util_figures')
     mosaik.util.plot_execution_time_per_simulator(world, folder='util_figures')
         
-
-def on_message(client, userdata, message):
-    # callback per messaggi MQTT
-    global world, model, dtsdamng, tRun_on_message
-    print(f'------------------------>on_message: Received con topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
-        
-
 
 def main():
     global END

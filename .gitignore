@@ -93,10 +93,10 @@ target/
 /models
 /references
 /reports
-mosaik/tutorial
-util_figures
+mosaik/tutorial/
+util_figures/
 
 redis_data/
 influxdb/influxdb-data/
-mosaik/docker/proc
+mosaik/docker/proc/
 
