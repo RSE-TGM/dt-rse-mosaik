@@ -8,10 +8,31 @@ redis:
     redis_port: 'REDIS_PORT'
     redis_port_default: 6380
     redis_password: 'mypassw'
-    DT:mode: 'SIM'
-    DT:mode_set: '0'
+    DT:mode: 'SIM'  # da togliere
+    DT:mode_set: '0'  # da togliere
+    DTSDA:
+        DTmode: 
+            - 'DTSDA:mode'
+            - 'SIM'
+        DTmode_set:
+            - 'DTSDA:mode_set'
+            - '0'
+        DTSDA_running:
+            - 'DTSDA:RUN'
+            - '0'        
+        DTSDA_stopped:
+            - 'DTSDA:STOP'
+            - '1'
+        DTSDA_ended:
+            - 'DTSDA:END'
+            - '0'
+
 
 mqtt:
+    SERVER: '0.0.0.0'
+    PORT: '1883'
+    USER: 'userDT'
+    PASSWORD: 'userDT'
     DTSDA:
         MISURE:
             BATT1: 
@@ -27,12 +48,5 @@ mqtt:
             StopSIM: 'DTSDA/STOP_SIM'
             EndProg: 'DTSDA/END'
             PlotGraf: 'DTSDA/PLOTGRAF'
-
-
-
-
-    
-
-
 
 

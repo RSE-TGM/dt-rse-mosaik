@@ -38,46 +38,39 @@ class DTSDA_Mng(mosaik_api_v3.Simulator):
     def init(self, sid, time_resolution):
         self.sid = sid
 
-        #connessione a Redis, per il momento su localhost
-
-        config_data_path = "mosaik/configuration/"
-        self.configDT = "configDT.yaml"
-
-        self.configDT = readConfig(config_data_path, self.configDT)
-
-        redis_host = os.getenv(self.configDT['redis']['redis_host'])
-        if redis_host == None:
-            redis_host = self.configDT['redis']['redis_host_default']
-
-        redis_port = os.getenv(self.configDT['redis']['redis_port'])
-        if redis_port == None:
-            redis_port = self.configDT['redis']['redis_port_default']
+        #connessione a Redis, in fase di test su localhost
+        self.redis = redisDT()     # legge il file di configurazione e crea oggetto redis  
+        self.tags = self.redis.gettags()
+        self.r = self.redis.connect()
         
 
-        #self.redis = redis.Redis(host=redis_host, port=redis_port, charset="utf-8", decode_responses=True)
-
-        self.redis  = redis.Redis(host=redis_host,port=redis_port)   
-        try:
-            response = self.redis.client_list()
-        except redis.ConnectionError:
-            logger.info("REDIS: NON esiste  il servizio: {redis_host} {redis_port}!!",redis_host=redis_host,redis_port=redis_port )
-            exit(1)
-
-        if self.redis.exists('DT:mode') != 0:
-#            self.DTmode = self.redis.get('DTmode')
-            self.DTmode = self.redis.get('DT:mode').decode('utf-8') 
+        if self.redis.esistetag(self.tags['DTmode'][0]) != 0:
+            self.DTmode = self.tags['DTmode'][0]
         else:
-            self.DTmode = self.configDT['redis']['DT:mode'] # se non esiste metto il dafault letto dal configDT
-            self.redis.set('DT:mode',self.DTmode)
+            self.DTmode = self.tags['DTmode'][1] # se non esiste metto il dafault letto dal configDT
+            self.redis.aset(self.tags['DTmode'][0],self.DTmode)
 
-        if self.redis.exists('DT:mode_set') != 0:
-#            self.DTmode = self.redis.get('DTmode')
-            self.DTmode_set = self.redis.get('DT:mode_set').decode('utf-8') 
+        if self.redis.esistetag(self.tags['DTmode_set'][0]) != 0:
+            self.DTmod_set = self.tags['DTmode_set'][0]
         else:
-            self.DTmode_set = self.configDT['redis']['DT:mode_set'] # se non esiste metto il dafault letto dal configDT
-            self.redis.set('DT:mode_set',self.DTmode_set)
+            self.DTmode_set = self.tags['DTmode_set'][1] # se non esiste metto il dafault letto dal configDT
+            self.redis.aset(self.tags['DTmode_set'][0],self.DTmode)
 
-        logger.info('REDIS:  redis_host={redis_host} redis_port={redis_port}', redis_host=redis_host, redis_port=redis_port)
+
+
+#         if self.redis.esistetag('DT:mode') != 0:
+#             self.DTmode = self.redis.aget('DT:mode')
+#         else:
+#             self.DTmode = self.configDT['redis']['DT:mode'] # se non esiste metto il dafault letto dal configDT
+#             self.redis.aset('DT:mode',self.DTmode)
+
+#         if self.redis.esistetag('DT:mode_set') != 0:
+# #            self.DTmode = self.redis.get('DTmode')
+#             self.DTmode_set = self.redis.aget('DT:mode_set')
+#         else:
+#             self.DTmode_set = self.configDT['redis']['DT:mode_set'] # se non esiste metto il dafault letto dal configDT
+#             self.redis.aset('DT:mode_set',self.DTmode_set)
+
 
 
         return self.meta
@@ -98,20 +91,15 @@ class DTSDA_Mng(mosaik_api_v3.Simulator):
         #     case _:
         # val = NOFORZ
         if val == NOFORZ :
-            self.DTmode = self.redis.get('DT:mode').decode('utf-8')   # int(self.redis.get('DT:mode'))
+            self.DTmode = self.redis.aget('DT:mode')   # int(self.redis.get('DT:mode'))
         elif val == FORZSIM:
             self.DTmode = val
-            self.redis.set('DT:mode',val)
+            self.redis.aset('DT:mode',val)
         elif val == FORZLEARN:
             self.DTmode = val
-            self.redis.set('DT:mode',val)
+            self.redis.aset('DT:mode',val)
         
-        
-        # if (int(self.redis.get('DT:mode_set')) == STOP) :
-        #     logger.info('!!! STOP  !! step at {time} with inputs {inputs}', time=time, inputs=inputs)
-        #     return 1000000000
-
-        #return time + 1   # se è hybrid
+        #return time + 1   # se è hybrid o time-based
         return None     # se è event-base
 
     def get_data(self, outputs):
@@ -119,7 +107,7 @@ class DTSDA_Mng(mosaik_api_v3.Simulator):
         return {self.eid: {'DTmode': self.DTmode}}
     
     def finalize(self):
-        self.redis.close()
+        self.redis.chiudi()
 
 
 def main():
