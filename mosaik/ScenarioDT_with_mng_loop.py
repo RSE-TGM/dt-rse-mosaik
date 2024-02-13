@@ -1,26 +1,30 @@
 #
-# Scanario Mosaik con loop MQTT
+# Scenario Mosaik con loop MQTT
 #
 import sys
 import argparse
 from time import sleep, perf_counter
+# import logging as log
+from loguru import logger
 
 import mosaik
 import mosaik_api_v3 as mosaik_api
 #from mosaik.util import connect_randomly, connect_many_to_one
 from mosaik.util import *
+#import mosaik.scheduler as scheduler
+
+from threading import Thread
+#import asyncio
+# import nest_asyncio
+# #        call apply()
+# nest_asyncio.apply()
+import paho.mqtt.client as mqtt
+
+##### import packages locali
 from batt_simulator import *
 from batt_collector import *
 from batt_mng import *
 
-#import asyncio
-#import mosaik.scheduler as scheduler
-from threading import Thread
-# import nest_asyncio
-# #        call apply()
-# nest_asyncio.apply()
-
-import paho.mqtt.client as mqtt
 
 
 def prepScenario(SIM_CONFIG):
@@ -69,16 +73,12 @@ def prepScenario(SIM_CONFIG):
         measurement='experiment_0001'
     )
 
-
     # Connect entities
     world.connect(LCUdata[0], model, ('LCU', 'load_current'))
     world.connect(model, monitor, 'load_current', 'output_voltage')
     world.connect(model, influx, 'load_current', 'output_voltage')
-
     world.connect(model, dtsdamng, 'DTmode_set', time_shifted=True, initial_data={'DTmode_set': NOFORZ})
-  
     world.connect(dtsdamng, model, 'DTmode')
-
     world.connect(dtsdamng, monitor, 'DTmode', 'DTmode_set')
 
     return (world, model, dtsdamng)
@@ -137,7 +137,6 @@ def taskRunInThread():
 
 ## sys.exit()
 
-import logging as log
 
 
 class DTmqtt(object):
@@ -146,6 +145,7 @@ class DTmqtt(object):
         self.port = port
         self.client = mqtt.Client(cli)
         self.client.on_message = self.on_message
+        self.client.on_connect = self.on_connect
         self.client.username_pw_set(user, passw)
 # connessione al brojer mqtt
         self.client.connect(self.mqttBroker, self.port)
@@ -177,11 +177,11 @@ class DTmqtt(object):
         # self.client.loop_forever()
         # print("------------------------> DTmqtt_messloop: FINE metodo")
         
-        # connessione a redis
+        # Connessione a redis
         self.redis = redisDT()
         self.r = self.redis.connect()
         self.redis_tags = self.redis.gettags()
- 
+        self.redis.aset('DTSDA_State',S_IDLE) 
 
 
     def run(self):
@@ -189,15 +189,15 @@ class DTmqtt(object):
 #            redisID=self.redis
             try:
                 if self.client.loop_forever() != 0:    # invece di self.client.loop()
-                    log.warning('Disonnected from MQTT server: %s', self.mqttBroker)
-#                    self.__init__(self.mqttBroker)
+                    logger.warning('Disconnected from MQTT server: {server}', server=self.mqttBroker)
             except KeyboardInterrupt:
                 self.client.disconnect()
 #                break
         
-    def on_connect(self, mosq, obj, msg):
-        log.info('Connected to MQTT server: %s', self.mqttBroker)
-
+    def on_connect(self, mosq, obj, msg, rc): 
+        logger.info('Connected to MQTT server: {server}. Wainting for commands...', server=self.mqttBroker)
+#        log.info('Connected to MQTT server: %s', self.mqttBroker)
+        
     def disconnect(self):
         return(self.client.loop_stop())
  
@@ -206,7 +206,11 @@ class DTmqtt(object):
     
     def on_EndProg(self, client, userdata, message):
         print(f'------------------------>on_EndProg:  DISCONNET and END')
-        self.redis.aset(self.redis_tags['DTSDA_ended'][0],'1')
+        if self.redis.aget('DTSDA_State') == S_RUNNING :
+            self.on_StopSIM(client, userdata, message)
+        self.redis.aset('DTSDA_State',S_ENDED) 
+        logger.warning('END Request IGNORED. Simulator in state: {state} Stopped! State set to {state2}. EXIT', 
+                               state=self.redis.aget('DTSDA_State'), state2=S_IDLE )       
         self.client.disconnect()
 
     def on_SetModoSIM(self, client, userdata, message):
@@ -218,20 +222,31 @@ class DTmqtt(object):
     def on_LoadSIM(self, client, userdata, message):
         global world, model, dtsdamng
         print(f'------------------------>on_LoadSIM:   LOAD DELLA SIMULAZIONE')
-        world, model, dtsdamng = prepScenario(SIM_CONFIG)
+        if self.redis.aget('DTSDA_State') == S_IDLE :
+            self.redis.aset('DTSDA_State', S_LOADED )
+            world, model, dtsdamng = prepScenario(SIM_CONFIG)
+        else:
+            print(f'------------------------>on_LoadSIM:  SIM NOT in IDLE!! ')
+            logger.warning('LOAD Request IGNORED. Simulator in state: {state} NOT changed! Simulator must be {state2} to be loaded.', 
+                               state=self.redis.aget('DTSDA_State'), state2=S_IDLE ) 
 
 
     def on_RunSIM(self, client, userdata, message):
         global world, model, dtsdamng, tRun_on_message
         print(f'------------------------>on_RunSIM:  RUN DELLA SIMULAZIONE')
+        
         #------------------------------------------
         # Per sopprime il traceback!!!!
         sys.tracebacklimit = 0
         try:
-            tRun_on_message = taskRunInThread()
-            self.redis.aset(self.redis_tags['DTSDA_ended'][0],'0')
-            self.redis.aset(self.redis_tags['DTSDA_running'][0],'1')
-            self.redis.aset(self.redis_tags['DTSDA_stopped'][0],'0')
+            if self.redis.aget('DTSDA_State') == S_LOADED :
+                self.redis.aset('DTSDA_State', S_RUNNING)
+                tRun_on_message = taskRunInThread()
+            else:
+                print(f'------------------------>on_RunSIM:  SIM NOT LOADED!! ')
+                logger.warning('RUN Request IGNORED. Simulator in state: {state} NOT changed! Simulator must be {state2} to be run.', 
+                               state=self.redis.aget('DTSDA_State'), state2=S_LOADED ) 
+
         except Exception as e:
             if debug:
                 raise # re-raise the exception
@@ -245,14 +260,18 @@ class DTmqtt(object):
     def on_StopSIM(self, client, userdata, message):
         global world, model, dtsdamng, tRun_on_message
         print(f'------------------------>on_StopSIM:  Stop della Simulazione')
-        world.until = 1
-        sleep(1)
-        print(f"SHUTDOWN!")       
         try:
-            self.redis.aset(self.redis_tags['DTSDA_ended'][0],'0')
-            self.redis.aset(self.redis_tags['DTSDA_running'][0],'0')
-            self.redis.aset(self.redis_tags['DTSDA_stopped'][0],'1')
-            world.shutdown()
+            if self.redis.aget('DTSDA_State') == S_RUNNING :
+                self.redis.aset('DTSDA_State', S_IDLE)
+                world.until = 1
+                sleep(1)
+                print(f"SHUTDOWN!")    
+                world.shutdown()
+            else: 
+                print(f'------------------------>on_StopSIM:  SIM NOT RUNNING!! ')
+                logger.warning('STOP Request IGNORED. Simulator in state: {state} NOT changed! Simulator must be {state2} to be stopped.', 
+                               state=self.redis.aget('DTSDA_State'), state2=S_RUNNING ) 
+
         except Exception as e:
             if debug:
                 raise # re-raise the exception, traceback gets printed                 
@@ -272,8 +291,6 @@ class DTmqtt(object):
         # callback per messaggi MQTT
         global world, model, dtsdamng, tRun_on_message
         print(f'------------------------>on_message: Received con topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
-
-
 
   
 def CheckForTmaxLoop(world, model, dtsdamng, tRun, TMAX):
@@ -308,8 +325,16 @@ def CheckForTmax(world, model, dtsdamng, tRun, TMAX):
     
 
 def SIMtest():
-    # Viene eseguito un transitorio in batch e visulaizzati i plot di prestazione
+    #
+    # Viene eseguito un transitorio in batch e visulaizzati i plot di prestazione       
+    #
+    global world, model, dtsdamng 
+    #carico la configurazione di default
+    world, model, dtsdamng = prepScenario(SIM_CONFIG)
+
+    # lancio simulazione
     taskRun()
+
     ## grafici attivati con il debug mode
     mosaik.util.plot_dataflow_graph(world, folder='util_figures')
     mosaik.util.plot_execution_graph(world, folder='util_figures')
@@ -326,10 +351,10 @@ def main():
     if args.test:
         print(f'Modalità TEST, {args.test}!')
         END=10
+        # carico e lancio la configurazione di default
         SIMtest()
     else:
         # modalità normale in "mqtt message loop"
-#        dt_mqtt_messloop()
         climqtt = DTmqtt(
                     broker="0.0.0.0", 
                     port=1883, 
@@ -339,6 +364,7 @@ def main():
                     confpath="mosaik/configuration/", 
                     confname="configDT.yaml")
         
+#        logger.info('Connected to MQTT server: {server}, waiting commands ...', server=climqtt.mqttBroker)        
         climqtt.run()
 
 
@@ -367,16 +393,13 @@ END = 1 * 24 * 60 * 60 # one day in seconds
 
 # Load della simulazine di default
 debug=False
-world, model, dtsdamng = prepScenario(SIM_CONFIG)
-
-
-
+####   world, model, dtsdamng = prepScenario(SIM_CONFIG)
 
 
 if __name__ == '__main__':
     main()
 
-
+####
 # TMAX=3000  # fermo la simulazione dopo TMAX secondi
 # try:
 #     CheckForTmaxLoop(world, model, dtsdamng, tRun, TMAX)
@@ -387,9 +410,9 @@ if __name__ == '__main__':
 #     else:
 #         print("{}: {}".format(type(e).__name__, e))
 # sleep(1)
-
-# Esempio per accedere a variabili del simulatore:
+#####
+# Esempio accesso a variabili del simulatore:
 # world.sims['ModelSim-0']._proxy.sim.entities['Model_0'].load_current
 # world.sims['ModelSim-0'].output_to_push[('Model_0', 'DTmode_set')][0][1]  ritorna il valore di DTmode_set
 # world.sims['ModelSim-0'].current_step.time         tempo corrente della task ModelSim-0
-#------------------------------------------------------
+#####

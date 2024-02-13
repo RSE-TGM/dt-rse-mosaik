@@ -15,6 +15,11 @@ FORZSIM = MODSIM
 FORZLEARN = MODLEARN
 STOP = -1
 
+S_IDLE    = 'Idle'
+S_RUNNING = 'Running'
+S_LOADED  = 'Loaded'
+S_ENDED   = 'Endend'
+
 CONFIG_DATA_PATH = "mosaik/configuration/"
 CONFIGDT = "configDT.yaml"  
 
@@ -37,6 +42,7 @@ class  redisDT(object):
         self.config_data_path = CONFIG_DATA_PATH
         self.configDT = CONFIGDT 
         self.configDT = readConfig(self.config_data_path, self.configDT)
+        self.tags = self.configDT['redis']['DTSDA']
 
         self.redis_host = os.getenv(self.configDT['redis']['redis_host'])
         if self.redis_host == None:
@@ -52,7 +58,7 @@ class  redisDT(object):
             self.red  = redis.Redis(host=self.redis_host,port=self.redis_port)   
             print (self.red)
             self.red.ping()
-            logger.info('Redis Connected!')
+#            logger.info('Redis Connected!')
         except Exception as ex:
             print ('Error:', ex)
             exit('Failed to connect, terminating.')
@@ -69,11 +75,11 @@ class  redisDT(object):
             return (None)
 
     def aget(self, tag) :
-        return(self.red.get(tag).decode('utf-8') )
+        return(self.red.get(self.tags[tag][0]).decode('utf-8') )
+#        return(self.red.get(tag).decode('utf-8') )
    
-
     def aset(self, tag, val) :
-        return(self.red.set(tag,val))
+        return(self.red.set(self.tags[tag][0],val))
             
     def esistetag(self,tag):
         return(self.red.exists(tag))

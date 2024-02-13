@@ -8,8 +8,6 @@ redis:
     redis_port: 'REDIS_PORT'
     redis_port_default: 6380
     redis_password: 'mypassw'
-    DT:mode: 'SIM'  # da togliere
-    DT:mode_set: '0'  # da togliere
     DTSDA:
         DTmode: 
             - 'DTSDA:mode'
@@ -17,16 +15,9 @@ redis:
         DTmode_set:
             - 'DTSDA:mode_set'
             - '0'
-        DTSDA_running:
-            - 'DTSDA:RUN'
-            - '0'        
-        DTSDA_stopped:
-            - 'DTSDA:STOP'
-            - '1'
-        DTSDA_ended:
-            - 'DTSDA:END'
-            - '0'
-
+        DTSDA_State:
+            - 'DTSDA:STATE'
+            - 'IDLE'
 
 mqtt:
     SERVER: '0.0.0.0'
@@ -39,7 +30,7 @@ mqtt:
                 temperatura: 'DTSDA/BATT1/T'
                 tensione: 'DTSDA/BATT1/V'
                 corrente: 'DTSDA/BATT1/I'
-# associazione Callback-comando_mqtt
+# associazione Callback --> TagComando_mqtt
         CALLBACK: 
             SetModoSIM: 'DTSDA/SET_SIM'
             SetModoLEARN: 'DTSDA/SET_LEARN'

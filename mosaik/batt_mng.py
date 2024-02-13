@@ -48,13 +48,13 @@ class DTSDA_Mng(mosaik_api_v3.Simulator):
             self.DTmode = self.tags['DTmode'][0]
         else:
             self.DTmode = self.tags['DTmode'][1] # se non esiste metto il dafault letto dal configDT
-            self.redis.aset(self.tags['DTmode'][0],self.DTmode)
+            self.redis.aset('DTmode',self.DTmode)
 
         if self.redis.esistetag(self.tags['DTmode_set'][0]) != 0:
             self.DTmod_set = self.tags['DTmode_set'][0]
         else:
             self.DTmode_set = self.tags['DTmode_set'][1] # se non esiste metto il dafault letto dal configDT
-            self.redis.aset(self.tags['DTmode_set'][0],self.DTmode)
+            self.redis.aset('DTmode_set',self.DTmode)
 
 
 
@@ -91,13 +91,13 @@ class DTSDA_Mng(mosaik_api_v3.Simulator):
         #     case _:
         # val = NOFORZ
         if val == NOFORZ :
-            self.DTmode = self.redis.aget('DT:mode')   # int(self.redis.get('DT:mode'))
+            self.DTmode = self.redis.aget('DTmode')   # int(self.redis.get('DT:mode'))
         elif val == FORZSIM:
             self.DTmode = val
-            self.redis.aset('DT:mode',val)
+            self.redis.aset('DTmode',val)
         elif val == FORZLEARN:
             self.DTmode = val
-            self.redis.aset('DT:mode',val)
+            self.redis.aset('DTmode',val)
         
         #return time + 1   # se è hybrid o time-based
         return None     # se è event-base
