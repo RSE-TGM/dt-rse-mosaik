@@ -1,0 +1,6 @@
+#!/bin/bash
+# user: admin password: password
+set -x
+cd ./minio
+docker-compose down 
+docker ps

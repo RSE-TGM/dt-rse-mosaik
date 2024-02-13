@@ -99,4 +99,7 @@ util_figures/
 redis_data/
 influxdb/influxdb-data/
 mosaik/docker/proc/
+minio/data/
+minio/data/.minio.sys/
+minio/cim_data/
 

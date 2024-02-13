@@ -1,0 +1,6 @@
+FROM minio/minio:latest
+
+#docs  https://min.io/docs/minio/container/operations/install-deploy-manage/deploy-minio-single-node-single-drive.html
+
+# ENTRYPOINT ["tail", "-f", "/dev/null"]
+ENTRYPOINT ["minio", "server", "/data", "--console-address", ":9090"]
