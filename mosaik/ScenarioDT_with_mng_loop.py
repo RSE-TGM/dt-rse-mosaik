@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 # Scenario Mosaik con loop MQTT
 #
@@ -141,19 +142,31 @@ def taskRunInThread():
 
 class DTmqtt(object):
     def __init__(self, broker="0.0.0.0", port=1883, cli="DTSDA", user="userDT", passw="userDT", confpath="mosaik/configuration/", confname="configDT.yaml" ):
-        self.mqttBroker = broker
-        self.port = port
+
+# lettura del file di configurazione per acquisire le tag mqtt
+        self.config_data_path = CONFIG_DATA_PATH
+        self.configDT = CONFIGDT 
+        self.configDT = readConfig(self.config_data_path, self.configDT)
+
+        # self.confpath = confpath
+        # self.confname = confname
+        # self.configDT = readConfig(self.confpath, self.confname)
+           
+        self.mqttBroker = self.configDT['mqtt']['SERVER']
+        self.port = int(self.configDT['mqtt']['PORT'])
+        self.user = self.configDT['mqtt']['USER']
+        self.passw = self.configDT['mqtt']['PASSWORD']
+
+        # self.mqttBroker = broker
+        # self.port = port
+
         self.client = mqtt.Client(cli)
         self.client.on_message = self.on_message
         self.client.on_connect = self.on_connect
-        self.client.username_pw_set(user, passw)
+        self.client.username_pw_set(self.user, self.passw)
 # connessione al brojer mqtt
         self.client.connect(self.mqttBroker, self.port)
 
-# lettura del file di configurazione per acquisire le tag mqtt
-        self.confpath=confpath
-        self.confname = confname
-        self.configDT = readConfig(self.confpath, self.confname)
         self.callbacks = self.configDT['mqtt']['DTSDA']['CALLBACK']
         for tag in self.callbacks:
             print(f'{self.callbacks[tag]}')
@@ -163,6 +176,7 @@ class DTmqtt(object):
         for tag in self.misure:
             print(f'{self.misure[tag]}')
             self.client.subscribe(self.misure[tag])
+
 
 # aggiunta delle callback associate ai comandi mqtt
         self.client.message_callback_add(self.callbacks['EndProg'], self.on_EndProg)
@@ -343,7 +357,7 @@ def SIMtest():
         
 
 def main():
-    global END
+    global END, cli_minio
     parser = argparse.ArgumentParser()
     parser.add_argument('--test', action='store_true')
     args = parser.parse_args()
@@ -355,17 +369,22 @@ def main():
         SIMtest()
     else:
         # modalità normale in "mqtt message loop"
-        climqtt = DTmqtt(
-                    broker="0.0.0.0", 
-                    port=1883, 
-                    cli="DTSDA", 
-                    user="userDT", 
-                    passw="userDT", 
-                    confpath="mosaik/configuration/", 
-                    confname="configDT.yaml")
+        # connessione a mqtt
+        cli_mqtt = DTmqtt()
         
-#        logger.info('Connected to MQTT server: {server}, waiting commands ...', server=climqtt.mqttBroker)        
-        climqtt.run()
+                # climqtt = DTmqtt(
+                #     broker="0.0.0.0", 
+                #     port=1883, 
+                #     cli="DTSDA", 
+                #     user="userDT", 
+                #     passw="userDT", 
+                #     confpath="mosaik/configuration/", 
+                #     confname="configDT.yaml")
+        
+        # Connessione al object DB        
+        cli_minio = MinioClient()
+       
+        cli_mqtt.run()
 
 
 #-------------------------------------------------------------------------
@@ -395,6 +414,13 @@ END = 1 * 24 * 60 * 60 # one day in seconds
 debug=False
 ####   world, model, dtsdamng = prepScenario(SIM_CONFIG)
 
+# # test per gui
+# from PySide6.QtWidgets import QApplication, QWidget
+# import sys
+# app = QApplication(sys.argv)
+# window = QWidget()
+# window.show()
+# app.exec()
 
 if __name__ == '__main__':
     main()

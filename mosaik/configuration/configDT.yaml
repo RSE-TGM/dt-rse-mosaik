@@ -3,41 +3,46 @@
 # ################## #
 
 redis:
-    redis_host: 'REDIS_HOST'
-    redis_host_default: 'localhost'
-    redis_port: 'REDIS_PORT'
-    redis_port_default: 6380
-    redis_password: 'mypassw'
-    DTSDA:
-        DTmode: 
-            - 'DTSDA:mode'
-            - 'SIM'
-        DTmode_set:
-            - 'DTSDA:mode_set'
-            - '0'
-        DTSDA_State:
-            - 'DTSDA:STATE'
-            - 'IDLE'
+  redis_host: "REDIS_HOST"
+  redis_host_default: "localhost"
+  redis_port: "REDIS_PORT"
+  redis_port_default: 6380
+  redis_password: "mypassw"
+  DTSDA:
+    DTmode:
+      - "DTSDA:mode"
+      - "SIM"
+    DTmode_set:
+      - "DTSDA:mode_set"
+      - "0"
+    DTSDA_State:
+      - "DTSDA:STATE"
+      - "IDLE"
 
 mqtt:
-    SERVER: '0.0.0.0'
-    PORT: '1883'
-    USER: 'userDT'
-    PASSWORD: 'userDT'
-    DTSDA:
-        MISURE:
-            BATT1: 
-                temperatura: 'DTSDA/BATT1/T'
-                tensione: 'DTSDA/BATT1/V'
-                corrente: 'DTSDA/BATT1/I'
-# associazione Callback --> TagComando_mqtt
-        CALLBACK: 
-            SetModoSIM: 'DTSDA/SET_SIM'
-            SetModoLEARN: 'DTSDA/SET_LEARN'
-            LoadSIM: 'DTSDA/LOAD_SIM'
-            RunSIM: 'DTSDA/RUN_SIM'
-            StopSIM: 'DTSDA/STOP_SIM'
-            EndProg: 'DTSDA/END'
-            PlotGraf: 'DTSDA/PLOTGRAF'
+  SERVER: "0.0.0.0"
+  PORT: "1883"
+  USER: "userDT"
+  PASSWORD: "userDT"
+  DTSDA:
+    MISURE:
+      BATT1:
+        temperatura: "DTSDA/BATT1/T"
+        tensione: "DTSDA/BATT1/V"
+        corrente: "DTSDA/BATT1/I"
+    # associazione Callback --> TagComando_mqtt
+    CALLBACK:
+      SetModoSIM: "DTSDA/SET_SIM"
+      SetModoLEARN: "DTSDA/SET_LEARN"
+      LoadSIM: "DTSDA/LOAD_SIM"
+      RunSIM: "DTSDA/RUN_SIM"
+      StopSIM: "DTSDA/STOP_SIM"
+      EndProg: "DTSDA/END"
+      PlotGraf: "DTSDA/PLOTGRAF"
 
+minio:
+  ENDPOINT: "localhost:9000"
+  ACCESS_KEY: "4K10mbUN3FxVsDxtDYSh"
+  SECRET_KEY: "sI0zu0b4DlR2Vs0JyO6KhJZzws1w5eL1GzthLtPD"
+  SECURE: false
 

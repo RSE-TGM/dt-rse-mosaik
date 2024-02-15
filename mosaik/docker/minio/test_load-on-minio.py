@@ -15,3 +15,15 @@ print(
         result.object_name, result.etag, result.version_id,
     ),
 )
+
+# result = client.put_object(
+#     "sda-dt", "my-object", io.BytesIO(b"hello"), 5,
+# )
+# print(
+#     "created {0} object; etag: {1}, version-id: {2}".format(
+#         result.object_name, result.etag, result.version_id,
+#     ),
+# )
+# for bucket in client.list_buckets():
+#     for item in client.list_objects(bucket.name,recursive=True):
+#         client.fget_object(bucket.name,item.object_name,item.object_name)

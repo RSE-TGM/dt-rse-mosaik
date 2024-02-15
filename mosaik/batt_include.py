@@ -8,6 +8,11 @@ import redis
 import os
 from loguru import logger
 
+from minio import Minio
+import glob
+import os
+from minio.error import  S3Error
+
 MODSIM = 'SIM'    # era 1
 MODLEARN = 'LRN'  # era 10
 NOFORZ = '0'      # era 0
@@ -63,7 +68,7 @@ class  redisDT(object):
             print ('Error:', ex)
             exit('Failed to connect, terminating.')
         
-        logger.info("REDIS: CONNESSO: {redis_host} {redis_port}!!", redis_host=self.redis_host, redis_port=self.redis_port ) 
+        logger.info("REDIS: CONNECTED: {redis_host} {redis_port}!!", redis_host=self.redis_host, redis_port=self.redis_port ) 
         return self.red
     
     def check(self):
@@ -91,3 +96,76 @@ class  redisDT(object):
     def chiudi(self):
         return(self.red.close())
 
+
+class MinioClient(object):
+    def __init__(self, endpoint="localhost:9000", access_key="4K10mbUN3FxVsDxtDYSh", secret_key="sI0zu0b4DlR2Vs0JyO6KhJZzws1w5eL1GzthLtPD", secure=False ):
+        self.config_data_path = CONFIG_DATA_PATH
+        self.configDT = CONFIGDT 
+        self.configDT = readConfig(self.config_data_path, self.configDT)
+        self.endpoint = self.configDT['minio']['ENDPOINT']
+        self.access_key=self.configDT['minio']['ACCESS_KEY']
+        self.secret_key=self.configDT['minio']['SECRET_KEY']
+        self.secure=self.configDT['minio']['SECRET_KEY']
+
+        # self.endpoint=endpoint
+        # self.access_key=access_key
+        # self.secret_key=secret_key
+        # self.secure=secure
+        self.client = Minio( self.endpoint,
+                            self.access_key,
+                            self.secret_key,
+                            self.secure )
+#                           secure=secure )
+        logger.info("MINIO: CONNECTED: {minio_host} !!", minio_host=self.endpoint ) 
+
+    def object_exists(self, bucket, obj_path) -> bool:
+        try:
+            self.client.stat_object(bucket, obj_path)
+            return True
+        except S3Error as _:
+            return False
+
+    def upload_to_minio(self, local_path, bucket_name, minio_path):
+        assert os.path.isdir(local_path)
+        for local_file in glob.glob(local_path + '/**'):
+            local_file = local_file.replace(os.sep, "/") # Replace \ with / on Windows
+            if not os.path.isfile(local_file):
+                self.upload_to_minio(
+                    local_file, bucket_name, minio_path + "/" + os.path.basename(local_file))
+            else:
+                remote_path = os.path.join(
+                    minio_path, local_file[1 + len(local_path):])
+                remote_path = remote_path.replace(
+                    os.sep, "/")  # Replace \ with / on Windows
+                self.client.fput_object(bucket_name, remote_path, local_file)
+
+    def download_from_minio(self, minio_path, bucket_name, dst_local_path):
+        assert os.path.isdir(dst_local_path)
+    # for bucket_name in client.list_buckets():
+        for item in client.list_objects(bucket_name, prefix=minio_path, recursive=True):
+            full_path = os.path.join( dst_local_path, item.object_name)
+            full_path = full_path.replace(os.sep, "/") # Replace \ with / on Windows
+            print(item.object_name)
+            self.client.fget_object(bucket_name,item.object_name,full_path)
+
+
+# MINIO_ENDPOINT = "localhost:9000"
+# MINIO_ACCESS_KEY = "4K10mbUN3FxVsDxtDYSh"
+# MINIO_SECRET_KEY = "sI0zu0b4DlR2Vs0JyO6KhJZzws1w5eL1GzthLtPD"
+# MINIO_SECURE = False
+            
+# minio_client = MinioClient(endpoint="localhost:9000", 
+#                            access_key="4K10mbUN3FxVsDxtDYSh", 
+#                            secret_key="sI0zu0b4DlR2Vs0JyO6KhJZzws1w5eL1GzthLtPD", 
+#                            secure=False )
+
+# local_path = "/home/antonio/dtwin/dt-rse-mosaik/mosaik/configuration"
+# bucket_name = "sda-dt"
+# minio_path = "configuration"
+
+# minio_client.upload_to_minio(local_path, bucket_name, minio_path)
+
+
+# minio_path = "conf1/"
+# dst_local_path = "/home/antonio/temp4"
+# minio_client.download_from_minio(minio_path, bucket_name, dst_local_path)
