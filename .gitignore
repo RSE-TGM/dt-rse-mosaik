@@ -104,6 +104,9 @@ minio/data/
 minio/data/.minio.sys/
 minio/cim_data/
 
+docker/minio/data/
+
+
 qq.py
 qqq.py
 qq.yaml
