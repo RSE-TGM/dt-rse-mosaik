@@ -115,7 +115,7 @@ class MinioClient(object):
                             self.access_key,
                             self.secret_key,
                             self.secure )
-#                           secure=secure )
+
         logger.info("MINIO: CONNECTED: {minio_host} !!", minio_host=self.endpoint ) 
 
     def object_exists(self, bucket, obj_path) -> bool:
@@ -147,6 +147,28 @@ class MinioClient(object):
             full_path = full_path.replace(os.sep, "/") # Replace \ with / on Windows
             print(item.object_name)
             self.client.fget_object(bucket_name,item.object_name,full_path)
+
+class InfluxDBCli(object):
+    def __init__(self, influx_sim):
+        self.config_data_path = CONFIG_DATA_PATH
+        self.configDT = CONFIGDT 
+        self.configDT = readConfig(self.config_data_path, self.configDT)
+        self.url = self.configDT['influxdb']['URL']
+        self.org = self.configDT['influxdb']['ORG']
+        self.bucket = self.configDT['influxdb']['BUCKET']
+        self.token = self.configDT['influxdb']['TOKEN']
+        self.measurement = self.configDT['influxdb']['MEASUREMENT']
+        
+        self.influx = influx_sim.Database(
+           url=self.url,
+           org=self.org,
+           bucket=self.bucket,
+           token=self.token,
+           measurement=self.measurement )
+                  
+    def getinflux(self):
+        return (self.influx)
+
 
 
 # MINIO_ENDPOINT = "localhost:9000"

@@ -95,6 +95,7 @@ target/
 /reports
 mosaik/tutorial/
 util_figures/
+mosaik/old/
 
 redis_data/
 influxdb/influxdb-data/

@@ -1,6 +1,6 @@
-# ################## #
-# Comunication Options #
-# ################## #
+# ############################
+# Communication MESP Options #
+# ############################
 
 redis:
   redis_host: "REDIS_HOST"
@@ -45,4 +45,15 @@ minio:
   ACCESS_KEY: "4K10mbUN3FxVsDxtDYSh"
   SECRET_KEY: "sI0zu0b4DlR2Vs0JyO6KhJZzws1w5eL1GzthLtPD"
   SECURE: false
+  CONSOLE: "localhost:9090"
+  USER: "user"           # utilizzato solo in console
+  PASSWORD: "password"   # utilizzato solo in console
 
+influxdb:
+  URL: "http://localhost:8086"
+  ORG: "RSE"
+  BUCKET: "nuovobuck"    # il bucket deve essere già esistente
+  TOKEN: "aHMudy-R1gicVNWRDzVTWmw4_HPFVCdwzcUTIErKl_i2uVRpCrCpmTOtcOAg0n-qNdnuetSQfTKGHAmgsMeL4A=="
+  MEASUREMENT: "experiment_0001"
+  USER: "influxuser"     # utilizzato solo in console
+  PASSWORD: "DTpass!!"   # utilizzato solo in console
