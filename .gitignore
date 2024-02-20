@@ -105,7 +105,9 @@ minio/data/.minio.sys/
 minio/cim_data/
 
 docker/minio/data/
-
+mosaik/docker/influxdb/influxdb-data/
+docker/minio/data/sda-dt/conf1/
+docker/minio/data/sda-dt/conf2/
 
 qq.py
 qqq.py

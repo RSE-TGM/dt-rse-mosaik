@@ -3,6 +3,8 @@
 # definizioni di variabili e funzioni varie
 
 import yaml
+import json
+import uuid
 from pathlib import Path
 import redis
 import os
@@ -106,6 +108,17 @@ class MinioClient(object):
         self.access_key=self.configDT['minio']['ACCESS_KEY']
         self.secret_key=self.configDT['minio']['SECRET_KEY']
         self.secure=self.configDT['minio']['SECRET_KEY']
+        
+        self.indexname = self.configDT['minio']['INDEXNAME']
+        self.indexcontext = self.configDT['minio']['INDEXCONTEXT']
+        self.indexbucket = self.configDT['minio']['INDEXBUCKET']
+
+        self._indexctx = self.configDT['minio']['INDEX_CTX']
+        self._indexuid = self.configDT['minio']['INDEX_UID']
+        self._indexname = self.configDT['minio']['INDEX_NAME']
+        self._indexdescription = self.configDT['minio']['INDEX_DESCRIPTION']
+        self._indexdata = self.configDT['minio']['INDEX_DATA']
+
 
         # self.endpoint=endpoint
         # self.access_key=access_key
@@ -142,11 +155,43 @@ class MinioClient(object):
     def download_from_minio(self, minio_path, bucket_name, dst_local_path):
         assert os.path.isdir(dst_local_path)
     # for bucket_name in client.list_buckets():
-        for item in client.list_objects(bucket_name, prefix=minio_path, recursive=True):
+        for item in self.client.list_objects(bucket_name, prefix=minio_path, recursive=True):
             full_path = os.path.join( dst_local_path, item.object_name)
             full_path = full_path.replace(os.sep, "/") # Replace \ with / on Windows
             print(item.object_name)
             self.client.fget_object(bucket_name,item.object_name,full_path)
+    
+    def read_index(self):
+        if  self.object_exists(self.indexbucket, self.indexname):
+            findex = open(self.indexname)
+            data_index = json.load(findex)
+            findex.close()
+            return ( data_index )
+        else:
+            return(None)
+
+    def add_to_index(self, newconf, newdescr):
+        if  self.object_exists(self.indexbucket, self.indexname):
+            # findex = open(self.indexname, "rw")
+            # data_index = json.load(findex)
+            struid =  str(uuid.uuid4())
+            datafield = self.indexbucket + "/" + newconf
+            entry={newconf: {
+                    self._indexctx:  self.indexcontext,
+                    self._indexuid: struid,
+                    self._indexname: newconf,
+                    self._indexdescription: newdescr,
+                    self._indexdata: datafield
+                    }}
+            with open(self.indexname, "r+") as file:
+                data = json.load(file)
+                data.append(entry)
+                file.seek(0)
+                json.dump(data, file)
+                file.close()
+            return ( data )        
+        pass
+
 
 class InfluxDBCli(object):
     def __init__(self, influx_sim):
