@@ -112,6 +112,8 @@ mosaik/docker/influxdb/influxdb-data/
 docker/minio/data/sda-dt/conf1/
 docker/minio/data/sda-dt/conf2/
 
+mosaik/docker/minio2/minio_data
+
 qq.py
 qqq.py
 qq.yaml

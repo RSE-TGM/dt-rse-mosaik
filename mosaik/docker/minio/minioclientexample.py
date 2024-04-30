@@ -75,11 +75,11 @@ class _MinioClient:
 minio_client = _MinioClient()
 source_path = "/home/antonio/dtwin/dt-rse-mosaik/mosaik/configuration"
 bucket_name = "sda-dt"
-minio_path = "conf2"
+minio_path = "confX"
 minio_client.upload_directory(local_directory=source_path, bucket=bucket_name, dst_directory=minio_path)
 
 
 bucket_name = "sda-dt"
-minio_path = "conf2"
-dst_local_directory = "/home/antonio/test"
+minio_path = "confX"
+dst_local_directory = "/home/antonio/testDIR"
 minio_client.download_directory(bucket=bucket_name, remote_directory=minio_path, dst_local_directory=dst_local_directory)
