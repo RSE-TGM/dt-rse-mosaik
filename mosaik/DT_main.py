@@ -107,7 +107,7 @@ class DTmqtt(object):
         self.client.on_message = self.on_message
         self.client.on_connect = self.on_connect
         self.client.username_pw_set(self.user, self.passw)
-# connessione al brojer mqtt
+# connessione al broker mqtt
         self.client.connect(self.mqttBroker, self.port)
 
         self.callbacks = self.configDT['mqtt']['DTSDA']['CALLBACK']
@@ -129,6 +129,8 @@ class DTmqtt(object):
         self.client.message_callback_add(self.callbacks['RunSIM'], self.on_RunSIM)
         self.client.message_callback_add(self.callbacks['StopSIM'], self.on_StopSIM)
         self.client.message_callback_add(self.callbacks['PlotGraf'], self.on_PlotGraf)
+        self.client.message_callback_add(self.callbacks['LoadConf'], self.on_LoadConf)
+        self.client.message_callback_add(self.callbacks['SaveConf'], self.on_SaveConf)
 
         # print("------------------------> DTmqtt_messloop: loop forever")
         # self.client.loop_forever()
@@ -251,7 +253,24 @@ class DTmqtt(object):
         # callback per messaggi MQTT
         global world, model, dtsdamng, tRun_on_message
         print(f'------------------------>on_message: Received con topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
-
+    
+    def on_SaveConf(self, client, userdata, message):
+        global cli_minio
+        print(f'------------------------>on_SaveConf: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
+        source_path = "/home/antonio/dtwin/dt-rse-mosaik/mosaik/configuration"
+        bucket_name = "sda-dt"
+        minio_path = "confX"
+        cli_minio.upload_to_minio(local_path=source_path, bucket_name=bucket_name, minio_path=minio_path)
+        pass
+    
+    def on_LoadConf(self, client, userdata, message):
+        global cli_minio
+        print(f'------------------------>on_LoadConf: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
+        bucket_name = "sda-dt"
+        minio_path = "confX"
+        dst_local_directory = "/home/antonio/test"
+        cli_minio.download_from_minio( bucket_name=bucket_name, minio_path=minio_path, dst_local_path=dst_local_directory)
+        pass
   
 def CheckForTmaxLoop(world, model, dtsdamng, tRun, TMAX):
 #    DTmqtt_messloop()                                                                                                                                                                                                                                                                                                                                        c

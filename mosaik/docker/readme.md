@@ -29,4 +29,9 @@ docker-compose -f docker-compose_conRedis.yaml logs
 ### restart di un servizio
 docker-compose -f docker-compose_conRedis.yaml restart DTredis
 
+### Apertura console MinIO
+127.0.0.1:9090
+user: admin
+password: password
 
+comandi a DT:   mqtt-explorer

@@ -2,6 +2,7 @@
 # DTSDA
 # definizioni di variabili e funzioni varie
 
+import io
 import yaml
 import json
 import uuid
@@ -107,7 +108,7 @@ class MinioClient(object):
         self.endpoint = self.configDT['minio']['ENDPOINT']
         self.access_key=self.configDT['minio']['ACCESS_KEY']
         self.secret_key=self.configDT['minio']['SECRET_KEY']
-        self.secure=self.configDT['minio']['SECRET_KEY']
+        self.secure=self.configDT['minio']['SECURE']
         
         self.indexname = self.configDT['minio']['INDEXNAME']
         self.indexcontext = self.configDT['minio']['INDEXCONTEXT']
@@ -139,18 +140,21 @@ class MinioClient(object):
             return False
 
     def upload_to_minio(self, local_path, bucket_name, minio_path):
-        assert os.path.isdir(local_path)
+    #    assert os.path.isdir(local_path)
         for local_file in glob.glob(local_path + '/**'):
             local_file = local_file.replace(os.sep, "/") # Replace \ with / on Windows
             if not os.path.isfile(local_file):
+                dirfile = minio_path + "/" + os.path.basename(local_file)
+#                self.client.fput_object(bucket_name, dirfile, io.BytesIO(b""), 0 )
+#                self.client.fput_object(bucket_name, dirfile + "/", local_file)
                 self.upload_to_minio(
-                    local_file, bucket_name, minio_path + "/" + os.path.basename(local_file))
+                    local_file, bucket_name, dirfile)
             else:
                 remote_path = os.path.join(
                     minio_path, local_file[1 + len(local_path):])
                 remote_path = remote_path.replace(
                     os.sep, "/")  # Replace \ with / on Windows
-                self.client.fput_object(bucket_name, remote_path, local_file)
+                self.client.fput_object(bucket_name, remote_path, local_file, -1)
 
     def download_from_minio(self, minio_path, bucket_name, dst_local_path):
         assert os.path.isdir(dst_local_path)

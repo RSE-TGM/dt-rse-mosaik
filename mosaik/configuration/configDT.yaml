@@ -39,13 +39,17 @@ mqtt:
       StopSIM: "DTSDA/STOP_SIM"
       EndProg: "DTSDA/END"
       PlotGraf: "DTSDA/PLOTGRAF"
+      LoadConf: "DTSDA/LOADCONF"
+      SaveConf: "DTSDA/SAVECONF"
 
 minio:
-  ENDPOINT: "localhost:9000"
-  ACCESS_KEY: "4K10mbUN3FxVsDxtDYSh"
-  SECRET_KEY: "sI0zu0b4DlR2Vs0JyO6KhJZzws1w5eL1GzthLtPD"
+  ENDPOINT: "localhost:9090"
+#  ACCESS_KEY: "4K10mbUN3FxVsDxtDYSh"
+#  SECRET_KEY: "sI0zu0b4DlR2Vs0JyO6KhJZzws1w5eL1GzthLtPD"
+  ACCESS_KEY: "oouICbtT7IsE0HQpmVWg"
+  SECRET_KEY: "8DvNcONsS0TwoCbiuLHdZDxoWgS0IxeQKOqkR1Pv"
   SECURE: false
-  CONSOLE: "localhost:9090"
+  CONSOLE: "localhost:9091"
   USER: "admin"           # utilizzato solo in console
   PASSWORD: "password"   # utilizzato solo in console
 # per il file di index  

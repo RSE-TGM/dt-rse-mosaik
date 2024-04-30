@@ -102,7 +102,10 @@ influxdb/influxdb-data/
 mosaik/docker/proc/
 minio/data/
 minio/data/.minio.sys/
+mosaik/docker/minio/data/.minio.sys
 minio/cim_data/
+.minio.sys/
+sda-dt/
 
 docker/minio/data/
 mosaik/docker/influxdb/influxdb-data/
