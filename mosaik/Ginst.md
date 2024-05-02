@@ -1,4 +1,5 @@
-# preparazione sistema
+# Set up di DTWIN, UBUNTU20.04
+## preparazione sistema
 sudo apt-get update -y
 sudo apt-get upgrade -y
 sudo apt install python3-pip
@@ -8,14 +9,15 @@ sudo apt  install docker-compose -y
 sudo usermod -aG docker $USER
 sudo apt install redis-tools -y
 
-#preparazione python
+## preparazione python
 sudo apt install build-essential -y
 sudo apt install swig -y
 sudo apt install libsundials-dev -y
 sudo apt install libboost-all-dev  -y
 pip3 install -r requirements.txt
 
-# set up servizi
+## set up servizi e utilità
+sudo install gedit
 sudo snap install mqtt-explorer
 sudo cp -a docker/minio2     dt-rse-mosaik/mosaik/docker
 sudo cp -a docker/influxdb   dt-rse-mosaik/mosaik/docker

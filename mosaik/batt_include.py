@@ -125,10 +125,10 @@ class MinioClient(object):
         # self.access_key=access_key
         # self.secret_key=secret_key
         # self.secure=secure
-        self.client = Minio( self.endpoint,
-                            self.access_key,
-                            self.secret_key,
-                            self.secure )
+        self.client = Minio( endpoint = self.endpoint,
+                            access_key = self.access_key,
+                            secret_key = self.secret_key,
+                            secure = self.secure )
 
         logger.info("MINIO: CONNECTED: {minio_host} !!", minio_host=self.endpoint ) 
 
