@@ -1,0 +1,26 @@
+# Copyright VMware, Inc.
+# SPDX-License-Identifier: APACHE-2.0
+
+version: '2'
+
+services:
+  minio:
+    image: docker.io/bitnami/minio:latest
+    ports:
+      - '9090:9000'
+      - '9091:9001'
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+    networks:
+      - DT-net
+    volumes:
+      - './minio_data:/bitnami/minio/data'
+
+#volumes:
+#  minio_data:
+#    driver: local
+
+networks:
+  DT-net:
+    driver: bridge

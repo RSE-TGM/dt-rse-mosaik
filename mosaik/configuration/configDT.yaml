@@ -48,7 +48,7 @@ minio:
 #  SECRET_KEY: "sI0zu0b4DlR2Vs0JyO6KhJZzws1w5eL1GzthLtPD"
   ACCESS_KEY: "oouICbtT7IsE0HQpmVWg"
   SECRET_KEY: "8DvNcONsS0TwoCbiuLHdZDxoWgS0IxeQKOqkR1Pv"
-  SECURE: false
+  SECURE: False
   CONSOLE: "localhost:9091"
   USER: "admin"           # utilizzato solo in console
   PASSWORD: "password"   # utilizzato solo in console

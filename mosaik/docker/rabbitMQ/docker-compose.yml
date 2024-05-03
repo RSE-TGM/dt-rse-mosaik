@@ -1,0 +1,23 @@
+# istruzioni:
+# guarda qui https://hub.docker.com/_/rabbitmq/
+# 
+
+version: '2'
+
+services:
+  minio:
+    image: rabbitmq:3.13-management
+    container_name: dtsda_rabbitmq
+    hostname: dtsda_rabbit
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
+    networks:
+      - DT-net
+
+networks:
+  DT-net:
+    driver: bridge

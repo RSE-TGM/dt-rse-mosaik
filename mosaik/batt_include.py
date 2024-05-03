@@ -145,8 +145,6 @@ class MinioClient(object):
             local_file = local_file.replace(os.sep, "/") # Replace \ with / on Windows
             if not os.path.isfile(local_file):
                 dirfile = minio_path + "/" + os.path.basename(local_file)
-#                self.client.fput_object(bucket_name, dirfile, io.BytesIO(b""), 0 )
-#                self.client.fput_object(bucket_name, dirfile + "/", local_file)
                 self.upload_to_minio(
                     local_file, bucket_name, dirfile)
             else:
@@ -154,10 +152,10 @@ class MinioClient(object):
                     minio_path, local_file[1 + len(local_path):])
                 remote_path = remote_path.replace(
                     os.sep, "/")  # Replace \ with / on Windows
-                self.client.fput_object(bucket_name, remote_path, local_file, -1)
+                self.client.fput_object(bucket_name, remote_path, local_file)
 
     def download_from_minio(self, minio_path, bucket_name, dst_local_path):
-        assert os.path.isdir(dst_local_path)
+#        assert os.path.isdir(dst_local_path)
     # for bucket_name in client.list_buckets():
         for item in self.client.list_objects(bucket_name, prefix=minio_path, recursive=True):
             full_path = os.path.join( dst_local_path, item.object_name)
