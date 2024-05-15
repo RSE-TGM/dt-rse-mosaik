@@ -20,7 +20,8 @@ redis:
       - "IDLE"
 
 mqtt:
-  SERVER: "0.0.0.0"
+        #  SERVER: "0.0.0.0"
+  SERVER: "localhost"
   PORT: "1883"
   USER: "userDT"
   PASSWORD: "userDT"

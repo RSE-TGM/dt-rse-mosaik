@@ -2,5 +2,5 @@
 # user: userDT password: userDT
 set -x
 cd ./mqtt
-docker-compose up -d
+docker-compose  -f docker-compose2.yml up -d
 docker ps

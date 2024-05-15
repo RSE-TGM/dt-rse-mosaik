@@ -1,3 +1,5 @@
 #!/bin/bash
 set -x
-docker-compose -f docker-compose_conRedis.yaml down --remove-orphans 
+./DTRedisStop ; ./DTinfluxdbstop; ./DTmqttstop; ./DTminiostop
+./DTstop
+#docker-compose -f docker-compose_conRedis.yaml down --remove-orphans 

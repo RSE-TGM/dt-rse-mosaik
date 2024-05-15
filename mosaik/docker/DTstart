@@ -1,4 +1,5 @@
 #!/bin/bash
 set -x
-docker-compose up --remove-orphans -d
-# docker-compose up --build -d
+#docker-compose up -f docker-compose.yml --remove-orphans -d
+docker-compose -f docker-compose.yml  up -d
+

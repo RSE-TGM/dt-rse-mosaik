@@ -1,17 +1,23 @@
 version: '2.0'
 services:
   DTSDAServ:
-    build:
-      context: .
-      dockerfile: Dockerfile_python38
-    image: aguagliardi/dtsda:2.0
+#    build:
+#      context: .
+#      dockerfile: Dockerfile_python38
+    image: aguagliardi/dtsda:2.1
     #image: dtsda38
+    network_mode: "host" 
     container_name: DTSDA
     environment:
       DISPLAY: $DISPLAY
-      REDIS_HOST: DTredis
+      #      REDIS_HOST: DTredis
+      REDIS_HOST: localhost
       REDIS_PORT: 6380
       REDIS_PASSWORD: mypassw
     volumes:
       - "../..:/home/dt-rse-mosaik"
       - "/tmp/.X11-unix:/tmp/.X11-unix"
+
+#networks:
+#  DT-net:
+#    driver: bridge

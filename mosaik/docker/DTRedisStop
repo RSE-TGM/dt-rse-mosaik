@@ -1,4 +1,5 @@
 #!/bin/bash
 set -x
-docker-compose -f docker-compose_SOLORedis.yaml down
+cd ./redis
+docker-compose -f docker-compose2.yml down
 docker ps

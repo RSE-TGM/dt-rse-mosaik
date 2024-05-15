@@ -1,5 +1,5 @@
 #!/bin/bash
 set -x
 cd ./influxdb
-docker-compose up -d
+docker-compose  -f docker-compose2.yml up -d
 docker ps
