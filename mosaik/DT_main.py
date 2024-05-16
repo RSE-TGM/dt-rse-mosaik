@@ -2,7 +2,6 @@
 #
 # Scenario Mosaik con loop MQTT
 #
-
 ########################################
 import sys
 import argparse
@@ -136,7 +135,6 @@ class DTmqtt(object):
         # self.client.loop_forever()
         # print("------------------------> DTmqtt_messloop: FINE metodo")
         
-
         #-----------------
         # Connessione a redis
         self.redis = redisDT()
@@ -257,20 +255,30 @@ class DTmqtt(object):
     def on_SaveConf(self, client, userdata, message):
         global cli_minio
         print(f'------------------------>on_SaveConf: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
-        source_path = "/home/antonio/dtwin/dt-rse-mosaik/mosaik/configuration"
-        bucket_name = "sda-dt"
-        minio_path = "confX"
-        cli_minio.upload_to_minio(local_path=source_path, bucket_name=bucket_name, minio_path=minio_path)
-        pass
-    
+        source_path = CONFIG_DATA_PATH
+        #bucket_name = cli_minio.indexbucket
+#        minio_path = "confX" # str(message.payload.decode("utf-8"))
+        minio_path = str(message.payload.decode("utf-8"))
+        if not minio_path:
+            minio_path='confX'
+
+        logger.info("Salvataggio configurazione da {source_path} in {minio_path} ", source_path=source_path, minio_path=minio_path )
+        cli_minio.upload_to_minio(local_path=source_path, bucket_name=cli_minio.indexbucket, minio_path=minio_path)
+          
     def on_LoadConf(self, client, userdata, message):
         global cli_minio
         print(f'------------------------>on_LoadConf: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
-        bucket_name = "sda-dt"
-        minio_path = "confX"
-        dst_local_directory = "/home/antonio/test"
-        cli_minio.download_from_minio( bucket_name=bucket_name, minio_path=minio_path, dst_local_path=dst_local_directory)
-        pass
+        #bucket_name = cli_minio.indexbucket
+#        minio_path = "confX" # str(message.payload.decode("utf-8"))
+        minio_path = str(message.payload.decode("utf-8")) +'/'
+        if not minio_path:
+            minio_path='confX/'
+
+        dst_local_directory = CONFIG_DATA_PATH
+
+        logger.info("Carico configurazione da {minio_path} a {dst_local_directory} ", minio_path=minio_path, dst_local_directory=dst_local_directory )
+        cli_minio.download_from_minio( bucket_name=cli_minio.indexbucket, minio_path=minio_path, dst_local_path=dst_local_directory)
+        
   
 def CheckForTmaxLoop(world, model, dtsdamng, tRun, TMAX):
 #    DTmqtt_messloop()                                                                                                                                                                                                                                                                                                                                        c

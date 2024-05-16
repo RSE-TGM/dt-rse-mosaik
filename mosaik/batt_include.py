@@ -28,8 +28,13 @@ S_RUNNING = 'Running'
 S_LOADED  = 'Loaded'
 S_ENDED   = 'Endend'
 
-CONFIG_DATA_PATH = "mosaik/configuration/"
-CONFIGDT = "configDT.yaml"  
+DTHOME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+CONFIG_DATA_PATH = DTHOME + "/mosaik/configuration/"
+
+CONFIGDT = "configDT.yaml"
+
+EXPERIMENT_CONFIG = "experiment_config.yaml" 
 
 def readConfig(config_path, namefile):
         # Read in memory a yalm file
@@ -144,21 +149,19 @@ class MinioClient(object):
         for local_file in glob.glob(local_path + '/**'):
             local_file = local_file.replace(os.sep, "/") # Replace \ with / on Windows
             if not os.path.isfile(local_file):
-                dirfile = minio_path + "/" + os.path.basename(local_file)
-                self.upload_to_minio(
-                    local_file, bucket_name, dirfile)
+                minio_path_new = minio_path + "/" + os.path.basename(local_file)
+                self.upload_to_minio(local_file, bucket_name, minio_path_new)
             else:
-                remote_path = os.path.join(
-                    minio_path, local_file[1 + len(local_path):])
-                remote_path = remote_path.replace(
-                    os.sep, "/")  # Replace \ with / on Windows
+                remote_path = os.path.join(minio_path, os.path.basename(local_file))
+                remote_path = remote_path.replace(os.sep, "/")  # Replace \ with / on Windows
                 self.client.fput_object(bucket_name, remote_path, local_file)
 
     def download_from_minio(self, minio_path, bucket_name, dst_local_path):
-#        assert os.path.isdir(dst_local_path)
     # for bucket_name in client.list_buckets():
         for item in self.client.list_objects(bucket_name, prefix=minio_path, recursive=True):
-            full_path = os.path.join( dst_local_path, item.object_name)
+#        for item in self.client.list_objects(bucket_name, start_after=minio_path, recursive=True):
+            full_path = os.path.join( dst_local_path,  item.object_name[len(minio_path):])
+#            full_path = os.path.join( dst_local_path,  os.path.basename(item.object_name))
             full_path = full_path.replace(os.sep, "/") # Replace \ with / on Windows
             print(item.object_name)
             self.client.fget_object(bucket_name,item.object_name,full_path)

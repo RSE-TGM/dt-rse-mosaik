@@ -27,6 +27,9 @@ from pathlib import Path
 
 from  batt_include import readConfig
 
+from  batt_include import CONFIG_DATA_PATH
+from  batt_include import EXPERIMENT_CONFIG
+
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 # aggiunge nel path la directory base del package, ad esempio: /home/antonio/dtwin/dt-rse-mosaik
 sys.path.append(os.path.dirname(SCRIPT_DIR))  
@@ -44,8 +47,10 @@ class Model:
         models = ['thevenin', 'rc_thermal']
 
 
-        config_data_path = "mosaik/configuration/"
-        experiment_config = "experiment_config.yaml"
+#        config_data_path = "mosaik/configuration/"
+#        experiment_config = "experiment_config.yaml"
+        config_data_path = CONFIG_DATA_PATH
+        experiment_config = EXPERIMENT_CONFIG
 
         self.experiment_config = readConfig(config_data_path, experiment_config)
 
