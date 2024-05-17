@@ -109,16 +109,20 @@ class DTmqtt(object):
 # connessione al broker mqtt
         self.client.connect(self.mqttBroker, self.port)
 
-        self.callbacks = self.configDT['mqtt']['DTSDA']['CALLBACK']
+        self.callbacks = self.configDT['mqtt']['DTSDA']['CALLBACK']   # callbacks associate ai comandi mqtt
         for tag in self.callbacks:
             print(f'{self.callbacks[tag]}')
             self.client.subscribe(self.callbacks[tag])
-    
+
+        self.posts = self.configDT['mqtt']['DTSDA']['POST']
+        for tag in self.posts:
+            print(f'post da pubblicare: {self.posts[tag]}')
+            self.client.subscribe(self.posts[tag])    # eseguo il subcribe comunque perchè le informazioni potrebbero essere generate da altri
+                   
         self.misure = self.configDT['mqtt']['DTSDA']['MISURE']['BATT1']
         for tag in self.misure:
             print(f'{self.misure[tag]}')
             self.client.subscribe(self.misure[tag])
-
 
 # aggiunta delle callback associate ai comandi mqtt
         self.client.message_callback_add(self.callbacks['EndProg'], self.on_EndProg)
@@ -130,7 +134,8 @@ class DTmqtt(object):
         self.client.message_callback_add(self.callbacks['PlotGraf'], self.on_PlotGraf)
         self.client.message_callback_add(self.callbacks['LoadConf'], self.on_LoadConf)
         self.client.message_callback_add(self.callbacks['SaveConf'], self.on_SaveConf)
-
+        self.client.message_callback_add(self.callbacks['LoadConfList'], self.on_LoadConfList)
+        self.client.message_callback_add(self.callbacks['DelConf'], self.on_DelConf)
         # print("------------------------> DTmqtt_messloop: loop forever")
         # self.client.loop_forever()
         # print("------------------------> DTmqtt_messloop: FINE metodo")
@@ -278,7 +283,26 @@ class DTmqtt(object):
 
         logger.info("Carico configurazione da {minio_path} a {dst_local_directory} ", minio_path=minio_path, dst_local_directory=dst_local_directory )
         cli_minio.download_from_minio( bucket_name=cli_minio.indexbucket, minio_path=minio_path, dst_local_path=dst_local_directory)
+    
+    def on_LoadConfList(self, client, userdata, message):
+        global cli_minio
+        print(f'------------------------>on_LoadConfList: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
+        id_minio_path='conf'
+        listaconf =  cli_minio.getconflist_minio()   # variabile di tipo text
+        # self.client.publish("DTSDA/LIST_CONF", listaconf)
+        self.client.publish(self.posts['listaconf'],listaconf)
         
+        print(f'------------------------>on_LoadConfList: nuova listaconf: {listaconf} pubblicata')
+
+        pass
+    def on_DelConf(self, client, userdata, message):
+        global cli_minio
+        print(f'------------------------>on_deleteFolder_minio: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
+        minio_path = str(message.payload.decode("utf-8"))
+        logger.info("Rimozione configurazione {minio_path} dal bucket {bucket_name}", minio_path=minio_path, bucket_name=cli_minio.indexbucket)
+        cli_minio.deleteFolder_minio(bucket_name=cli_minio.indexbucket, minio_path=minio_path)
+
+
   
 def CheckForTmaxLoop(world, model, dtsdamng, tRun, TMAX):
 #    DTmqtt_messloop()                                                                                                                                                                                                                                                                                                                                        c
@@ -340,19 +364,16 @@ def main():
     args = parser.parse_args()
     
     if args.test:
-        print(f'Modalità TEST, {args.test}!')
-       
-        # carico e lancio la configurazione di default
+        print(f'Modalità TEST, {args.test}!')       
+# carico e lancio la configurazione di default
         SIMtest()
     else:
-        # modalità normale in "mqtt message loop"
-
+# modalità normale in "mqtt message loop"
         # connessione a mqtt
         cli_mqtt = DTmqtt()
-
         # Connessione al object DB        
         cli_minio = MinioClient()
-       
+        #lancio del loop mqtt   
         cli_mqtt.run()
 
 

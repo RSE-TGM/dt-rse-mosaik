@@ -32,16 +32,21 @@ mqtt:
         tensione: "DTSDA/BATT1/V"
         corrente: "DTSDA/BATT1/I"
     # associazione Callback --> TagComando_mqtt
-    CALLBACK:
+    CALLBACK:                             # Comandi GET ricevuti dal HMI e callbacks associate
       SetModoSIM: "DTSDA/SET_SIM"
       SetModoLEARN: "DTSDA/SET_LEARN"
       LoadSIM: "DTSDA/LOAD_SIM"
       RunSIM: "DTSDA/RUN_SIM"
       StopSIM: "DTSDA/STOP_SIM"
       EndProg: "DTSDA/END"
-      PlotGraf: "DTSDA/PLOTGRAF"
-      LoadConf: "DTSDA/LOADCONF"
-      SaveConf: "DTSDA/SAVECONF"
+      PlotGraf: "DTSDA/PLOTGRAF"           
+      LoadConf: "DTSDA/LOADCONF"           # Richiesta configurazione da caricare, es:  "DTSDA/LOADCONF  conf1"
+      SaveConf: "DTSDA/SAVECONF"           # Richiesta configurazione da salvare, es:  "DTSDA/SAVECONF  conf1"
+      LoadConfList: "DTSDA/LIST_CONF_REQ"  # Richiesta della lista delle configurazioni salvate in minio. Ad es: "DTSDA/LIST_CONF_REQ"
+      DelConf: "DTSDA/DELCONF"             # Rimozione di una configurazione salvata in minio. es: "DTSDA/DELCONF  conf1"
+    POST:
+      listaconf: "DTSDA/LIST_CONF"         # Lista delle configurazioni salvate in minio e pubblicata da DTSDA nel mqtt brocker (come testo) per il HMI. 
+                                           # Esempio comando di pubblicazione: "DTSDA/LIST_CONF  listaconf". 
 
 minio:
   ENDPOINT: "localhost:9090"
@@ -55,7 +60,7 @@ minio:
   PASSWORD: "password"   # utilizzato solo in console
 # per il file di index  
   INDEXNAME: "DTindex.jsonld"
-  INDEXBUCKET: "sda-dt"
+  INDEXBUCKET: "dtsda"
   INDEXCONTEXT: "http://schema.org/"
   INDEX_CTX: "@context"
   INDEX_UID: "@id"

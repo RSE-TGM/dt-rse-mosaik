@@ -134,6 +134,8 @@ class MinioClient(object):
                             access_key = self.access_key,
                             secret_key = self.secret_key,
                             secure = self.secure )
+        
+        self.listaconf=""
 
         logger.info("MINIO: CONNECTED: {minio_host} !!", minio_host=self.endpoint ) 
 
@@ -165,7 +167,25 @@ class MinioClient(object):
             full_path = full_path.replace(os.sep, "/") # Replace \ with / on Windows
             print(item.object_name)
             self.client.fget_object(bucket_name,item.object_name,full_path)
+
+    def deleteFolder_minio(self, bucket_name, minio_path):
+    # Delete using "remove_objects"
+        objects_to_delete = self.client.list_objects(bucket_name, prefix=minio_path, recursive=True)
+        for obj in objects_to_delete:
+            self.client.remove_object(bucket_name, obj.object_name)
     
+    # def deleteFolder_minio2(self, bucket_name, minio_path):
+    # # Delete using "remove_objects"
+    #     objects_to_delete = self.client.list_objects(bucket_name, prefix=minio_path, recursive=True)
+    #     objects_to_delete = [x.object_name for x in objects_to_delete]
+    #     for del_err in self.client.remove_objects(bucket_name, objects_to_delete):
+    #         print("Deletion Error: {}".format(del_err))
+
+
+    def getconflist_minio(self):
+        self.listaconf = '"conf1":"descr conf1", "conf2":"descr conf2","conf3":"descr conf3"'
+        return (self.listaconf)
+
     def read_index(self):
         if  self.object_exists(self.indexbucket, self.indexname):
             findex = open(self.indexname)
