@@ -161,7 +161,6 @@ class DTmqtt(object):
         
     def on_connect(self, mosq, obj, msg, rc): 
         logger.info('Connected to MQTT server: {server}. Wainting for commands...', server=self.mqttBroker)
-#        log.info('Connected to MQTT server: %s', self.mqttBroker)
         
     def disconnect(self):
         return(self.client.loop_stop())
@@ -189,7 +188,7 @@ class DTmqtt(object):
         print(f'------------------------>on_LoadSIM:   LOAD DELLA SIMULAZIONE')
         if self.redis.aget('DTSDA_State') == S_IDLE :
             self.redis.aset('DTSDA_State', S_LOADED )
-            world, model, dtsdamng = prepScenario()
+            world, model, dtsdamng = batt_prepScenario()
         else:
             print(f'------------------------>on_LoadSIM:  SIM NOT in IDLE!! ')
             logger.warning('LOAD Request IGNORED. Simulator in state: {state} NOT changed! Simulator must be {state2} to be loaded.', 
@@ -253,7 +252,7 @@ class DTmqtt(object):
         mosaik.util.plot_execution_time_per_simulator(world, folder='util_figures')
 
     def on_message(self, client, userdata, message):
-        # callback per messaggi MQTT
+        # callback per echo dei messaggi MQTT
         global world, model, dtsdamng, tRun_on_message
         print(f'------------------------>on_message: Received con topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
     
@@ -261,40 +260,33 @@ class DTmqtt(object):
         global cli_minio
         print(f'------------------------>on_SaveConf: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
         source_path = CONFIG_DATA_PATH
-        #bucket_name = cli_minio.indexbucket
-#        minio_path = "confX" # str(message.payload.decode("utf-8"))
         minio_path = str(message.payload.decode("utf-8"))
         if not minio_path:
             minio_path='confX'
 
-        logger.info("Salvataggio configurazione da {source_path} in {minio_path} ", source_path=source_path, minio_path=minio_path )
-        cli_minio.upload_to_minio(local_path=source_path, bucket_name=cli_minio.indexbucket, minio_path=minio_path)
+        logger.info("Salvataggio configurazione da {source_path} nel objDb con id {minio_path} ", source_path=source_path, minio_path=minio_path )
+        cli_minio.upload_to_minio(local_path=source_path,  minio_path=minio_path)
           
     def on_LoadConf(self, client, userdata, message):
         global cli_minio
         print(f'------------------------>on_LoadConf: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
-        #bucket_name = cli_minio.indexbucket
-#        minio_path = "confX" # str(message.payload.decode("utf-8"))
-        minio_path = str(message.payload.decode("utf-8")) +'/'
+        minio_path = str(message.payload.decode("utf-8")) +'/'  # Aggiungo la barra se no va in crash
         if not minio_path:
             minio_path='confX/'
 
         dst_local_directory = CONFIG_DATA_PATH
 
-        logger.info("Carico configurazione da {minio_path} a {dst_local_directory} ", minio_path=minio_path, dst_local_directory=dst_local_directory )
-        cli_minio.download_from_minio( bucket_name=cli_minio.indexbucket, minio_path=minio_path, dst_local_path=dst_local_directory)
+        logger.info("Carico configurazione dal objDB con id {minio_path} in {dst_local_directory} ", minio_path=minio_path, dst_local_directory=dst_local_directory )
+        cli_minio.download_from_minio(  minio_path=minio_path, dst_local_path=dst_local_directory)
     
     def on_LoadConfList(self, client, userdata, message):
         global cli_minio
         print(f'------------------------>on_LoadConfList: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
         id_minio_path='conf'
         listaconf =  cli_minio.getconflist_minio()   # variabile di tipo text
-        # self.client.publish("DTSDA/LIST_CONF", listaconf)
-        self.client.publish(self.posts['listaconf'],listaconf)
-        
+        self.client.publish(self.posts['listaconf'],listaconf)        
         print(f'------------------------>on_LoadConfList: nuova listaconf: {listaconf} pubblicata')
 
-        pass
     def on_DelConf(self, client, userdata, message):
         global cli_minio
         print(f'------------------------>on_deleteFolder_minio: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
@@ -342,7 +334,7 @@ def SIMtest():
     global world, model, dtsdamng , debug
 
     #carico la configurazione di default
-    world, model, dtsdamng = prepScenario()
+    world, model, dtsdamng = batt_prepScenario()
 
     # lancio simulazione
     #taskRun()
@@ -372,7 +364,7 @@ def main():
         # connessione a mqtt
         cli_mqtt = DTmqtt()
         # Connessione al object DB        
-        cli_minio = MinioClient()
+        cli_minio = DTMinioClient()
         #lancio del loop mqtt   
         cli_mqtt.run()
 

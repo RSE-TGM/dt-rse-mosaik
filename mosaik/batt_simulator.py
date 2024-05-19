@@ -7,7 +7,7 @@ Mosaik interface for the example simulator.
 from loguru import logger
 import mosaik_api_v3 as mosaik_api
 import batt_model
-from  batt_include import *
+from  DT_include import *
 
 META_Battmodel = {
 #    'type': 'time-based',

@@ -25,10 +25,10 @@ from loguru import logger
 from pathlib import Path
 #from .. src.digital_twin.bess import BatteryEnergyStorageSystem
 
-from  batt_include import readConfig
+from  DT_include import readConfig
 
-from  batt_include import CONFIG_DATA_PATH
-from  batt_include import EXPERIMENT_CONFIG
+from  DT_include import CONFIG_DATA_PATH
+from  DT_include import EXPERIMENT_CONFIG
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 # aggiunge nel path la directory base del package, ad esempio: /home/antonio/dtwin/dt-rse-mosaik

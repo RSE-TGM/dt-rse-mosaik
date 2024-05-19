@@ -8,9 +8,9 @@ from loguru import logger
 import mosaik
 import datetime
 
-from  batt_include import *
+from  DT_include import *
 
-def prepScenario():
+def batt_prepScenario():
 
 # inizializzazzione simulazione di test    
     SIM_CONFIG = {
@@ -89,4 +89,4 @@ def prepScenario():
 
 if __name__ == '__main__':
     debug=True
-    prepScenario()
+    batt_prepScenario()
