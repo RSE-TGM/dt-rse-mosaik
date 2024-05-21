@@ -1,6 +1,7 @@
 #!/bin/bash
 # user: admin password: password
 set -x
-cd ../ServicesEtc/minio2
+SERV=../../../ServicesEtc
+cd $SERV/minio2
 docker-compose  -f docker-compose2.yml down 
 docker ps

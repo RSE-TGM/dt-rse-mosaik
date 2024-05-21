@@ -1,0 +1,9 @@
+{
+    "configuration": {
+    "@context": "http://schema.org/",
+    "@id": "34c117bd-6599-4323-b029-8913f8975c06",
+    "name": "ConfIgurazione di default",
+    "description": "Prima prova con il modello A",
+    "data": "DTSDA/configuration"
+    }
+}

@@ -28,9 +28,9 @@ S_RUNNING = 'Running'
 S_LOADED  = 'Loaded'
 S_ENDED   = 'Endend'
 
-DTHOME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DT_MOSAIK_HOME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-CONFIG_DATA_PATH = DTHOME + "/configuration/"
+CONFIG_DATA_PATH = DT_MOSAIK_HOME + "/configuration/"
 
 CONFIGDT = "configDT.yaml"
 
