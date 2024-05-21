@@ -32,7 +32,7 @@ from  DT_include import EXPERIMENT_CONFIG
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 # aggiunge nel path la directory base del package, ad esempio: /home/antonio/dtwin/dt-rse-mosaik
-sys.path.append(os.path.dirname(SCRIPT_DIR))  
+sys.path.append(os.path.dirname(os.path.dirname(SCRIPT_DIR)))  
 # a questo punto riesco a trovare src.digital_twin.bess
 from src.digital_twin.bess import BatteryEnergyStorageSystem
 

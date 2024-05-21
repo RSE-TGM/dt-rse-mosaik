@@ -35,7 +35,7 @@ mqtt:
     CALLBACK:                             # Comandi GET ricevuti dal HMI e callbacks associate
       SetModoSIM: "DTSDA/SET_SIM"
       SetModoLEARN: "DTSDA/SET_LEARN"
-      LoadSIM: "DTSDA/LOAD_SIM"
+      LoadSIM: "DTSDA/INIT_SIM"
       RunSIM: "DTSDA/RUN_SIM"
       StopSIM: "DTSDA/STOP_SIM"
       EndProg: "DTSDA/END"
@@ -45,7 +45,7 @@ mqtt:
       LoadConfList: "DTSDA/LIST_CONF_REQ"  # Richiesta della lista delle configurazioni salvate in minio. Ad es: "DTSDA/LIST_CONF_REQ"
       DelConf: "DTSDA/DELCONF"             # Rimozione di una configurazione salvata in minio. es: "DTSDA/DELCONF  conf1"
     POST:
-      listaconf: "DTSDA/LIST_CONF"         # Lista delle configurazioni salvate in minio e pubblicata da DTSDA nel mqtt brocker (come testo) per il HMI. 
+      listaconf: "DTSDA/LIST_CONF"         # Lista delle configurazioni (per HMI)  salvate in minio e pubblicata da DTSDA nel mqtt brocker (come testo). 
                                            # Esempio comando di pubblicazione: "DTSDA/LIST_CONF  listaconf". 
 
 minio:

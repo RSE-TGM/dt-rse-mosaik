@@ -158,7 +158,15 @@ class DTmqtt(object):
             except KeyboardInterrupt:
                 self.client.disconnect()
 #                break
-        
+    
+    def publish(self,tag,message):
+        self.client.publish(tag,message)
+
+    def on_message(self, client, userdata, message):
+        # callback per echo dei messaggi MQTT
+        global world, model, dtsdamng, tRun_on_message
+        print(f'------------------------>on_message: Received con topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
+
     def on_connect(self, mosq, obj, msg, rc): 
         logger.info('Connected to MQTT server: {server}. Wainting for commands...', server=self.mqttBroker)
         
@@ -250,11 +258,6 @@ class DTmqtt(object):
         mosaik.util.plot_execution_graph(world, folder='util_figures')
         mosaik.util.plot_execution_time(world, folder='util_figures')
         mosaik.util.plot_execution_time_per_simulator(world, folder='util_figures')
-
-    def on_message(self, client, userdata, message):
-        # callback per echo dei messaggi MQTT
-        global world, model, dtsdamng, tRun_on_message
-        print(f'------------------------>on_message: Received con topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
     
     def on_SaveConf(self, client, userdata, message):
         global cli_minio
@@ -361,11 +364,18 @@ def main():
         SIMtest()
     else:
 # modalità normale in "mqtt message loop"
-        # connessione a mqtt
+        # Connessione a mqtt e sua configurazione, la classe si connette inoltre a Redis. 
+        # Invece il modello della batteria ( modulo batt_prepscenario ) si connette direttamente a InfluxDB
         cli_mqtt = DTmqtt()
-        # Connessione al object DB        
+
+        ## Connessione al object DB Minio      
         cli_minio = DTMinioClient()
-        #lancio del loop mqtt   
+        # eseguo il backup della configurazione iniziale ...
+        adesso=datetime.datetime.now()
+        confbackName='ConfInitBackup'+adesso.strftime("-%d%m%Y-%H:%M:%S:%f")
+        cli_mqtt.publish(cli_mqtt.callbacks['SaveConf'], confbackName)
+
+        ## lancio del loop senza fine mqtt   
         cli_mqtt.run()
 
 
