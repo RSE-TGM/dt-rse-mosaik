@@ -1,5 +1,5 @@
 #!/bin/bash
 set -x
-cd ./redis
+cd ../ServicesEtc/redis
 docker-compose -f docker-compose2.yml down
 docker ps

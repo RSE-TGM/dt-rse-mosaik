@@ -1,6 +1,6 @@
 #!/bin/bash
 # user: userDT password: userDT
 set -x
-cd ./mqtt
+cd ../ServicesEtc/mqtt
 docker-compose  -f docker-compose2.yml up -d
 docker ps

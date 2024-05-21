@@ -1,5 +1,5 @@
 #!/bin/bash
 set -x
-cd ./influxdb
+cd ../ServicesEtc/influxdb
 docker-compose  -f docker-compose2.yml down
 docker ps

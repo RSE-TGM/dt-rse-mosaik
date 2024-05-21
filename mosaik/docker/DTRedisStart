@@ -1,6 +1,6 @@
 #!/bin/bash
 set -x
-cd ./redis
+cd ../ServicesEtc/redis
 docker-compose  -f docker-compose2.yml up  -d
 # docker-compose  -f docker-compose_SOLORedis.yaml up  --remove-orphans -d
 docker ps

@@ -1,5 +1,5 @@
 #!/bin/bash
 set -x
-cd ./mqtt
+cd ../ServicesEtc/mqtt
 docker-compose  -f docker-compose2.yml down
 docker ps
