@@ -1,6 +1,6 @@
 #!/bin/bash
 set -x
-SERV=../../../ServicesEtc
-cd $SERV/redis
+DTSERV=../../../ServicesEtc
+cd $DTSERV/redis
 docker-compose -f docker-compose2.yml down
 docker ps

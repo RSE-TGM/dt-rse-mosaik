@@ -1,6 +1,6 @@
 #!/bin/bash
 set -x
-SERV=.
-$SERV/DTminiostop; sleep 1;  $SERV/DTRedisStop; $SERV/DTinfluxdbstop; $SERV/DTmqttstop
+DTSERV=.
+$DTSERV/DTminiostop; sleep 1;  $DTSERV/DTRedisStop; $DTSERV/DTinfluxdbstop; $DTSERV/DTmqttstop
 ./DTstop
 #docker-compose -f docker-compose_conRedis.yaml down --remove-orphans 

@@ -134,8 +134,9 @@ class DTmqtt(object):
         self.client.message_callback_add(self.callbacks['PlotGraf'], self.on_PlotGraf)
         self.client.message_callback_add(self.callbacks['LoadConf'], self.on_LoadConf)
         self.client.message_callback_add(self.callbacks['SaveConf'], self.on_SaveConf)
-        self.client.message_callback_add(self.callbacks['LoadConfList'], self.on_LoadConfList)
+        self.client.message_callback_add(self.callbacks['ListaConfReq'], self.on_ListaConfReq)
         self.client.message_callback_add(self.callbacks['DelConf'], self.on_DelConf)
+        self.client.message_callback_add(self.callbacks['CurrConfReq'], self.on_CurrConfReq)
         # print("------------------------> DTmqtt_messloop: loop forever")
         # self.client.loop_forever()
         # print("------------------------> DTmqtt_messloop: FINE metodo")
@@ -282,13 +283,13 @@ class DTmqtt(object):
         logger.info("Carico configurazione dal objDB con id {minio_path} in {dst_local_directory} ", minio_path=minio_path, dst_local_directory=dst_local_directory )
         cli_minio.download_from_minio(  minio_path=minio_path, dst_local_path=dst_local_directory)
     
-    def on_LoadConfList(self, client, userdata, message):
+    def on_ListaConfReq(self, client, userdata, message):
         global cli_minio
-        print(f'------------------------>on_LoadConfList: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
+        print(f'------------------------>on_ListaConfReq: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
         id_minio_path='conf'
         listaconf =  cli_minio.getconflist_minio()   # variabile di tipo text
         self.client.publish(self.posts['listaconf'],listaconf)        
-        print(f'------------------------>on_LoadConfList: nuova listaconf: {listaconf} pubblicata')
+        print(f'------------------------>on_ListaConfReq: nuova listaconf: {listaconf} pubblicata')
 
     def on_DelConf(self, client, userdata, message):
         global cli_minio
@@ -296,6 +297,15 @@ class DTmqtt(object):
         minio_path = str(message.payload.decode("utf-8"))
         logger.info("Rimozione configurazione {minio_path} dal bucket {bucket_name}", minio_path=minio_path, bucket_name=cli_minio.indexbucket)
         cli_minio.deleteFolder_minio(bucket_name=cli_minio.indexbucket, minio_path=minio_path)
+
+    def on_CurrConfReq(self, client, userdata, message):
+        global cli_minio
+        print(f'------------------------>on_CurrConfReq: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
+        #id_minio_path='conf'
+        # si deve leggere il file index nella directory 'configurazione" dell'app ... per ora ci metto una stringa fissa
+        currconf =  '"currconf": "Questa è la descrizione della configurazione"'  # variabile di tipo text
+        self.client.publish(self.posts['listaconf'], currconf)        
+        print(f'------------------------>on_CurrConfReq: currconf: {currconf} pubblicata')
 
 
   
@@ -372,7 +382,7 @@ def main():
         cli_minio = DTMinioClient()
         # eseguo il backup della configurazione iniziale ...
         adesso=datetime.datetime.now()
-        confbackName='ConfInitBackup'+adesso.strftime("-%d%m%Y-%H:%M:%S:%f")
+        confbackName='CurrConfBackup'+adesso.strftime("-%d%m%Y-%H:%M:%S:%f")
         cli_mqtt.publish(cli_mqtt.callbacks['SaveConf'], confbackName)
 
         ## lancio del loop senza fine mqtt   
