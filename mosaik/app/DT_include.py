@@ -16,6 +16,8 @@ import glob
 import os
 from minio.error import  S3Error
 
+from  DT_rdf import *
+
 MODSIM = 'SIM'    # era 1
 MODLEARN = 'LRN'  # era 10
 NOFORZ = '0'      # era 0
@@ -35,6 +37,12 @@ CONFIG_DATA_PATH = DT_MOSAIK_HOME + "/configuration/"
 CONFIGDT = "configDT.yaml"
 
 EXPERIMENT_CONFIG = "experiment_config.yaml" 
+
+DTINDEX="DTindex.json"
+INDEXPATHDEF=CONFIG_DATA_PATH+"/"+DTINDEX
+INDEXPATHTMP="/tmp"+"/"+DTINDEX
+
+NAMESPACEDEF="http://tgm-sda.rse-web.it/"
 
 def readConfig(config_path, namefile):
         # Read in memory a yalm file
@@ -147,7 +155,7 @@ class DTMinioClient(object):
         except S3Error as _:
             return False
 
-    def upload_to_minio(self, local_path,  minio_path):
+    def upload_to_minio(self, local_path,  minio_path, indexFlag=False):
     #    assert os.path.isdir(local_path)
         for local_file in glob.glob(local_path + '/**'):
             local_file = local_file.replace(os.sep, "/") # Replace \ with / on Windows
@@ -158,6 +166,9 @@ class DTMinioClient(object):
                 remote_path = os.path.join(minio_path, os.path.basename(local_file))
                 remote_path = remote_path.replace(os.sep, "/")  # Replace \ with / on Windows
                 self.client.fput_object(self.indexbucket, remote_path, local_file)
+        if indexFlag:
+            #mm=minio_path+"/"+os.path.basename(INDEXPATHTMP)           
+            self.client.fput_object(self.indexbucket, minio_path+"/"+os.path.basename(INDEXPATHTMP), INDEXPATHTMP)
 
     def download_from_minio(self, minio_path,  dst_local_path):
     # for bucket_name in client.list_buckets():
@@ -188,8 +199,21 @@ class DTMinioClient(object):
         # per ogni conf legge il file di indice ( index.jsonId ?) e legge la descrizione, ad es. "conf1" e "descr conf1"
         # ricava la lista che è un dict come stringa di caratteri. ad es: listaconf = '"conf1":"descr conf1", "conf2":"descr conf2","conf3":"descr conf3"'
         
+        self.listaconf = []   # é una lista di liste
+        for itemC in self.client.list_objects(self.indexbucket, recursive=False):
+            #prefisso=item.object_name+"/DTindex.json"
+            prefisso=itemC.object_name+DTINDEX
+            
+            for item in self.client.list_objects(self.indexbucket, prefix=prefisso, recursive=False):
+#                print("item=", item.object_name)
+                self.client.fget_object(self.indexbucket,item.object_name,INDEXPATHTMP)
+                resp=rdfquery(namespace=NAMESPACEDEF,indexpath=INDEXPATHTMP)
+#                print(resp)
+                self.listaconf.append([resp['name'],resp['description']])
+        print("---->", self.listaconf)
+
         # lista fake per prova ...
-        self.listaconf = '"conf1":"descr conf1", "conf2":"descr conf2","conf3":"descr conf3"'
+        # self.listaconf = '"conf1":"descr conf1", "conf2":"descr conf2","conf3":"descr conf3"'
         return (self.listaconf)
 
     def read_index(self):

@@ -80,7 +80,7 @@ influxdb:
   USER: "influxuser"     # utilizzato solo in console
   PASSWORD: "DTpass!!"   # utilizzato solo in console
 
-RDF_v2:
-  - ['dtsdabuck', 'hold', 'index', '', '']
-  - ['dtsdabuck', 'hold', 'conf1', 'timestamp1', 'Questa è la descrizione di conf1']
-  - ['dtsdabuck', 'hold', 'conf2', 'timestamp2', 'Questa è la descrizione di conf2']
+rdf:
+  NAMESPACE: "http://tgm-sda.rse-web.it/"
+  INDEXPATH: "index.json"
+

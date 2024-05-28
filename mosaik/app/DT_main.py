@@ -27,6 +27,10 @@ from batt_simulator import *
 from batt_collector import *
 from batt_mng import *
 from batt_prepscenario import *
+from DT_include import INDEXPATHDEF
+from DT_include import NAMESPACEDEF
+
+from DT_rdf import *
 
 ##########################################
 
@@ -264,30 +268,44 @@ class DTmqtt(object):
         global cli_minio
         print(f'------------------------>on_SaveConf: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
         source_path = CONFIG_DATA_PATH
-        minio_path = str(message.payload.decode("utf-8"))
+        minio_path = str(message.payload.decode("utf-8")) # il message.payload é un str formattata come un dict del tipo {nome:descrizione}. Ad es:  '{"conf1":"descrizione conf1"}'
         if not minio_path:
             minio_path='confX'
 
-        logger.info("Salvataggio configurazione da {source_path} nel objDb con id {minio_path} ", source_path=source_path, minio_path=minio_path )
-        cli_minio.upload_to_minio(local_path=source_path,  minio_path=minio_path)
+        # converto da str a dict
+        minio_path_dict= json.loads(minio_path)
+
+        for key, value in minio_path_dict.items():
+#            print( key, value)
+            rdfcreate(indexpath=INDEXPATHTMP, name=key, description=value)
+            logger.info("Salvataggio configurazione da {source_path} nel objDB con id {minio_path} ", source_path=source_path, minio_path=minio_path )
+            cli_minio.upload_to_minio(local_path=source_path,  minio_path=key)
+            # a questo punto copio solo index.json giusto, prodotto nella directory /tmp (con indexFlag a true)
+            cli_minio.upload_to_minio(local_path=INDEXPATHTMP,  minio_path=key, indexFlag=True)
           
     def on_LoadConf(self, client, userdata, message):
         global cli_minio
         print(f'------------------------>on_LoadConf: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
-        minio_path = str(message.payload.decode("utf-8")) +'/'  # Aggiungo la barra se no va in crash
+        minio_path = str(message.payload.decode("utf-8")) +'/'  # E' una str. Ad es: 'conf1'. Aggiungo la barra se no va in crash, 
         if not minio_path:
             minio_path='confX/'
 
         dst_local_directory = CONFIG_DATA_PATH
 
-        logger.info("Carico configurazione dal objDB con id {minio_path} in {dst_local_directory} ", minio_path=minio_path, dst_local_directory=dst_local_directory )
-        cli_minio.download_from_minio(  minio_path=minio_path, dst_local_path=dst_local_directory)
+        cli_minio.download_from_minio( minio_path=minio_path, dst_local_path=dst_local_directory)
+        confActual=rdfquery(indexpath=INDEXPATHDEF)  # è un dict
+        nameActual=confActual['name']
+        descrActual=confActual['description']
+
+        # logger.info("Carico configurazione dal objDB con id {minio_path} in {dst_local_directory} ", minio_path=minio_path, dst_local_directory=dst_local_directory )
+        logger.info("Caricata la configurazione dal objDB  {nameActual}:{descrActual} in {dst_local_directory}", nameActual=nameActual, descrActual=descrActual, dst_local_directory=dst_local_directory)
+
     
     def on_ListaConfReq(self, client, userdata, message):
         global cli_minio
         print(f'------------------------>on_ListaConfReq: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
         id_minio_path='conf'
-        listaconf =  cli_minio.getconflist_minio()   # variabile di tipo text
+        listaconf =  str(cli_minio.getconflist_minio())   # variabile di tipo text
         self.client.publish(self.posts['listaconf'],listaconf)        
         print(f'------------------------>on_ListaConfReq: nuova listaconf: {listaconf} pubblicata')
 
@@ -301,9 +319,14 @@ class DTmqtt(object):
     def on_CurrConfReq(self, client, userdata, message):
         global cli_minio
         print(f'------------------------>on_CurrConfReq: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
+        confActual=rdfquery(indexpath=INDEXPATHDEF)  # è un dict
+        currconf=str(confActual)
+        nameActual=confActual['name']
+        descrActual=confActual['description']
+
         #id_minio_path='conf'
         # si deve leggere il file index nella directory 'configurazione" dell'app ... per ora ci metto una stringa fissa
-        currconf =  '"currconf": "Questa è la descrizione della configurazione"'  # variabile di tipo text
+#        currconf =  '"currconf": "Questa è la descrizione della configurazione"'  # variabile di tipo text
         self.client.publish(self.posts['listaconf'], currconf)        
         print(f'------------------------>on_CurrConfReq: currconf: {currconf} pubblicata')
 
@@ -380,10 +403,15 @@ def main():
 
         ## Connessione al object DB Minio      
         cli_minio = DTMinioClient()
+        
         # eseguo il backup della configurazione iniziale ...
+        confActual=rdfquery(indexpath=INDEXPATHDEF)
+
         adesso=datetime.datetime.now()
-        confbackName='CurrConfBackup'+adesso.strftime("-%d%m%Y-%H:%M:%S:%f")
-        cli_mqtt.publish(cli_mqtt.callbacks['SaveConf'], confbackName)
+        confbackName='CurrConfBackup'+adesso.strftime("-%d%m%Y-%H_%M_%S_%f") 
+        descrActual=confActual['description']
+        confback = f"""{{"{confbackName}":"{descrActual}"}}"""
+        cli_mqtt.publish(cli_mqtt.callbacks['SaveConf'], confback)
 
         ## lancio del loop senza fine mqtt   
         cli_mqtt.run()
