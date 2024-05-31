@@ -17,6 +17,9 @@ sudo apt install libboost-all-dev  -y
 pip3 install -r requirements.txt
 
 ## set up servizi e utilità
+### Visual studio code
+sudo apt install software-properties-common apt-transport-https wget
+### altri
 sudo install gedit
 sudo snap install mqtt-explorer
 sudo cp -a docker/minio2     dt-rse-mosaik/mosaik/docker
