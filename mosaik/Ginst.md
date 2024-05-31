@@ -19,6 +19,10 @@ pip3 install -r requirements.txt
 ## set up servizi e utilità
 ### Visual studio code
 sudo apt install software-properties-common apt-transport-https wget
+sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
+sudo apt install code
+sudo apt update
+sudo apt upgrade
 ### altri
 sudo install gedit
 sudo snap install mqtt-explorer
