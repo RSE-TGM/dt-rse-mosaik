@@ -2,5 +2,5 @@
 set -x
 DTSERV=../../../ServicesEtc
 cd $DTSERV/influxdb
-docker-compose  -f docker-compose2.yml up -d
+sudo docker-compose  -f docker-compose2.yml up -d
 docker ps

@@ -1,4 +1,4 @@
 #!/bin/bash
 set -x
 cd proc/influxdb
- docker-compose  logs --follow
+sudo  docker-compose  logs --follow

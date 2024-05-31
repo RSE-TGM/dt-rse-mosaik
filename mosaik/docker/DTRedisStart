@@ -2,6 +2,6 @@
 set -x
 DTSERV=../../../ServicesEtc
 cd $DTSERV/redis
-docker-compose  -f docker-compose2.yml up  -d
+sudo docker-compose  -f docker-compose2.yml up  -d
 # docker-compose  -f docker-compose_SOLORedis.yaml up  --remove-orphans -d
 docker ps
