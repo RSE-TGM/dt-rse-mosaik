@@ -327,7 +327,7 @@ class DTmqtt(object):
         #id_minio_path='conf'
         # si deve leggere il file index nella directory 'configurazione" dell'app ... per ora ci metto una stringa fissa
 #        currconf =  '"currconf": "Questa è la descrizione della configurazione"'  # variabile di tipo text
-        self.client.publish(self.posts['listaconf'], currconf)        
+        self.client.publish(self.posts['currconf'], currconf)        
         print(f'------------------------>on_CurrConfReq: currconf: {currconf} pubblicata')
 
 
