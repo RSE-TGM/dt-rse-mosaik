@@ -1,6 +1,6 @@
 #!/bin/bash
 set -x
-DTSERV=../../../ServicesEtc
+# DTSERV=../../../DTwinServices
 cd $DTSERV/mqtt
 sudo docker-compose  -f docker-compose2.yml down
 docker ps
