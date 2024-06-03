@@ -27,10 +27,10 @@ from batt_simulator import *
 from batt_collector import *
 from batt_mng import *
 from batt_prepscenario import *
-from DT_include import INDEXPATHDEF
-from DT_include import NAMESPACEDEF
+#from DT_include import INDEXPATHDEF
+from DT_include import *
 
-from DT_rdf import *
+#from DT_rdf import *
 
 ##########################################
 
@@ -113,7 +113,7 @@ class DTmqtt(object):
 # connessione al broker mqtt
         self.client.connect(self.mqttBroker, self.port)
 
-        self.callbacks = self.configDT['mqtt']['DTSDA']['CALLBACK']   # callbacks associate ai comandi mqtt
+        self.callbacks = self.configDT['mqtt']['DTSDA']['CALLBACK']   # lista delle callbacks associate ai comandi mqtt e subscribe degli stessi
         for tag in self.callbacks:
             print(f'{self.callbacks[tag]}')
             self.client.subscribe(self.callbacks[tag])
@@ -320,7 +320,8 @@ class DTmqtt(object):
         global cli_minio
         print(f'------------------------>on_CurrConfReq: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
         confActual=rdfquery(indexpath=INDEXPATHDEF)  # è un dict
-        currconf=str(confActual)
+        currconf = json.dumps(confActual) # converto in json per inviare
+        ## currconf=str(confActual)
         nameActual=confActual['name']
         descrActual=confActual['description']
 

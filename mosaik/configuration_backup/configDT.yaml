@@ -25,6 +25,7 @@ mqtt:
   PORT: "1883"
   USER: "userDT"
   PASSWORD: "userDT"
+  WEBSOCKETPORT: "9001"
   DTSDA:
     MISURE:
       BATT1:
@@ -33,20 +34,22 @@ mqtt:
         corrente: "DTSDA/BATT1/I"
     # associazione Callback --> TagComando_mqtt
     CALLBACK:                             # Comandi GET ricevuti dal HMI e callbacks associate
-      SetModoSIM: "DTSDA/SET_SIM"
+      SetModoSIM:   "DTSDA/SET_SIM"
       SetModoLEARN: "DTSDA/SET_LEARN"
-      LoadSIM: "DTSDA/INIT_SIM"
-      RunSIM: "DTSDA/RUN_SIM"
-      StopSIM: "DTSDA/STOP_SIM"
-      EndProg: "DTSDA/END"
-      PlotGraf: "DTSDA/PLOTGRAF"           
-      LoadConf: "DTSDA/LOADCONF"           # Richiesta configurazione da caricare, es:  "DTSDA/LOADCONF  conf1"
+      LoadSIM:      "DTSDA/INIT_SIM"
+      RunSIM:       "DTSDA/RUN_SIM"
+      StopSIM:      "DTSDA/STOP_SIM"
+      EndProg:      "DTSDA/END"
+      PlotGraf:     "DTSDA/PLOTGRAF"           
+      CurrConfReq:  "DTSDA/CURRCONF_REQ"    # Richiesta della configurazione corrente, es:  "DTSDA/CURRCONF_REQ"
+      LoadConf:     "DTSDA/LOADCONF"        # Richiesta configurazione da caricare, es:  "DTSDA/LOADCONF  conf1"
       SaveConf: "DTSDA/SAVECONF"           # Richiesta configurazione da salvare, es:  "DTSDA/SAVECONF  conf1"
-      LoadConfList: "DTSDA/LIST_CONF_REQ"  # Richiesta della lista delle configurazioni salvate in minio. Ad es: "DTSDA/LIST_CONF_REQ"
+      ListaConfReq: "DTSDA/LISTCONF_REQ"   # Richiesta della lista delle configurazioni salvate in minio. Ad es: "DTSDA/LISTCONF_REQ"
       DelConf: "DTSDA/DELCONF"             # Rimozione di una configurazione salvata in minio. es: "DTSDA/DELCONF  conf1"
     POST:
-      listaconf: "DTSDA/LIST_CONF"         # Lista delle configurazioni (per HMI)  salvate in minio e pubblicata da DTSDA nel mqtt brocker (come testo). 
-                                           # Esempio comando di pubblicazione: "DTSDA/LIST_CONF  listaconf". 
+      listaconf: "DTSDA/LISTCONF"         # Lista delle configurazioni (per HMI)  salvate in minio e pubblicata da DTSDA nel mqtt brocker (come testo). 
+                                           # Esempio comando di pubblicazione: "DTSDA/LIST_CONF  listaconf"
+      currconf: "DTSDA/CURRCONF"           # Configurazione corrente, es:  "DTSDA/CURRCONF  currconf"
 
 minio:
   ENDPOINT: "localhost:9090"
@@ -78,7 +81,7 @@ influxdb:
   USER: "influxuser"     # utilizzato solo in console
   PASSWORD: "DTpass!!"   # utilizzato solo in console
 
-RDF_v2:
-  - ['dtsdabuck', 'hold', 'index', '', '']
-  - ['dtsdabuck', 'hold', 'conf1', 'timestamp1', 'Questa è la descrizione di conf1']
-  - ['dtsdabuck', 'hold', 'conf2', 'timestamp2', 'Questa è la descrizione di conf2']
+rdf:
+  NAMESPACE: "http://tgm-sda.rse-web.it/"
+  INDEXPATH: "index.json"
+

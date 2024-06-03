@@ -200,6 +200,7 @@ class DTMinioClient(object):
         # ricava la lista che è un dict come stringa di caratteri. ad es: listaconf = '"conf1":"descr conf1", "conf2":"descr conf2","conf3":"descr conf3"'
         
         self.listaconf = []   # é una lista di liste
+        self.listaconf_dict = {}   # é una dict di dict
         for itemC in self.client.list_objects(self.indexbucket, recursive=False):
             #prefisso=item.object_name+"/DTindex.json"
             prefisso=itemC.object_name+DTINDEX
@@ -210,11 +211,12 @@ class DTMinioClient(object):
                 resp=rdfquery(namespace=NAMESPACEDEF,indexpath=INDEXPATHTMP)
 #                print(resp)
                 self.listaconf.append([resp['name'],resp['description']])
-        print("---->", self.listaconf)
-
+                self.listaconf_dict[resp['name']] = resp
+        #print("---->", self.listaconf_dict)
         # lista fake per prova ...
         # self.listaconf = '"conf1":"descr conf1", "conf2":"descr conf2","conf3":"descr conf3"'
-        return (self.listaconf)
+#        return (self.listaconf_dict)
+        return (json.dumps(self.listaconf_dict))  # invio un json
 
     def read_index(self):
         if  self.object_exists(self.indexbucket, self.indexname):

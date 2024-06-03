@@ -25,6 +25,7 @@ mqtt:
   PORT: "1883"
   USER: "userDT"
   PASSWORD: "userDT"
+  WEBSOCKETPORT: "9001"
   DTSDA:
     MISURE:
       BATT1:
