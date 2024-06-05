@@ -1,0 +1,30 @@
+#!/bin/bash
+
+versione=aguagliardi/dtsda_full:2.1
+
+while true; do
+
+echo " "
+echo "Building dell'immagine $versione"  
+read -p "Procedo? (y/n) " yn
+
+ case $yn in 
+	[yY] ) echo ok, verrà cotruita la immagine docker $versione ;
+        set -x
+	cd ../../..
+        docker build -t  $versione --file dt-rse-mosaik/mosaik/docker/Dockerfile_python38_full .
+        set +x
+        if [ $? -eq 0 ]; then
+            echo "--------------> Fine building dell'immagine $versione <---------------"
+        else
+            echo "Errore nel building dell'immagine"
+        fi
+		break;;
+	[nN] ) echo exiting...;
+		exit;;
+	* ) echo invalid response;;
+ esac
+
+done
+#set -x
+#docker build -t  aguagliardi/dtsda:2.0 --file Dockerfile_python38 .

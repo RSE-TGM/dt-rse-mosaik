@@ -1,0 +1,5 @@
+#!/bin/bash
+set -x
+#docker-compose up -f docker-compose.yml --remove-orphans -d
+sudo docker-compose -f docker-compose_full.yml  up -d
+
