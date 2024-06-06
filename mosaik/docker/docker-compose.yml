@@ -10,14 +10,16 @@ services:
     container_name: DTSDA
     environment:
       DISPLAY: $DISPLAY
-      #      REDIS_HOST: DTredis
+      #      REDIS_HOST: redis
       REDIS_HOST: localhost
       REDIS_PORT: 6380
+      #      REDIS_PORT: 6379
       REDIS_PASSWORD: mypassw
     volumes:
       - "../..:/home/dt-rse-mosaik"
       - "/tmp/.X11-unix:/tmp/.X11-unix"
 
 #networks:
-#  DT-net:
-#    driver: bridge
+#  mesp_net:
+#   external: true
+
