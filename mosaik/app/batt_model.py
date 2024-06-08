@@ -108,12 +108,14 @@ class Model:
 
 def test():
     model = Model()
-    model.delta=12.45
-    step =1.
-    tcur=0.
+    model.delta=12.45  # current (A)
+    step =1.  # incremento in secondi
+    tcur=0.   
+    for tcur in range(0,10,1):
+        model.delta=model.delta+0.1
+        esito = model.step(step, tcur)
+        print("esito=",esito,"T=",tcur, "sec.", "- load_current=",model.load_current,"output_voltage=",model.output_voltage)
     
-    esito = model.step(step, tcur)
-    print("esito=",esito,"load_current=",model.load_current,"output_voltage=",model.output_voltage)
     return(esito)
 
 

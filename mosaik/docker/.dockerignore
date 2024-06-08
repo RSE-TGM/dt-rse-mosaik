@@ -6,3 +6,5 @@ old
 tmp
 rabbitMQ
 redis
+*/.git
+*/.venv
