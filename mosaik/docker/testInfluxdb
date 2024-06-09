@@ -1,1 +1,0 @@
-curl -sL -I localhost:8086/ping

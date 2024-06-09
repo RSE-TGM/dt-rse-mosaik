@@ -1,0 +1,48 @@
+https://lists.offis.de/mailman/listinfo/mosaik-users
+https://github.com/OFFIS-mosaik/mosaik
+https://github.com/OFFIS-mosaik
+
+https://mosaik.readthedocs.io/en/latest/tutorials/graphs.html
+
+https://gitlab.com/mosaik/components/mosaik-fmi
+
+
+----------------------------------------
+per installare mosaik_fmi vedi
+https://pypi.org/project/fmipp/
+
+Installation on Linux (Ubuntu 20.04)
+make sure to have installed the following prerequisites(e.g. via apt, see package names in brackets below):
+
+python (python3) (recommended: version 3.7 or higher)
+
+pip (python3-pip)
+
+distutils (python3-setuptools)
+
+GCC compiler toolchain (build-essential)
+
+swig (swig)
+
+SUNDIALS library (libsundials-dev)
+
+Boost library (libboost-all-dev)
+
+use pip to install the FMI++ Python Interface from the PyPI via source distribution:
+
+$ python3 -m pip install fmipp
+
+------------------------------------
+
+
+pip install mosaik_fmi
+sudo apt-get install python3-dev
+
+pythonfmu per fmu 3.x
+https://pypi.org/project/pythonfmu3/
+
+-----------------
+-------------------
+pip freeze senza numero versione:
+pip list --format=json | jq -r ".[].name"
+---------------

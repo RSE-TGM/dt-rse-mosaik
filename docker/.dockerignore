@@ -1,0 +1,10 @@
+mqtt
+influxdb
+minio2
+minio
+old
+tmp
+rabbitMQ
+redis
+*/.git
+*/.venv

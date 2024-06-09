@@ -1,3 +1,0 @@
-#!/bin/bash
-set -x
-docker exec -it DTSDA python mosaik/app/DT_main.py 

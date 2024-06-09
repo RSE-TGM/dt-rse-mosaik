@@ -1,0 +1,7 @@
+#!/bin/bash
+# user: userDT password: userDT
+set -x
+# DTSERV=../../../DTwinServices
+cd $DTSERV/mqtt
+docker compose  -f docker-compose2.yml up -d
+docker ps

@@ -1,0 +1,7 @@
+#!/bin/bash
+set -x
+DTSERVLOCALE=.
+$DTSERVLOCALE/DTminiostart; sleep 1;  $DTSERVLOCALE/DTRedisStart; $DTSERVLOCALE/DTinfluxdbstart; $DTSERVLOCALE/DTmqttstart
+./DTstart
+./DTRun
+#docker-compose -f docker-compose_conRedis.yaml up --remove-orphans -d

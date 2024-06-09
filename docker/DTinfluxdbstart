@@ -1,0 +1,6 @@
+#!/bin/bash
+set -x
+# DTSERV=../../../DTwinServices
+cd $DTSERV/influxdb
+docker compose  -f docker-compose2.yml up -d
+docker ps

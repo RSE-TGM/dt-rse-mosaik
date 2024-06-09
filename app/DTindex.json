@@ -1,0 +1,20 @@
+[
+  {
+    "@id": "http://tgm-sda.rse-web.it/DTSDA_eb35f655-c34b-49f0-bfef-9109e924367d",
+    "http://tgm-sda.rse-web.it/date": [
+      {
+        "@value": "2024-06-09 11:51:48.530687"
+      }
+    ],
+    "http://tgm-sda.rse-web.it/description": [
+      {
+        "@value": " Configurazione n. 1"
+      }
+    ],
+    "http://tgm-sda.rse-web.it/name": [
+      {
+        "@value": "Config1"
+      }
+    ]
+  }
+]

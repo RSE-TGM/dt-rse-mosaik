@@ -1,7 +1,0 @@
-#!/bin/bash
-# user: admin password: password
-set -x
-# DTSERV=../../../DTwinServices
-cd $DTSERV/minio2
-docker compose  -f docker-compose2.yml down 
-docker ps
