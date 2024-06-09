@@ -18,6 +18,8 @@ from minio.error import  S3Error
 
 from  DT_rdf import *
 
+SRC_DTRSE=False  # con false il modello della batteria è locale a dt-rse-mosaik,  con true è quello di DT-rse
+
 MODSIM = 'SIM'    # era 1
 MODLEARN = 'LRN'  # era 10
 NOFORZ = '0'      # era 0

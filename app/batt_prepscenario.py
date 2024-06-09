@@ -40,7 +40,8 @@ def batt_prepScenario():
     now = datetime.datetime.now()
     START = f"{now}"
     ### INPUT_DATA = 'mosaik/configuration/data/input_data.csv' # .csv in your setup
-    INPUT_DATA = 'configuration/data/input_data.csv' # .csv in your setup
+    INPUT_DATA = CONFIG_DATA_PATH + 'data/input_data.csv'
+    #INPUT_DATA = 'configuration/data/input_data.csv' # .csv in your setup
 
     # Start simulators
     #modelsim = world.start('ModelSim', eid_prefix='Model_',step_size=2.8)
