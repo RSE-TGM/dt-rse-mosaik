@@ -26,9 +26,9 @@ sudo apt upgrade
 ### altri
 sudo install gedit
 sudo snap install mqtt-explorer
-sudo cp -a docker/minio2     dt-rse-mosaik/mosaik/docker
-sudo cp -a docker/influxdb   dt-rse-mosaik/mosaik/docker
-sudo cp -a docker/mqtt        dt-rse-mosaik/mosaik/docker
+sudo cp -a docker/minio2     dt-rse-mosaik/docker
+sudo cp -a docker/influxdb   dt-rse-mosaik/docker
+sudo cp -a docker/mqtt        dt-rse-mosaik/docker
 
 sudo chown -R 1001:1001 redis-data/
 sudo chown -R 1001:1001 minio-data/

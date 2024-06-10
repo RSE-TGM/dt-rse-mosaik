@@ -11,8 +11,8 @@ read -p "Procedo? (y/n) " yn
  case $yn in 
 	[yY] ) echo ok, verrà cotruita la immagine docker $versione ;
         set -x
-	cd ../../..
-        docker build -t  $versione --file dt-rse-mosaik/mosaik/docker/Dockerfile_python38_full .
+	cd ../..
+        docker build -t  $versione --file dt-rse-mosaik/docker/Dockerfile_python38_full .
         set +x
         if [ $? -eq 0 ]; then
             echo "--------------> Fine building dell'immagine $versione <---------------"

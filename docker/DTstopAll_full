@@ -1,0 +1,6 @@
+#!/bin/bash
+set -x
+DTSERVLOCALE=.
+$DTSERVLOCALE/DTminiostop; sleep 1;  $DTSERVLOCALE/DTRedisStop; $DTSERVLOCALE/DTinfluxdbstop; $DTSERVLOCALE/DTmqttstop
+./DTstop_full
+#docker-compose -f docker-compose_conRedis.yaml down --remove-orphans 
