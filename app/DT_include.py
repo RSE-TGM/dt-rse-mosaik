@@ -20,17 +20,22 @@ from  DT_rdf import *
 
 SRC_DTRSE=False  # con false il modello della batteria è locale a dt-rse-mosaik,  con true è quello di DT-rse
 
-MODSIM = 'SIM'    # era 1
-MODLEARN = 'LRN'  # era 10
-NOFORZ = '0'      # era 0
+MODSIM = 'MODSIM'    # era 1
+MODLEARN = 'MODLRN'  # era 10
+NOFORZ = 'NOFORZ'      # era 0
 FORZSIM = MODSIM
 FORZLEARN = MODLEARN
 STOP = -1
 
-S_IDLE    = 'Idle'
-S_RUNNING = 'Running'
-S_READY  = 'Ready'
-S_ENDED   = 'Endend'
+S_IDLE    = 'S_IDLE'
+S_RUNNING = 'S_RUNNING'
+S_READY  = 'S_READY'
+S_ENDED   = 'S_ENDED'
+
+S_SIM='SIM'
+S_LEARN='LRN'
+S_ON='1'
+S_OFF='0'
 
 DT_MOSAIK_HOME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -105,7 +110,8 @@ class  redisDT(object):
         return(self.red.set(self.tags[tag][0],val))
             
     def esistetag(self,tag):
-        return(self.red.exists(tag))
+        return(self.red.exists(self.tags[tag][0]))
+#        return(self.red.exists(tag))
     
     def gettags(self):
         ret = self.configDT['redis']['DTSDA']

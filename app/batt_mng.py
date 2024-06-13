@@ -44,14 +44,18 @@ class DTSDA_Mng(mosaik_api_v3.Simulator):
         self.r = self.redis.connect()
         
 
-        if self.redis.esistetag(self.tags['DTmode'][0]) != 0:
-            self.DTmode = self.tags['DTmode'][0]
+        if self.redis.esistetag('DTmode') != 0:
+ #       if self.redis.esistetag(self.tags['DTmode'][0]) != 0:
+            self.DTmode = self.redis.aget('DTmode')  # se esiste, leggo il valore da redis
+ #           self.DTmode = self.redis.aget(self.tags['DTmode'][0])  # se esiste, leggo il valore da redis
         else:
             self.DTmode = self.tags['DTmode'][1] # se non esiste metto il dafault letto dal configDT
             self.redis.aset('DTmode',self.DTmode)
 
-        if self.redis.esistetag(self.tags['DTmode_set'][0]) != 0:
-            self.DTmod_set = self.tags['DTmode_set'][0]
+        if self.redis.esistetag('DTmode_set') != 0:
+#        if self.redis.esistetag(self.tags['DTmode_set'][0]) != 0:
+            self.DTmod_set = self.redis.aget('DTmode_set')  # se esiste, leggo il valore da redis
+#            self.DTmod_set = self.redis.aget(self.tags['DTmode_set'][0])  # se esiste, leggo il valore da redis
         else:
             self.DTmode_set = self.tags['DTmode_set'][1] # se non esiste metto il dafault letto dal configDT
             self.redis.aset('DTmode_set',self.DTmode)
