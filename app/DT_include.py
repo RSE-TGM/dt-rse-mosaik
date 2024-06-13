@@ -29,7 +29,7 @@ STOP = -1
 
 S_IDLE    = 'Idle'
 S_RUNNING = 'Running'
-S_LOADED  = 'Loaded'
+S_READY  = 'Ready'
 S_ENDED   = 'Endend'
 
 DT_MOSAIK_HOME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

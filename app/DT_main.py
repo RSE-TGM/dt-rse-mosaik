@@ -132,7 +132,7 @@ class DTmqtt(object):
         self.client.message_callback_add(self.callbacks['EndProg'], self.on_EndProg)
         self.client.message_callback_add(self.callbacks['SetModoSIM'], self.on_SetModoSIM)
         self.client.message_callback_add(self.callbacks['SetModoLEARN'], self.on_SetModoLEARN)
-        self.client.message_callback_add(self.callbacks['LoadSIM'], self.on_LoadSIM)
+        self.client.message_callback_add(self.callbacks['InitSIM'], self.on_InitSIM)
         self.client.message_callback_add(self.callbacks['RunSIM'], self.on_RunSIM)
         self.client.message_callback_add(self.callbacks['StopSIM'], self.on_StopSIM)
         self.client.message_callback_add(self.callbacks['PlotGraf'], self.on_PlotGraf)
@@ -196,14 +196,14 @@ class DTmqtt(object):
     def on_SetModoLEARN(self, client, userdata, message):
         print(f'------------------------>on_SetModoLEARN:  SetModoLEARN')
 
-    def on_LoadSIM(self, client, userdata, message):
+    def on_InitSIM(self, client, userdata, message):
         global world, model, dtsdamng
-        print(f'------------------------>on_LoadSIM:   LOAD DELLA SIMULAZIONE')
+        print(f'------------------------>on_InitSIM:   INIT DELLA SIMULAZIONE')
         if self.redis.aget('DTSDA_State') == S_IDLE :
-            self.redis.aset('DTSDA_State', S_LOADED )
+            self.redis.aset('DTSDA_State', S_READY )
             world, model, dtsdamng = batt_prepScenario()
         else:
-            print(f'------------------------>on_LoadSIM:  SIM NOT in IDLE!! ')
+            print(f'------------------------>on_InitSIM:  SIM NOT in IDLE!! ')
             logger.warning('LOAD Request IGNORED. Simulator in state: {state} NOT changed! Simulator must be {state2} to be loaded.', 
                                state=self.redis.aget('DTSDA_State'), state2=S_IDLE ) 
 
@@ -216,13 +216,13 @@ class DTmqtt(object):
         # Per sopprime il traceback!!!!
         sys.tracebacklimit = 0
         try:
-            if self.redis.aget('DTSDA_State') == S_LOADED :
+            if self.redis.aget('DTSDA_State') == S_READY :
                 self.redis.aset('DTSDA_State', S_RUNNING)
                 tRun_on_message = taskRunInThread()
             else:
-                print(f'------------------------>on_RunSIM:  SIM NOT LOADED!! ')
+                print(f'------------------------>on_RunSIM:  SIM NOT READY, Must be inizialized to run a simulation!! ')
                 logger.warning('RUN Request IGNORED. Simulator in state: {state} NOT changed! Simulator must be {state2} to be run.', 
-                               state=self.redis.aget('DTSDA_State'), state2=S_LOADED ) 
+                               state=self.redis.aget('DTSDA_State'), state2=S_READY ) 
 
         except Exception as e:
             if debug:
@@ -238,14 +238,14 @@ class DTmqtt(object):
         global world, model, dtsdamng, tRun_on_message
         print(f'------------------------>on_StopSIM:  Stop della Simulazione')
         try:
-            if self.redis.aget('DTSDA_State') == S_RUNNING :
+            if (self.redis.aget('DTSDA_State') == S_RUNNING) or (self.redis.aget('DTSDA_State') == S_READY):
                 self.redis.aset('DTSDA_State', S_IDLE)
                 world.until = 1
                 sleep(1)
                 print(f"SHUTDOWN!")    
                 world.shutdown()
             else: 
-                print(f'------------------------>on_StopSIM:  SIM NOT RUNNING!! ')
+                print(f'------------------------>on_StopSIM:  SIM NOT RUNNING to be stopped! ')
                 logger.warning('STOP Request IGNORED. Simulator in state: {state} NOT changed! Simulator must be {state2} to be stopped.', 
                                state=self.redis.aget('DTSDA_State'), state2=S_RUNNING ) 
 
@@ -267,6 +267,14 @@ class DTmqtt(object):
     def on_SaveConf(self, client, userdata, message):
         global cli_minio
         print(f'------------------------>on_SaveConf: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
+        if self.redis.aget('DTSDA_State') != S_IDLE :
+            print(f'------------------------>on_SaveConf:   NOT in IDLE!! ')
+            logger.warning('SAVE Request IGNORED. DTwin in state: {state} NOT changed!  must be {state2} to save a configuration', 
+                               state=self.redis.aget('DTSDA_State'), state2=S_IDLE ) 
+            return
+
+
+
         source_path = CONFIG_DATA_PATH
         minio_path = str(message.payload.decode("utf-8")) # il message.payload é un str formattata come un dict del tipo {nome:descrizione}. Ad es:  '{"conf1":"descrizione conf1"}'
         if not minio_path:
@@ -286,6 +294,11 @@ class DTmqtt(object):
     def on_LoadConf(self, client, userdata, message):
         global cli_minio
         print(f'------------------------>on_LoadConf: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
+        if self.redis.aget('DTSDA_State') != S_IDLE :
+            print(f'------------------------>on_LoadConf:   NOT in IDLE!! ')
+            logger.warning('LOAD Request IGNORED. DTwin in state: {state} NOT changed!  must be {state2} to load a configuration', state=self.redis.aget('DTSDA_State'), state2=S_IDLE ) 
+            return
+
         minio_path = str(message.payload.decode("utf-8")) +'/'  # E' una str. Ad es: 'conf1'. Aggiungo la barra se no va in crash, 
         if not minio_path:
             minio_path='confX/'
@@ -312,6 +325,11 @@ class DTmqtt(object):
     def on_DelConf(self, client, userdata, message):
         global cli_minio
         print(f'------------------------>on_deleteFolder_minio: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
+        # if self.redis.aget('DTSDA_State') != S_IDLE :
+        #     print(f'------------------------>on_DelConf:   NOT in IDLE!! ')
+        #     logger.warning('Delete Request IGNORED. DTwin in state: {state} NOT changed!  must be {state2} to delete a configuration', state=self.redis.aget('DTSDA_State'), state2=S_IDLE ) 
+        #     return
+
         minio_path = str(message.payload.decode("utf-8"))
         logger.info("Rimozione configurazione {minio_path} dal bucket {bucket_name}", minio_path=minio_path, bucket_name=cli_minio.indexbucket)
         cli_minio.deleteFolder_minio(bucket_name=cli_minio.indexbucket, minio_path=minio_path)

@@ -36,7 +36,7 @@ mqtt:
     CALLBACK:                             # Comandi GET ricevuti dal HMI e callbacks associate
       SetModoSIM:   "DTSDA/SET_SIM"
       SetModoLEARN: "DTSDA/SET_LEARN"
-      LoadSIM:      "DTSDA/INIT_SIM"
+      InitSIM:      "DTSDA/INIT_SIM"
       RunSIM:       "DTSDA/RUN_SIM"
       StopSIM:      "DTSDA/STOP_SIM"
       EndProg:      "DTSDA/END"
