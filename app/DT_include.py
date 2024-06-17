@@ -22,7 +22,7 @@ SRC_DTRSE=False  # con false il modello della batteria è locale a dt-rse-mosaik
 
 
 S_SIM ='S_SIM'
-S_LEARN ='S_LRN'
+S_LEARN ='S_LEARN'
 S_ON ='1'
 S_OFF='0'
 
