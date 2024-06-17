@@ -46,19 +46,20 @@ class DTSDA_Mng(mosaik_api_v3.Simulator):
 
         if self.redis.esistetag('DTmode') != 0:
  #       if self.redis.esistetag(self.tags['DTmode'][0]) != 0:
-            self.DTmode = self.redis.aget('DTmode')  # se esiste, leggo il valore da redis
+            self.DTmode = hash(self.redis.aget('DTmode'))  # se esiste, leggo il valore da redis
  #           self.DTmode = self.redis.aget(self.tags['DTmode'][0])  # se esiste, leggo il valore da redis
         else:
-            self.DTmode = self.tags['DTmode'][1] # se non esiste metto il dafault letto dal configDT
-            self.redis.aset('DTmode',self.DTmode)
+            self.DTmode = hash(self.tags['DTmode'][1])        # se non esiste metto leggo il val
+            self.redis.aset('DTmode',self.tags['DTmode'][1] ) # se non esiste metto il dafault letto dal configDT anche in redis
+#            self.redis.aset('DTmode',self.DTmode)
 
         if self.redis.esistetag('DTmode_set') != 0:
 #        if self.redis.esistetag(self.tags['DTmode_set'][0]) != 0:
             self.DTmod_set = self.redis.aget('DTmode_set')  # se esiste, leggo il valore da redis
 #            self.DTmod_set = self.redis.aget(self.tags['DTmode_set'][0])  # se esiste, leggo il valore da redis
         else:
-            self.DTmode_set = self.tags['DTmode_set'][1] # se non esiste metto il dafault letto dal configDT
-            self.redis.aset('DTmode_set',self.DTmode)
+            self.DTmode_set = hash(self.tags['DTmode_set'][1])       # se esiste, leggo il valore da rediss
+            self.redis.aset('DTmode_set',self.tags['DTmode_set'][1]) # se non esiste metto il dafault letto dal configDT
 
 
 
@@ -84,8 +85,9 @@ class DTSDA_Mng(mosaik_api_v3.Simulator):
         return [{'eid': self.eid, 'type': model}]
 
     def step(self, time, inputs, max_advance):
-        val = list(inputs[self.eid]['DTmode_set'].values())[0]
-        logger.info('step at {time} with inputs {inputs}, DTmode_set={DTmode_set}', time=time, inputs=inputs,DTmode_set=val)
+        valSTR=list(inputs[self.eid]['DTmode_set'].values())[0]
+        val=hash(valSTR)
+        logger.info('step at {time} with inputs {inputs}, DTmode_set={DTmode_set}', time=time, inputs=inputs,DTmode_set=valSTR)
 
         # match val:
         #     case NOFORZ:
@@ -95,13 +97,13 @@ class DTSDA_Mng(mosaik_api_v3.Simulator):
         #     case _:
         # val = NOFORZ
         if val == NOFORZ :
-            self.DTmode = self.redis.aget('DTmode')   # int(self.redis.get('DT:mode'))
+            self.DTmode = hash(self.redis.aget('DTmode'))  # int(self.redis.get('DT:mode'))
         elif val == FORZSIM:
             self.DTmode = val
-            self.redis.aset('DTmode',val)
+            self.redis.aset('DTmode',valSTR)
         elif val == FORZLEARN:
             self.DTmode = val
-            self.redis.aset('DTmode',val)
+            self.redis.aset('DTmode',valSTR)
         
         #return time + 1   # se è hybrid o time-based
         return None     # se è event-base

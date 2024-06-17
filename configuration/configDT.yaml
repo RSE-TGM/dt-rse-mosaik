@@ -11,13 +11,13 @@ redis:
   DTSDA:
     DTmode:
       - "DTSDA:mode"
-      - "SIM"
+      - "S_SIM"
     DTmode_set:
       - "DTSDA:mode_set"
-      - "0"
+      - "S_SIM"
     DTSDA_State:
       - "DTSDA:STATE"
-      - "IDLE"
+      - "S_IDLE"
 
 mqtt:
         #  SERVER: "0.0.0.0"
