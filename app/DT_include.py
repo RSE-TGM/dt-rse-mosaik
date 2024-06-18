@@ -20,23 +20,28 @@ from  DT_rdf import *
 
 SRC_DTRSE=False  # con false il modello della batteria è locale a dt-rse-mosaik,  con true è quello di DT-rse
 
+S_IDLE    = 'S_IDLE'
+S_RUNNING = 'S_RUNNING'
+S_READY  = 'S_READY'
+S_ENDED   = 'S_ENDED'
 
 S_SIM ='S_SIM'
 S_LEARN ='S_LEARN'
 S_ON ='1'
 S_OFF='0'
+StrToNum={
+        S_OFF  :100,
+        S_ON   :111,
+        S_SIM  :122,
+        S_LEARN:133
+        }
 
-MODSIM = hash(S_SIM)    # era 1
-MODLEARN = hash(S_LEARN)  # era 10
-NOFORZ =  hash(S_OFF)      # era 0
+MODSIM = StrToNum[S_SIM]    # era 1
+MODLEARN = StrToNum[S_LEARN]  # era 10
+NOFORZ =  StrToNum[S_OFF]      # era 0
 FORZSIM = MODSIM
 FORZLEARN = MODLEARN
 STOP = -1
-
-S_IDLE    = 'S_IDLE'
-S_RUNNING = 'S_RUNNING'
-S_READY  = 'S_READY'
-S_ENDED   = 'S_ENDED'
 
 
 DT_MOSAIK_HOME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

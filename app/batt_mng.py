@@ -49,20 +49,20 @@ class DTSDA_Mng(mosaik_api_v3.Simulator):
         if self.redis.esistetag('DTmode') != 0:
  #       if self.redis.esistetag(self.tags['DTmode'][0]) != 0:
             self.DTmodeSTR=self.redis.aget('DTmode')
-            self.DTmode = hash(self.DTmodeSTR)  # se esiste, leggo il valore da redis
+            self.DTmode = StrToNum[self.DTmodeSTR]  # se esiste, leggo il valore da redis
  #           self.DTmode = self.redis.aget(self.tags['DTmode'][0])  # se esiste, leggo il valore da redis
         else:
-            self.DTmodeSTR = hash(self.tags['DTmode'][1])        # se non esiste metto leggo il val
+            self.DTmodeSTR = StrToNum[self.tags['DTmode'][1]]        # se non esiste metto leggo il val
             self.redis.aset('DTmode',self.DTmodeSTR ) # se non esiste metto il dafault letto dal configDT anche in redis
 #            self.redis.aset('DTmode',self.DTmode)
 
         if self.redis.esistetag('DTmode_set') != 0:
 #        if self.redis.esistetag(self.tags['DTmode_set'][0]) != 0:
             self.DTmod_setSTR = self.redis.aget('DTmode_set')  # se esiste, leggo il valore da redis
-            self.DTmod = hash(self.DTmod_setSTR)
+            self.DTmod = StrToNum[self.DTmod_setSTR]
 #            self.DTmod_set = self.redis.aget(self.tags['DTmode_set'][0])  # se esiste, leggo il valore da redis
         else:
-            self.DTmode_setSTR = hash(self.tags['DTmode_set'][1])       # se esiste, leggo il valore da rediss
+            self.DTmode_setSTR = StrToNum[self.tags['DTmode_set'][1]]       # se esiste, leggo il valore da rediss
             self.redis.aset('DTmode_set',self.DTmode_setSTR) # se non esiste metto il dafault letto dal configDT
 
 
@@ -101,7 +101,7 @@ class DTSDA_Mng(mosaik_api_v3.Simulator):
         # val = NOFORZ
         if val == NOFORZ :
             self.DTmodeSTR = self.redis.aget('DTmode')
-            self.DTmode = hash(self.DTmodeSTR)  # int(self.redis.get('DT:mode'))
+            self.DTmode = StrToNum[self.DTmodeSTR]  # int(self.redis.get('DT:mode'))
         elif val == FORZSIM:
             self.DTmode = val
             self.DTmodeSTR = S_SIM
