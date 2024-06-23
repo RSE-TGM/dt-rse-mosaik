@@ -150,7 +150,7 @@ class DTmqtt(object):
         self.redis = redisDT()
         self.r = self.redis.connect()
         self.redis_tags = self.redis.gettags()
-        self.redis.aset('DTSDA_State',S_IDLE) 
+        self.redis.aset('DTSDA_State',S_IDLE, hmode=True) 
         #------------------
 
 
@@ -183,29 +183,34 @@ class DTmqtt(object):
     
     def on_EndProg(self, client, userdata, message):
         print(f'------------------------>on_EndProg:  DISCONNET and END')
-        if self.redis.aget('DTSDA_State') == S_RUNNING :
+        if self.redis.aget('DTSDA_State', hmode=True) == S_RUNNING :
             self.on_StopSIM(client, userdata, message)
-        self.redis.aset('DTSDA_State',S_ENDED) 
+        self.redis.aset('DTSDA_State',S_ENDED, hmode=True)
         logger.warning('END Request IGNORED. Simulator in state: {state} Stopped! State set to {state2}. EXIT', 
-                               state=self.redis.aget('DTSDA_State'), state2=S_IDLE )       
+                               state=self.redis.aget('DTSDA_State', hmode=True), state2=S_IDLE )       
         self.client.disconnect()
 
     def on_SetModoSIM(self, client, userdata, message):
         print(f'------------------------>on_SetModoSIM:  SetModoSIM')
+        self.redis.aset('DTmode', S_SIM, hmode=True)
+        self.redis.aset('DTmode_set', S_SIM, hmode=True)
 
     def on_SetModoLEARN(self, client, userdata, message):
         print(f'------------------------>on_SetModoLEARN:  SetModoLEARN')
+        self.redis.aset('DTmode', S_LEARN, hmode=True)
+        self.redis.aset('DTmode_set', S_LEARN, hmode=True)
+
 
     def on_InitSIM(self, client, userdata, message):
         global world, model, dtsdamng
         print(f'------------------------>on_InitSIM:   INIT DELLA SIMULAZIONE')
-        if self.redis.aget('DTSDA_State') == S_IDLE :
-            self.redis.aset('DTSDA_State', S_READY )
+        if self.redis.aget('DTSDA_State', hmode=True) == S_IDLE :
+            self.redis.aset('DTSDA_State', S_READY , hmode=True)
             world, model, dtsdamng = batt_prepScenario()
         else:
             print(f'------------------------>on_InitSIM:  SIM NOT in IDLE!! ')
             logger.warning('LOAD Request IGNORED. Simulator in state: {state} NOT changed! Simulator must be {state2} to be loaded.', 
-                               state=self.redis.aget('DTSDA_State'), state2=S_IDLE ) 
+                               state=self.redis.aget('DTSDA_State', hmode=True), state2=S_IDLE ) 
 
 
     def on_RunSIM(self, client, userdata, message):
@@ -216,13 +221,13 @@ class DTmqtt(object):
         # Per sopprime il traceback!!!!
         sys.tracebacklimit = 0
         try:
-            if self.redis.aget('DTSDA_State') == S_READY :
-                self.redis.aset('DTSDA_State', S_RUNNING)
+            if self.redis.aget('DTSDA_State', hmode=True) == S_READY :
+                self.redis.aset('DTSDA_State', S_RUNNING, hmode=True)
                 tRun_on_message = taskRunInThread()
             else:
                 print(f'------------------------>on_RunSIM:  SIM NOT READY, Must be inizialized to run a simulation!! ')
                 logger.warning('RUN Request IGNORED. Simulator in state: {state} NOT changed! Simulator must be {state2} to be run.', 
-                               state=self.redis.aget('DTSDA_State'), state2=S_READY ) 
+                               state=self.redis.aget('DTSDA_State', hmode=True), state2=S_READY ) 
 
         except Exception as e:
             if debug:
@@ -238,8 +243,8 @@ class DTmqtt(object):
         global world, model, dtsdamng, tRun_on_message
         print(f'------------------------>on_StopSIM:  Stop della Simulazione')
         try:
-            if (self.redis.aget('DTSDA_State') == S_RUNNING) or (self.redis.aget('DTSDA_State') == S_READY):
-                self.redis.aset('DTSDA_State', S_IDLE)
+            if (self.redis.aget('DTSDA_State', hmode=True) == S_RUNNING) or (self.redis.aget('DTSDA_State', hmode=True) == S_READY):
+                self.redis.aset('DTSDA_State', S_IDLE, hmode=True)
                 world.until = 1
                 sleep(1)
                 print(f"SHUTDOWN!")    
@@ -247,7 +252,7 @@ class DTmqtt(object):
             else: 
                 print(f'------------------------>on_StopSIM:  SIM NOT RUNNING to be stopped! ')
                 logger.warning('STOP Request IGNORED. Simulator in state: {state} NOT changed! Simulator must be {state2} to be stopped.', 
-                               state=self.redis.aget('DTSDA_State'), state2=S_RUNNING ) 
+                               state=self.redis.aget('DTSDA_State', hmode=True), state2=S_RUNNING ) 
 
         except Exception as e:
             if debug:
@@ -267,10 +272,10 @@ class DTmqtt(object):
     def on_SaveConf(self, client, userdata, message):
         global cli_minio
         print(f'------------------------>on_SaveConf: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
-        if self.redis.aget('DTSDA_State') != S_IDLE :
+        if self.redis.aget('DTSDA_State', hmode=True) != S_IDLE :
             print(f'------------------------>on_SaveConf:   NOT in IDLE!! ')
             logger.warning('SAVE Request IGNORED. DTwin in state: {state} NOT changed!  must be {state2} to save a configuration', 
-                               state=self.redis.aget('DTSDA_State'), state2=S_IDLE ) 
+                               state=self.redis.aget('DTSDA_State', hmode=True), state2=S_IDLE ) 
             return
 
 
@@ -294,9 +299,9 @@ class DTmqtt(object):
     def on_LoadConf(self, client, userdata, message):
         global cli_minio
         print(f'------------------------>on_LoadConf: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
-        if self.redis.aget('DTSDA_State') != S_IDLE :
+        if self.redis.aget('DTSDA_State', hmode=True) != S_IDLE :
             print(f'------------------------>on_LoadConf:   NOT in IDLE!! ')
-            logger.warning('LOAD Request IGNORED. DTwin in state: {state} NOT changed!  must be {state2} to load a configuration', state=self.redis.aget('DTSDA_State'), state2=S_IDLE ) 
+            logger.warning('LOAD Request IGNORED. DTwin in state: {state} NOT changed!  must be {state2} to load a configuration', state=self.redis.aget('DTSDA_State', hmode=True), state2=S_IDLE ) 
             return
 
         minio_path = str(message.payload.decode("utf-8")) +'/'  # E' una str. Ad es: 'conf1'. Aggiungo la barra se no va in crash, 

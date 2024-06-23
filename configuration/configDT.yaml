@@ -3,21 +3,36 @@
 # ############################
 
 redis:
-  redis_host: "REDIS_HOST"
-  redis_host_default: "localhost"
-  redis_port: "REDIS_PORT"
+  redis_host: REDIS_HOST
+  redis_host_default: localhost
+  redis_port: REDIS_PORT
   redis_port_default: 6380
-  redis_password: "mypassw"
+  redis_password: mypassw
+  
+  htags:
+    - DTSDA:batt1
+  batt1:
+    id: batt1
+    DTmode:
+      field: mode
+      value: S_SIM
+    DTmode_set:
+      field: mode_set
+      value: S_SIM
+    DTSDA_State:
+      field: state
+      value: S_IDLE
+  
   DTSDA:
     DTmode:
-      - "DTSDA:mode"
-      - "S_SIM"
+      - DTSDA:mode
+      - S_SIM
     DTmode_set:
-      - "DTSDA:mode_set"
-      - "S_SIM"
+      - DTSDA:mode_set
+      - S_SIM
     DTSDA_State:
-      - "DTSDA:STATE"
-      - "S_IDLE"
+      - DTSDA:STATE
+      - S_IDLE
 
 mqtt:
         #  SERVER: "0.0.0.0"

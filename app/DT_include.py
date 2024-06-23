@@ -109,15 +109,56 @@ class  redisDT(object):
             logger.info("REDIS: NON esiste  il servizio: {redis_host} {redis_port}!!", redis_host=self.redis_host, redis_port=self.redis_port ) 
             return (None)
 
-    def aget(self, tag) :
-        return(self.red.get(self.tags[tag][0]).decode('utf-8') )
+    def aget(self, simbtag, id='batt1', hmode = False) :
+        if (not hmode):
+           return(self.red.get(self.tags[simbtag][0]).decode('utf-8') )
+        else:  # hash mode
+            htag= self.configDT['redis']['htags'][0]
+            field= self.configDT['redis'][id][simbtag]['field']               
+            #ret=self.red.hget(htag, field).decode('utf-8')
+            print(f'hget {htag}  {field}')
+        return(self.red.hget(htag, field).decode('utf-8'))
+
+    
 #        return(self.red.get(tag).decode('utf-8') )
    
-    def aset(self, tag, val) :
-        return(self.red.set(self.tags[tag][0],val))
+    def aset(self, simbtag, val, id='batt1', hmode = False) :
+        if (not hmode):
+           return(self.red.set(self.tags[simbtag][0],val))
+        else:  # hash mode
+           htag = self.configDT['redis']['htags'][0]           # è il tag del hash redis
+           field = self.configDT['redis'][id][simbtag]['field']   # id è il tag della batteria, ad esempio 'batt1', simbtag è ad esempio 'DTmode'
+           #ret=self.red.hset(htag, field, val)
+           print(f'------------------------------>  hset {htag}  {field} {val}')
+        return(self.red.hset(htag, field,val))
+
             
-    def esistetag(self,tag):
-        return(self.red.exists(self.tags[tag][0]))
+    
+    def hhset(self, simbtag, val, id):
+        htag = self.configDT['redis']['htags'][0]           # è il tag del hash redis
+        field = self.configDT['redis'][id][simbtag]['field']   # id è il tag della batteria, ad esempio 'batt1', simbtag è ad esempio 'DTmode'
+        #ret=self.red.hset(htag, field, val)
+        print(f'hget {htag}  {field} {val}')
+        return
+
+    def hhget(self, simbtag, id):
+        htag= self.configDT['redis']['htags'][0]
+        field= self.configDT['redis'][id][simbtag]['field']               
+        #ret=self.red.hget(htag, field).decode('utf-8')
+        print(f'hget {htag}  {field}')
+        return
+                 
+    def esistetag(self,simbtag, id='batt1', hmode = False):
+        if (not hmode):
+           return(self.red.exists(self.tags[simbtag][0]) )
+        else:
+            htag= self.configDT['redis']['htags'][0]
+            field= self.configDT['redis'][id][simbtag]['field']  
+            retval=self.red.get(self.red.hget(htag, field).decode('utf-8') ) 
+            if retval == None : 
+                ret=0
+            else: ret=1           
+        return(ret)
 #        return(self.red.exists(tag))
     
     def gettags(self):
@@ -147,7 +188,6 @@ class DTMinioClient(object):
         self._indexname = self.configDT['minio']['INDEX_NAME']
         self._indexdescription = self.configDT['minio']['INDEX_DESCRIPTION']
         self._indexdata = self.configDT['minio']['INDEX_DATA']
-
 
         # self.endpoint=endpoint
         # self.access_key=access_key
