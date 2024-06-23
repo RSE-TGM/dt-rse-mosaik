@@ -154,7 +154,8 @@ class  redisDT(object):
         else:
             htag= self.configDT['redis']['htags'][0]
             field= self.configDT['redis'][id][simbtag]['field']  
-            retval=self.red.get(self.red.hget(htag, field).decode('utf-8') ) 
+#            retval=self.red.get(self.red.hget(htag, field).decode('utf-8') ) 
+            retval=self.red.hget(htag, field) 
             if retval == None : 
                 ret=0
             else: ret=1           
