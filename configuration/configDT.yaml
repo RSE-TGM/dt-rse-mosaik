@@ -32,17 +32,16 @@ redis:
       field: load_current
       value: 0
 
-
-  DTSDA:
-    DTmode:
-      - DTSDA:mode
-      - S_SIM
-    DTmode_set:
-      - DTSDA:mode_set
-      - S_SIM
-    DTSDA_State:
-      - DTSDA:STATE
-      - S_IDLE
+  # DTSDA:
+  #   DTmode:
+  #     - DTSDA:mode
+  #     - S_SIM
+  #   DTmode_set:
+  #     - DTSDA:mode_set
+  #     - S_SIM
+  #   DTSDA_State:
+  #     - DTSDA:STATE
+  #     - S_IDLE
 
 mqtt:
         #  SERVER: "0.0.0.0"

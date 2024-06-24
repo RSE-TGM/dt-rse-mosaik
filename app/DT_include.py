@@ -77,7 +77,7 @@ class  redisDT(object):
         self.config_data_path = CONFIG_DATA_PATH
         self.configDT = CONFIGDT 
         self.configDT = readConfig(self.config_data_path, self.configDT)
-        self.tags = self.configDT['redis']['DTSDA']
+#        self.tags = self.configDT['redis']['DTSDA']
 
         self.redis_host = os.getenv(self.configDT['redis']['redis_host'])
         if self.redis_host == None:
@@ -110,27 +110,33 @@ class  redisDT(object):
             return (None)
 
     def aget(self, simbtag, id='batt1', hmode = False) :
+        htag= self.configDT['redis']['htags'][0]
+        field= self.configDT['redis'][id][simbtag]['field']
         if (not hmode):
-           return(self.red.get(self.tags[simbtag][0]).decode('utf-8') )
+            tagg=htag+':'+field
+            print(f'get {tagg}')                       
+            return(self.red.get(tagg).decode('utf-8') )
+#            return(self.red.get(self.tags[simbtag][0]).decode('utf-8') )
         else:  # hash mode
-            htag= self.configDT['redis']['htags'][0]
-            field= self.configDT['redis'][id][simbtag]['field']               
             #ret=self.red.hget(htag, field).decode('utf-8')
             print(f'hget {htag}  {field}')
-        return(self.red.hget(htag, field).decode('utf-8'))
+            return(self.red.hget(htag, field).decode('utf-8'))
 
     
 #        return(self.red.get(tag).decode('utf-8') )
    
     def aset(self, simbtag, val, id='batt1', hmode = False) :
+        htag = self.configDT['redis']['htags'][0]           # è il tag del hash redis
+        field = self.configDT['redis'][id][simbtag]['field']   # id è il tag della batteria, ad esempio 'batt1', simbtag è ad esempio 'DTmode'
         if (not hmode):
-           return(self.red.set(self.tags[simbtag][0],val))
+            tagg=htag+':'+field
+            print(f'set {tagg}')             
+            return(self.red.set(tagg,val))
+#           return(self.red.set(self.tags[simbtag][0],val))
         else:  # hash mode
-           htag = self.configDT['redis']['htags'][0]           # è il tag del hash redis
-           field = self.configDT['redis'][id][simbtag]['field']   # id è il tag della batteria, ad esempio 'batt1', simbtag è ad esempio 'DTmode'
-           #ret=self.red.hset(htag, field, val)
-           print(f'------------------------------>  hset {htag}  {field} {val}')
-        return(self.red.hset(htag, field,val))
+            #ret=self.red.hset(htag, field, val)
+            print(f'------------------------------>  hset {htag}  {field} {val}')
+            return(self.red.hset(htag, field,val))
 
             
     
@@ -149,11 +155,13 @@ class  redisDT(object):
         return
                  
     def esistetag(self,simbtag, id='batt1', hmode = False):
+        htag= self.configDT['redis']['htags'][0]
+        field= self.configDT['redis'][id][simbtag]['field']  
         if (not hmode):
-           return(self.red.exists(self.tags[simbtag][0]) )
+            tagg=htag+':'+field
+            return(self.red.exists(tagg) )
+#            return(self.red.exists(self.tags[simbtag][0]) )
         else:
-            htag= self.configDT['redis']['htags'][0]
-            field= self.configDT['redis'][id][simbtag]['field']  
 #            retval=self.red.get(self.red.hget(htag, field).decode('utf-8') ) 
             retval=self.red.hget(htag, field) 
             if retval == None : 
