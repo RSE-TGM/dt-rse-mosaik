@@ -10,6 +10,8 @@ import collections
 
 import mosaik_api_v3 as mosaik_api
 
+from  DT_include import *
+
 
 META_Monitor = {
     'type': 'event-based',
@@ -30,6 +32,11 @@ class Collector(mosaik_api.Simulator):
         self.eid = None
         self.data = collections.defaultdict(lambda:
                                             collections.defaultdict(dict))
+        
+        self.redis = redisDT()     # legge il file di configurazione e crea oggetto redis  
+        self.tags = self.redis.gettags()
+        self.r = self.redis.connect()
+  
 
     def init(self, sid, time_resolution):
         return self.meta
@@ -43,12 +50,15 @@ class Collector(mosaik_api.Simulator):
 
     def step(self, time, inputs, max_advance):
         data = inputs.get(self.eid, {})
+        self.redis.aset('tsim',str(time), hmode=True)
         for attr, values in data.items():
             for src, value in values.items():
                 self.data[src][attr][time] = value
+                #savetoredis(src,attr,time,value)
+                if attr != 'DTmode' and attr != 'DTmode_set' : self.redis.aset(attr,str(value), hmode=True)
 
         return None
-
+    
     def finalize(self):
         print('Collected data:')
         for sim, sim_data in sorted(self.data.items()):

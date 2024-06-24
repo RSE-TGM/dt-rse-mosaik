@@ -22,7 +22,17 @@ redis:
     DTSDA_State:
       field: state
       value: S_IDLE
-  
+    tsim:
+      field: tsim
+      value: 0
+    output_voltage:
+      field: output_voltage
+      value: 0
+    load_current:
+      field: load_current
+      value: 0
+
+
   DTSDA:
     DTmode:
       - DTSDA:mode

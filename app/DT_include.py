@@ -162,8 +162,9 @@ class  redisDT(object):
         return(ret)
 #        return(self.red.exists(tag))
     
-    def gettags(self):
-        ret = self.configDT['redis']['DTSDA']
+    def gettags(self, id='batt1'):
+#        ret = self.configDT['redis']['DTSDA']
+        ret = self.configDT['redis'][id]
         return(ret)
     
     def chiudi(self):

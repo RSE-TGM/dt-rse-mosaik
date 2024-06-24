@@ -149,7 +149,7 @@ class DTmqtt(object):
         # Connessione a redis
         self.redis = redisDT()
         self.r = self.redis.connect()
-        self.redis_tags = self.redis.gettags()
+        #self.redis_tags = self.redis.gettags()
         self.redis.aset('DTSDA_State',S_IDLE, hmode=True) 
         #------------------
 
