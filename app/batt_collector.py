@@ -54,8 +54,10 @@ class Collector(mosaik_api.Simulator):
         for attr, values in data.items():
             for src, value in values.items():
                 self.data[src][attr][time] = value
-                #savetoredis(src,attr,time,value)
-                if attr != 'DTmode' and attr != 'DTmode_set' : self.redis.aset(attr,str(value), hmode=True)
+                #savetoredis(src,attr,time,value)                
+                if attr != 'DTmode' and attr != 'DTmode_set' : 
+                    valueApross='%.3f' % round(value * 1000 / 1000,3)  # 3 decimali
+                    self.redis.aset(attr,str(valueApross), hmode=True)
 
         return None
     
