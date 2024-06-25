@@ -118,10 +118,20 @@ class DTmqtt(object):
             print(f'{self.callbacks[tag]}')
             self.client.subscribe(self.callbacks[tag])
 
+        self.command = self.configDT['mqtt']['DTSDA']['COMMAND']   # lista delle callbacks associate ai comandi mqtt e subscribe degli stessi
+        for tag in self.command:
+            print(f'{self.command[tag]}')
+            self.client.subscribe(self.command[tag])
+
         self.posts = self.configDT['mqtt']['DTSDA']['POST']
         for tag in self.posts:
             print(f'post da pubblicare: {self.posts[tag]}')
             self.client.subscribe(self.posts[tag])    # eseguo il subcribe comunque perchè le informazioni potrebbero essere generate da altri
+                   
+        self.posts2 = self.configDT['mqtt']['DTSDA']['POST2']
+        for tag in self.posts2:
+            print(f'post da pubblicare: {self.posts2[tag]}')
+            self.client.subscribe(self.posts2[tag])    # eseguo il subcribe comunque perchè le informazioni potrebbero essere generate da altri
                    
         self.misure = self.configDT['mqtt']['DTSDA']['MISURE']['BATT1']
         for tag in self.misure:
@@ -129,6 +139,8 @@ class DTmqtt(object):
             self.client.subscribe(self.misure[tag])
 
 # aggiunta delle callback associate ai comandi mqtt
+        self.client.message_callback_add(self.callbacks['MainCall'], self.on_switch)
+
         self.client.message_callback_add(self.callbacks['EndProg'], self.on_EndProg)
         self.client.message_callback_add(self.callbacks['SetModoSIM'], self.on_SetModoSIM)
         self.client.message_callback_add(self.callbacks['SetModoLEARN'], self.on_SetModoLEARN)
@@ -163,6 +175,15 @@ class DTmqtt(object):
             except KeyboardInterrupt:
                 self.client.disconnect()
 #                break
+          
+    def on_connect(self, mosq, obj, msg, rc): 
+        logger.info('Connected to MQTT server: {server}. Wainting for commands...', server=self.mqttBroker)
+        
+    def disconnect(self):
+        return(self.client.loop_stop())
+    
+    def subscribe(self, topic):
+        return(self.client.subscribe(topic))
     
     def publish(self,tag,message):
         self.client.publish(tag,message)
@@ -172,15 +193,40 @@ class DTmqtt(object):
         global world, model, dtsdamng, tRun_on_message
         print(f'------------------------>on_message: Received con topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
 
-    def on_connect(self, mosq, obj, msg, rc): 
-        logger.info('Connected to MQTT server: {server}. Wainting for commands...', server=self.mqttBroker)
-        
-    def disconnect(self):
-        return(self.client.loop_stop())
- 
-    def subscribe(self, topic):
-        return(self.client.subscribe(topic))
+    def on_switch(self, client, userdata, message):
+        payl=json.loads(message.payload.decode("utf-8"))
+        if payl['command'] == self.command['EndProg'] :
+            self.on_EndProg(client, userdata, message)
+        elif payl['command'] == self.command['SetModoSIM'] :
+            self.on_SetModoSIM(client, userdata, message)
+        elif payl['command'] == self.command['SetModoLEARN'] :
+            self.on_SetModoLEARN(client, userdata, message)
+        elif payl['command'] ==  self.command['InitSIM'] :
+            self.on_InitSIM(client, userdata, message)
+        elif payl['command'] == self.command['RunSIM'] :
+            self.on_RunSIM(client, userdata, message)
+        elif payl['command'] == self.command['StopSIM'] :
+            self.on_StopSIM(client, userdata, message)
+        elif payl['command'] == self.command['PlotGraf'] :
+            self.on_PlotGraf(client, userdata, message)
+        elif payl['command'] == self.command['ListaConfReq'] :
+            userdata = 1    # per abilitare la modalià con topic DTSDA + comando in payload
+            self.on_ListaConfReq(client, userdata, message)
+        elif payl['command'] == self.command['LoadConf'] :
+            userdata = 1    # per abilitare la modalià con topic DTSDA + comando in payload
+            self.on_LoadConf(client, userdata, message)
+        elif payl['command'] == self.command['SaveConf'] :
+            userdata = 1     # per abilitare la modalià con topic DTSDA + comando in payload
+            self.on_SaveConf(client, userdata, message)
+        elif payl['command'] == self.command['DelConf'] :
+            userdata = 1    # per abilitare la modalià con topic DTSDA + comando in payload
+            self.on_DelConf(client, userdata, message)
+        elif payl['command'] == self.command['CurrConfReq'] :
+            userdata = 1    # per abilitare la modalià con topic DTSDA + comando in payload
+            self.on_CurrConfReq(client, userdata, message)
+
     
+
     def on_EndProg(self, client, userdata, message):
         print(f'------------------------>on_EndProg:  DISCONNET and END')
         if self.redis.aget('DTSDA_State', hmode=True) == S_RUNNING :
@@ -278,15 +324,21 @@ class DTmqtt(object):
                                state=self.redis.aget('DTSDA_State', hmode=True), state2=S_IDLE ) 
             return
 
-
-
         source_path = CONFIG_DATA_PATH
-        minio_path = str(message.payload.decode("utf-8")) # il message.payload é un str formattata come un dict del tipo {nome:descrizione}. Ad es:  '{"conf1":"descrizione conf1"}'
+        
+        if userdata == 1:
+                payl=json.loads(message.payload.decode("utf-8")) 
+                minio_path_dict= {}
+                minio_path = payl['id']
+                minio_path_dict[minio_path]= payl['description']
+        else:
+            minio_path = str(message.payload.decode("utf-8")) # il message.payload é un str formattata come un dict del tipo {nome:descrizione}. Ad es:  '{"conf1":"descrizione conf1"}'
+            # converto da str a dict
+            minio_path_dict= json.loads(minio_path)
+        
         if not minio_path:
             minio_path='confX'
-
-        # converto da str a dict
-        minio_path_dict= json.loads(minio_path)
+            minio_path_dict= json.loads(minio_path)
 
         for key, value in minio_path_dict.items():
 #            print( key, value)
@@ -303,8 +355,14 @@ class DTmqtt(object):
             print(f'------------------------>on_LoadConf:   NOT in IDLE!! ')
             logger.warning('LOAD Request IGNORED. DTwin in state: {state} NOT changed!  must be {state2} to load a configuration', state=self.redis.aget('DTSDA_State', hmode=True), state2=S_IDLE ) 
             return
-
-        minio_path = str(message.payload.decode("utf-8")) +'/'  # E' una str. Ad es: 'conf1'. Aggiungo la barra se no va in crash, 
+        
+        if userdata == 1:
+            payl=json.loads(message.payload.decode("utf-8")) 
+            minio_path = payl['id'] +'/'
+            pass
+        else:
+            minio_path = str(message.payload.decode("utf-8")) +'/'  # E' una str. Ad es: 'conf1'. Aggiungo la barra se no va in crash, 
+        
         if not minio_path:
             minio_path='confX/'
 
@@ -318,15 +376,6 @@ class DTmqtt(object):
         # logger.info("Carico configurazione dal objDB con id {minio_path} in {dst_local_directory} ", minio_path=minio_path, dst_local_directory=dst_local_directory )
         logger.info("Caricata la configurazione dal objDB  {nameActual}:{descrActual} in {dst_local_directory}", nameActual=nameActual, descrActual=descrActual, dst_local_directory=dst_local_directory)
 
-    
-    def on_ListaConfReq(self, client, userdata, message):
-        global cli_minio
-        print(f'------------------------>on_ListaConfReq: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
-        id_minio_path='conf'
-        listaconf =  str(cli_minio.getconflist_minio())   # variabile di tipo text
-        self.client.publish(self.posts['listaconf'],listaconf)        
-        print(f'------------------------>on_ListaConfReq: nuova listaconf: {listaconf} pubblicata')
-
     def on_DelConf(self, client, userdata, message):
         global cli_minio
         print(f'------------------------>on_deleteFolder_minio: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
@@ -335,9 +384,36 @@ class DTmqtt(object):
         #     logger.warning('Delete Request IGNORED. DTwin in state: {state} NOT changed!  must be {state2} to delete a configuration', state=self.redis.aget('DTSDA_State'), state2=S_IDLE ) 
         #     return
 
-        minio_path = str(message.payload.decode("utf-8"))
+        if userdata == 1:
+            payl=json.loads(message.payload.decode("utf-8")) 
+            minio_path = payl['id']
+        else:
+            minio_path = str(message.payload.decode("utf-8"))
+        
         logger.info("Rimozione configurazione {minio_path} dal bucket {bucket_name}", minio_path=minio_path, bucket_name=cli_minio.indexbucket)
         cli_minio.deleteFolder_minio(bucket_name=cli_minio.indexbucket, minio_path=minio_path)
+
+    
+    def on_ListaConfReq(self, client, userdata, message):
+        global cli_minio
+        print(f'------------------------>on_ListaConfReq: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
+        id_minio_path='conf'
+        listaconf =  str(cli_minio.getconflist_minio())   # variabile di tipo text
+        if userdata == 1:
+            payl=json.loads(message.payload.decode("utf-8"))    # converte in dict
+        else:
+            payl={}
+            payl['id']="uidx"
+
+        listaconf_dict={}
+        listaconf_dict['command'] = self.posts2['listaconf']
+        listaconf_dict['id'] = payl['id']
+        listaconf_dict['description'] = listaconf
+
+        
+        self.client.publish(self.posts['listaconf'],json.dumps(listaconf_dict))       
+#        self.client.publish(self.posts['listaconf'],listaconf)        
+        print(f'------------------------>on_ListaConfReq: nuova listaconf: {listaconf} pubblicata')
 
     def on_CurrConfReq(self, client, userdata, message):
         global cli_minio
@@ -348,10 +424,22 @@ class DTmqtt(object):
         nameActual=confActual['name']
         descrActual=confActual['description']
 
+        if userdata == 1:
+            payl=json.loads(message.payload.decode("utf-8"))
+        else:
+            payl={}
+            payl['id']="uidx"
+
         #id_minio_path='conf'
         # si deve leggere il file index nella directory 'configurazione" dell'app ... per ora ci metto una stringa fissa
 #        currconf =  '"currconf": "Questa è la descrizione della configurazione"'  # variabile di tipo text
-        self.client.publish(self.posts['currconf'], currconf)        
+        currconf_dict={}
+        currconf_dict['command']=self.posts2['currconf']
+        currconf_dict['id']=payl['id']
+        currconf_dict['description'] = currconf
+        self.client.publish(self.posts['currconf'], json.dumps(currconf_dict))
+#        self.client.publish(self.posts['currconf'], currconf)
+
         print(f'------------------------>on_CurrConfReq: currconf: {currconf} pubblicata')
 
 
