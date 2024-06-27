@@ -139,7 +139,7 @@ class DTmqtt(object):
             self.client.subscribe(self.misure[tag])
 
 # aggiunta delle callback associate ai comandi mqtt
-        self.client.message_callback_add(self.callbacks['MainCall'], self.on_switch)
+##        self.client.message_callback_add(self.callbacks['MainCall'], self.on_switch)
 
         self.client.message_callback_add(self.callbacks['EndProg'], self.on_EndProg)
         self.client.message_callback_add(self.callbacks['SetModoSIM'], self.on_SetModoSIM)
@@ -325,7 +325,7 @@ class DTmqtt(object):
             return
 
         source_path = CONFIG_DATA_PATH
-        
+        userdata=1
         if userdata == 1:
                 payl=json.loads(message.payload.decode("utf-8")) 
                 minio_path_dict= {}
@@ -355,7 +355,7 @@ class DTmqtt(object):
             print(f'------------------------>on_LoadConf:   NOT in IDLE!! ')
             logger.warning('LOAD Request IGNORED. DTwin in state: {state} NOT changed!  must be {state2} to load a configuration', state=self.redis.aget('DTSDA_State', hmode=True), state2=S_IDLE ) 
             return
-        
+        userdata=1
         if userdata == 1:
             payl=json.loads(message.payload.decode("utf-8")) 
             minio_path = payl['id'] +'/'
@@ -383,7 +383,7 @@ class DTmqtt(object):
         #     print(f'------------------------>on_DelConf:   NOT in IDLE!! ')
         #     logger.warning('Delete Request IGNORED. DTwin in state: {state} NOT changed!  must be {state2} to delete a configuration', state=self.redis.aget('DTSDA_State'), state2=S_IDLE ) 
         #     return
-
+        userdata=1
         if userdata == 1:
             payl=json.loads(message.payload.decode("utf-8")) 
             minio_path = payl['id']
@@ -399,6 +399,8 @@ class DTmqtt(object):
         print(f'------------------------>on_ListaConfReq: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
         id_minio_path='conf'
         listaconf =  str(cli_minio.getconflist_minio())   # variabile di tipo text
+
+        userdata=1
         if userdata == 1:
             payl=json.loads(message.payload.decode("utf-8"))    # converte in dict
         else:
@@ -423,7 +425,7 @@ class DTmqtt(object):
         ## currconf=str(confActual)
         nameActual=confActual['name']
         descrActual=confActual['description']
-
+        userdata=1
         if userdata == 1:
             payl=json.loads(message.payload.decode("utf-8"))
         else:
@@ -522,8 +524,11 @@ def main():
         adesso=datetime.datetime.now()
         confbackName='CurrConfBackup'+adesso.strftime("-%d%m%Y-%H_%M_%S_%f") 
         descrActual=confActual['description']
-        confback = f"""{{"{confbackName}":"{descrActual}"}}"""
-        cli_mqtt.publish(cli_mqtt.callbacks['SaveConf'], confback)
+        idActual=confActual['date']
+        commandActual='Currconf init'
+        payl = f"""{{"command":"{commandActual}", "id":"{idActual}", "description":"{descrActual}"}}"""
+#        payl = f"""{{"{confbackName}":"{descrActual}"}}"""
+        cli_mqtt.publish(cli_mqtt.callbacks['SaveConf'], payl)
 
         ## lancio del loop senza fine mqtt   
         cli_mqtt.run()
