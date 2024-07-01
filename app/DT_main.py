@@ -336,17 +336,26 @@ class DTmqtt(object):
             # converto da str a dict
             minio_path_dict= json.loads(minio_path)
         
+        
         if not minio_path:
             minio_path='confX'
             minio_path_dict= json.loads(minio_path)
 
-        for key, value in minio_path_dict.items():
-#            print( key, value)
-            rdfcreate(indexpath=INDEXPATHTMP, name=key, description=value)
-            logger.info("Salvataggio configurazione da {source_path} nel objDB con id {minio_path} ", source_path=source_path, minio_path=minio_path )
-            cli_minio.upload_to_minio(local_path=source_path,  minio_path=key)
-            # a questo punto copio solo index.json giusto, prodotto nella directory /tmp (con indexFlag a true)
-            cli_minio.upload_to_minio(local_path=INDEXPATHTMP,  minio_path=key, indexFlag=True)
+
+        rdfcreate(indexpath=INDEXPATHTMP, name=minio_path, description=minio_path_dict[minio_path])
+        logger.info("Salvataggio configurazione da {source_path} nel objDB con id {minio_path} ", source_path=source_path, minio_path=minio_path )
+        cli_minio.upload_to_minio(local_path=source_path,  minio_path=minio_path)
+        # a questo punto copio solo index.json giusto, prodotto nella directory /tmp (con indexFlag a true)
+        cli_minio.upload_to_minio(local_path=INDEXPATHTMP,  minio_path=minio_path, indexFlag=True)
+
+
+#         for key, value in minio_path_dict.items():
+# #            print( key, value)
+#             rdfcreate(indexpath=INDEXPATHTMP, name=key, description=value)
+#             logger.info("Salvataggio configurazione da {source_path} nel objDB con id {minio_path} ", source_path=source_path, minio_path=minio_path )
+#             cli_minio.upload_to_minio(local_path=source_path,  minio_path=key)
+#             # a questo punto copio solo index.json giusto, prodotto nella directory /tmp (con indexFlag a true)
+#             cli_minio.upload_to_minio(local_path=INDEXPATHTMP,  minio_path=key, indexFlag=True)
           
     def on_LoadConf(self, client, userdata, message):
         global cli_minio
