@@ -180,7 +180,7 @@ class DTmqtt(object):
         logger.info('Connected to MQTT server: {server}. Wainting for commands...', server=self.mqttBroker)
         
     def disconnect(self):
-        return(self.client.loop_stop())
+        return(self.client.loop_stop(force=True))
     
     def subscribe(self, topic):
         return(self.client.subscribe(topic))
@@ -231,10 +231,14 @@ class DTmqtt(object):
         print(f'------------------------>on_EndProg:  DISCONNET and END')
         if self.redis.aget('DTSDA_State', hmode=True) == S_RUNNING :
             self.on_StopSIM(client, userdata, message)
-        self.redis.aset('DTSDA_State',S_ENDED, hmode=True)
-        logger.warning('END Request IGNORED. Simulator in state: {state} Stopped! State set to {state2}. EXIT', 
-                               state=self.redis.aget('DTSDA_State', hmode=True), state2=S_IDLE )       
-        self.client.disconnect()
+
+        if (self.redis.aget('DTSDA_State', hmode=True) == S_IDLE) or (self.redis.aget('DTSDA_State', hmode=True) == S_READY): 
+            self.redis.aset('DTSDA_State',S_ENDED, hmode=True)     
+            self.client.disconnect()
+        else:
+            logger.warning('END Request IGNORED. Simulator in state: {state} Stopped! State must be {state2} to end', 
+                               state=self.redis.aget('DTSDA_State', hmode=True), state2=S_IDLE )   
+
 
     def on_SetModoSIM(self, client, userdata, message):
         print(f'------------------------>on_SetModoSIM:  SetModoSIM')
@@ -287,16 +291,19 @@ class DTmqtt(object):
 
     def on_StopSIM(self, client, userdata, message):
         global world, model, dtsdamng, tRun_on_message
-        print(f'------------------------>on_StopSIM:  Stop della Simulazione')
+        print(f'------------------------>on_StopSIM:  Simulation STOP request')
         try:
-            if (self.redis.aget('DTSDA_State', hmode=True) == S_RUNNING) or (self.redis.aget('DTSDA_State', hmode=True) == S_READY):
-                self.redis.aset('DTSDA_State', S_IDLE, hmode=True)
+            if (self.redis.aget('DTSDA_State', hmode=True) == S_RUNNING) or (self.redis.aget('DTSDA_State', hmode=True) == S_READY):  
+                print(f'------------------------>on_StopSIM:  Exec STOP of the Simulation...')  
+                self.redis.aset('DTSDA_State', S_IDLE, hmode=True)           
                 world.until = 1
                 sleep(1)
                 print(f"SHUTDOWN!")    
                 world.shutdown()
+                
+                print(f'------------------------>on_StopSIM:  STOP of the Simulation!')
             else: 
-                print(f'------------------------>on_StopSIM:  SIM NOT RUNNING to be stopped! ')
+                print(f'------------------------>on_StopSIM:  SIM NOT RUNNING or READY to be stopped! ')
                 logger.warning('STOP Request IGNORED. Simulator in state: {state} NOT changed! Simulator must be {state2} to be stopped.', 
                                state=self.redis.aget('DTSDA_State', hmode=True), state2=S_RUNNING ) 
 
@@ -342,10 +349,11 @@ class DTmqtt(object):
             minio_path_dict= json.loads(minio_path)
 
 
+        #  produco DTindex.json che identifica univocamente la configurazione
         rdfcreate(indexpath=INDEXPATHTMP, name=minio_path, description=minio_path_dict[minio_path])
         logger.info("Salvataggio configurazione da {source_path} nel objDB con id {minio_path} ", source_path=source_path, minio_path=minio_path )
         cli_minio.upload_to_minio(local_path=source_path,  minio_path=minio_path)
-        # a questo punto copio solo index.json giusto, prodotto nella directory /tmp (con indexFlag a true)
+        # a questo punto copio solo DTindex.json giusto, prodotto nella directory /tmp (con indexFlag a true)
         cli_minio.upload_to_minio(local_path=INDEXPATHTMP,  minio_path=minio_path, indexFlag=True)
 
 
@@ -535,7 +543,7 @@ def main():
         descrActual=confActual['description']
         idActual=confActual['date']
         commandActual='Currconf init'
-        payl = f"""{{"command":"{commandActual}", "id":"{idActual}", "description":"{descrActual}"}}"""
+        payl = f"""{{"command":"{commandActual}", "id":"{confbackName}", "description":"{descrActual}"}}"""
 #        payl = f"""{{"{confbackName}":"{descrActual}"}}"""
         cli_mqtt.publish(cli_mqtt.callbacks['SaveConf'], payl)
 
