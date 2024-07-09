@@ -73,7 +73,9 @@ def readConfig(config_path, namefile):
         try:
             with open(Path(config_path) / Path(namefile), 'r') as fin:
                 ret = yaml.safe_load(fin)
-                print(ret['versione'])
+                logger.info("readConfig: Opening the conf file: {config_path}{namefile}", config_path=config_path, namefile=namefile )
+                if "versione" in ret:
+                    print(ret['versione'])
                 fin.close()
                 return ret
         except Exception:
