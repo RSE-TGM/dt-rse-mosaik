@@ -1,12 +1,13 @@
 # ############################
-# Communication MESP Options #
+# Communication MESP Options # 
 # ############################
 
 redis:
+
   redis_host: REDIS_HOST
-  redis_host_default: localhost
+  redis_host_default: 172.25.102.102
   redis_port: REDIS_PORT
-  redis_port_default: 6380
+  redis_port_default: 6379
   redis_password: mypassw
   
   htags:
@@ -45,11 +46,11 @@ redis:
 
 mqtt:
         #  SERVER: "0.0.0.0"
-  SERVER: "localhost"
+  SERVER: "172.25.102.102"
   PORT: "1883"
-  USER: "userDT"
-  PASSWORD: "userDT"
-  WEBSOCKETPORT: "9001"
+  USER: "admin"
+  PASSWORD: "password"
+  WEBSOCKETPORT: "1883"
   DTSDA:
     MISURE:
       BATT1:
@@ -94,13 +95,13 @@ mqtt:
       currconf: "CURRCONF"           # esempio payload: "{"command": "CURRCONF","id": "UID","description":{"name": "Confxx", "description": "Descrizione Confxx", "date": "2024-05-30 15:08:57.229179"}" Configurazione corrente, es:  "DTSDA/CURRCONF  currconf"
 
 minio:
-  ENDPOINT: "localhost:9090"
+  ENDPOINT: "172.25.102.102:9000"
 #  ACCESS_KEY: "4K10mbUN3FxVsDxtDYSh"
 #  SECRET_KEY: "sI0zu0b4DlR2Vs0JyO6KhJZzws1w5eL1GzthLtPD"
-  ACCESS_KEY: "oouICbtT7IsE0HQpmVWg"
-  SECRET_KEY: "8DvNcONsS0TwoCbiuLHdZDxoWgS0IxeQKOqkR1Pv"
+  ACCESS_KEY: "3XH4IscBBGH1FB4M8cDu"
+  SECRET_KEY: "7kTXv8kSnZ5jmMDu9Fbcj0McH2fDIbr5OInLdnPc"
   SECURE: False
-  CONSOLE: "localhost:9091"
+  CONSOLE: "172.25.102.102:9090"
   USER: "admin"           # utilizzato solo in console
   PASSWORD: "password"   # utilizzato solo in console
 # per il file di index  
@@ -115,10 +116,10 @@ minio:
 
 
 influxdb:
-  URL: "http://localhost:8086"
+  URL: "http://172.25.102.102:8086"
   ORG: "RSE"
   BUCKET: "nuovobuck"    # il bucket deve essere già esistente
-  TOKEN: "aHMudy-R1gicVNWRDzVTWmw4_HPFVCdwzcUTIErKl_i2uVRpCrCpmTOtcOAg0n-qNdnuetSQfTKGHAmgsMeL4A=="
+  TOKEN: ""
   MEASUREMENT: "experiment_0001"
   USER: "influxuser"     # utilizzato solo in console
   PASSWORD: "DTpass!!"   # utilizzato solo in console

@@ -48,7 +48,14 @@ DT_MOSAIK_HOME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 CONFIG_DATA_PATH = DT_MOSAIK_HOME + "/configuration/"
 
-CONFIGDT = "configDT.yaml"
+
+CONFIGDT_SERVLOCAL_PATH = Path(DT_MOSAIK_HOME+"/configDT_locale.yaml")
+
+if CONFIGDT_SERVLOCAL_PATH.exists():  
+    CONFIGDT = "configDT_locale.yaml"
+else:
+    CONFIGDT = "configDT.yaml"
+
 
 EXPERIMENT_CONFIG = "experiment_config.yaml" 
 
@@ -66,11 +73,14 @@ def readConfig(config_path, namefile):
         try:
             with open(Path(config_path) / Path(namefile), 'r') as fin:
                 ret = yaml.safe_load(fin)
+                print(ret['versione'])
                 fin.close()
                 return ret
         except Exception:
             raise FileExistsError("Selected configuration file doesn't exist.")
             return None 
+
+readConfig(CONFIG_DATA_PATH, CONFIGDT)
 
 class  redisDT(object):
     def __init__(self):

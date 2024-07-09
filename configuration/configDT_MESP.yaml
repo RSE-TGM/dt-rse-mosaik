@@ -1,6 +1,8 @@
 # ############################
 # Communication MESP Options #
+# VERSIONE MESP              #
 # ############################
+versione: "SERVIZI_MESP"
 
 redis:
 

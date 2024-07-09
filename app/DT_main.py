@@ -96,7 +96,7 @@ class DTmqtt(object):
 
 # lettura del file di configurazione per acquisire le tag mqtt
         self.config_data_path = CONFIG_DATA_PATH
-        self.configDT = CONFIGDT 
+        self.configDT = CONFIGDT
         self.configDT = readConfig(self.config_data_path, self.configDT)
 
            
@@ -523,7 +523,7 @@ def main():
     args = parser.parse_args()
     
     if args.test:
-        print(f'Modalità TEST, {args.test}!')       
+        print(f'Modalità TEST, {args.test}!') 
 # carico e lancio la configurazione di default
         SIMtest()
     else:
