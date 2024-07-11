@@ -1,6 +1,8 @@
 # ############################
 # Communication MESP Options #
+# VERSIONE SERVIZI LOCALI    #
 # ############################
+versione: "SERVIZI_LOCALI"
 
 redis:
   redis_host: REDIS_HOST
