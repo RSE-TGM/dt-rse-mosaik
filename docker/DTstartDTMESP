@@ -1,0 +1,7 @@
+#!/bin/bash
+echo "---> Start di DTSDA agganciato ai servizi MESP"
+#set -x
+echo "---> Creazione container DRSDA"
+docker compose -f docker-compose_MESP.yml  up -d
+echo "---> Run DTSDA"
+docker exec -it DTSDA python app/DT_main.py

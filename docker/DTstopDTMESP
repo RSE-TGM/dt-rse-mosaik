@@ -1,0 +1,5 @@
+#!/bin/bash
+set -x
+# Stop di DTSDA agganciato ai servizi MESP
+docker compose -f docker-compose_MESP.yml down
+docker ps
