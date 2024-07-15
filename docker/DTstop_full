@@ -1,4 +1,4 @@
 #!/bin/bash
 set -x
-docker compose -f docker-compose_full.yml down
+docker compose -f docker-compose_full.yaml down
 docker ps

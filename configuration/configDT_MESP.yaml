@@ -3,6 +3,8 @@
 # VERSIONE MESP              #
 # ############################
 versione: "SERVIZI_MESP"
+mesp_hmi: "https://mesp-sda.rse-web.it/frontend/sda-dt.html"
+mesp_ip:  "172.25.102.102"
 
 redis:
 

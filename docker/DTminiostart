@@ -3,5 +3,5 @@
 set -x
 # DTSERV=../../../DTwinServices
 cd $DTSERV/minio2
-docker compose  -f docker-compose2.yml up -d
+docker compose  -f docker-compose2.yaml up -d
 docker ps
