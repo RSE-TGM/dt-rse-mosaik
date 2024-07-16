@@ -3,7 +3,7 @@ services:
 #    build:
 #      context: .
 #      dockerfile: Dockerfile_python38
-    image: aguagliardi/dtsda:2.2
+    image: aguagliardi/dtsda_full:2.2
     #image: dtsda38
     #    network_mode: "host" 
     container_name: DTSDA
@@ -14,9 +14,9 @@ services:
       #      REDIS_PORT: 6380
       #      REDIS_PORT: 6379
       #      REDIS_PASSWORD: mypassw
-    volumes:
-      - "..:/home/dt-rse-mosaik"
-      - "/tmp/.X11-unix:/tmp/.X11-unix"
+      #    volumes:
+      #- "..:/home/dt-rse-mosaik"
+      # - "/tmp/.X11-unix:/tmp/.X11-unix"
 
 networks:
   mesp_net:

@@ -1,0 +1,4 @@
+#!/bin/bash
+set -x
+docker compose -f docker-compose_locale_full.yaml down
+docker ps

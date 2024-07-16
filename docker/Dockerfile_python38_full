@@ -22,4 +22,5 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 #RUN mkdir /home/dt-rse-mosaik
 COPY /dt-rse-mosaik /home/dt-rse-mosaik
 WORKDIR /home/dt-rse-mosaik
-CMD tail -f /dev/null
+#CMD tail -f /dev/null
+CMD ["python", "app/DT_main.py"]

@@ -1,5 +1,5 @@
 #!/bin/bash
 set -x
 #docker-compose up -f docker-compose.yaml --remove-orphans -d
-docker compose -f docker-compose.yaml  up -d
+docker compose -f docker-compose_locale_full.yaml  up -d
 

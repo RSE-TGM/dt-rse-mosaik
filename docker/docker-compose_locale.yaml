@@ -3,7 +3,7 @@ services:
 #    build:
 #      context: .
 #      dockerfile: Dockerfile_python38
-    image: aguagliardi/dtsda:2.1
+    image: aguagliardi/dtsda:2.2
     #image: dtsda38
     network_mode: "host" 
     container_name: DTSDA
