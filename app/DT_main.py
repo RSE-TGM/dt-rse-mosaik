@@ -153,6 +153,7 @@ class DTmqtt(object):
         self.client.message_callback_add(self.callbacks['ListaConfReq'], self.on_ListaConfReq)
         self.client.message_callback_add(self.callbacks['DelConf'], self.on_DelConf)
         self.client.message_callback_add(self.callbacks['CurrConfReq'], self.on_CurrConfReq)
+        self.client.message_callback_add(self.callbacks['StatusReq'], self.on_StatusReq)
         # print("------------------------> DTmqtt_messloop: loop forever")
         # self.client.loop_forever()
         # print("------------------------> DTmqtt_messloop: FINE metodo")
@@ -461,6 +462,27 @@ class DTmqtt(object):
 
         print(f'------------------------>on_CurrConfReq: currconf: {currconf} pubblicata')
 
+    def on_StatusReq(self, client, userdata, message):
+        print(f'------------------------>on_StatusReq: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
+        
+        userdata=1
+        if userdata == 1:
+            payl=json.loads(message.payload.decode("utf-8"))    # converte in dict
+        else:
+            payl={}
+            payl['id']="uidx"
+
+        status_dict = {}
+        status_dict = self.r.hgetall(' '.join(self.configDT['redis']['htags']))
+        status_dict = {key.decode('utf-8'):value.decode('utf-8') for key,value in status_dict.items()}  # elimino il b'...
+        status =json.dumps(status_dict) # converto in json per inviare
+
+        currstatus_dict = {}
+        currstatus_dict['command']=self.posts['status']
+        currstatus_dict['id']=payl['id']
+        currstatus_dict['status'] = status
+
+        self.client.publish(self.posts['status'],json.dumps(currstatus_dict))   
 
   
 def CheckForTmaxLoop(world, model, dtsdamng, tRun, TMAX):
@@ -510,9 +532,9 @@ def SIMtest():
     world.run(until=END,rt_factor=1.1)
 
     ## grafici attivati con il debug mode
-    mosaik.util.plot_dataflow_graph(world, folder='util_figures')
+    mosaik.util.plot_dataflow_graph (world, folder='util_figures')
     mosaik.util.plot_execution_graph(world, folder='util_figures')
-    mosaik.util.plot_execution_time(world, folder='util_figures')
+    mosaik.util.plot_execution_time (world, folder='util_figures')
     mosaik.util.plot_execution_time_per_simulator(world, folder='util_figures')
         
 
