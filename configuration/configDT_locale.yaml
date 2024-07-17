@@ -3,6 +3,11 @@
 # VERSIONE SERVIZI LOCALI    #
 # ############################
 versione: "SERVIZI_LOCALI"
+serv_hmi: "https://mesp-sda.rse-web.it/frontend/sda-dt.html"
+serv_ip:  &MIP "localhost"   # redis host, mqqt brocker, mesp hmi
+serv_ip9000:  &MIP9090 "localhost:9090"  # endpoint minio
+serv_ip9090:  &MIP9091 "localgost:9091"  # console minio
+serv_ip8086:  &MIP8086 "http://localhost:8086"  # influxdb server
 
 redis:
   redis_host: REDIS_HOST
@@ -34,20 +39,9 @@ redis:
       field: load_current
       value: 0
 
-  # DTSDA:
-  #   DTmode:
-  #     - DTSDA:mode
-  #     - S_SIM
-  #   DTmode_set:
-  #     - DTSDA:mode_set
-  #     - S_SIM
-  #   DTSDA_State:
-  #     - DTSDA:STATE
-  #     - S_IDLE
-
 mqtt:
         #  SERVER: "0.0.0.0"
-  SERVER: "localhost"
+  SERVER: *MIP
   PORT: "1883"
   USER: "userDT"
   PASSWORD: "userDT"
@@ -74,12 +68,14 @@ mqtt:
       ListaConfReq: "DTSDA/LISTCONF_REQ"    # payload: {"command": "LISTCONF_REQ","id":"uidx"}         Richiesta della lista delle configurazioni salvate in minio. Ad es: "DTSDA/LISTCONF_REQ"
       DelConf:      "DTSDA/DELCONF"         #  payload: {"command": "DELCONF", "id": "conf1"}          Rimozione di una configurazione salvata in minio. es: "DTSDA/DELCONF  conf1"
       StatusReq:    "DTSDA/STATUS_REQ"      # payload: {"command": "STATUS_REQ"} Richiesta stato redis hash DTSDA:batt1
-    
+      HealthReq:    "DTSDA/HEALTHCHECK_REQ"  # Richiesta di haelthcheck
+
     POST:
       listaconf: "DTSDA/LISTCONF"         # Lista delle configurazioni (per HMI)  salvate in minio e pubblicata da DTSDA nel mqtt brocker (come testo).      # Esempio comando di pubblicazione: "DTSDA/LIST_CONF  listaconf"
       currconf: "DTSDA/CURRCONF"          # Configurazione corrente, es:  "DTSDA/CURRCONF  currconf"
-      status: "DTSDA/STATUS"
-
+      status: "DTSDA/STATUS"              # esempio payload: {"state": "S_IDLE", "mode": "S_SIM", "mode_set": "S_SIM", "tsim": "6", "output_voltage": "4.254", "load_current": "32.000"}
+      health: "DTSDA/HEALTHCHECK"         # 
+      
     COMMAND:                             # Comandi GET ricevuti dal HMI e callbacks associate
       MainCall:  "DTSDA"                # topic per tutti i comandi 
       SetModoSIM:   "SET_SIM"           # payload: {"command":"SET_SIM"}
@@ -99,13 +95,13 @@ mqtt:
       currconf: "CURRCONF"           # esempio payload: "{"command": "CURRCONF","id": "UID","description":{"name": "Confxx", "description": "Descrizione Confxx", "date": "2024-05-30 15:08:57.229179"}" Configurazione corrente, es:  "DTSDA/CURRCONF  currconf"
 
 minio:
-  ENDPOINT: "localhost:9090"
+  ENDPOINT: *MIP9090
 #  ACCESS_KEY: "4K10mbUN3FxVsDxtDYSh"
 #  SECRET_KEY: "sI0zu0b4DlR2Vs0JyO6KhJZzws1w5eL1GzthLtPD"
   ACCESS_KEY: "oouICbtT7IsE0HQpmVWg"
   SECRET_KEY: "8DvNcONsS0TwoCbiuLHdZDxoWgS0IxeQKOqkR1Pv"
   SECURE: False
-  CONSOLE: "localhost:9091"
+  CONSOLE: *MIP9091
   USER: "admin"           # utilizzato solo in console
   PASSWORD: "password"   # utilizzato solo in console
 # per il file di index  
@@ -120,7 +116,7 @@ minio:
 
 
 influxdb:
-  URL: "http://localhost:8086"
+  URL: *MIP8086
   ORG: "RSE"
   BUCKET: "nuovobuck"    # il bucket deve essere già esistente
   TOKEN: "aHMudy-R1gicVNWRDzVTWmw4_HPFVCdwzcUTIErKl_i2uVRpCrCpmTOtcOAg0n-qNdnuetSQfTKGHAmgsMeL4A=="

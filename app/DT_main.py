@@ -154,6 +154,7 @@ class DTmqtt(object):
         self.client.message_callback_add(self.callbacks['DelConf'], self.on_DelConf)
         self.client.message_callback_add(self.callbacks['CurrConfReq'], self.on_CurrConfReq)
         self.client.message_callback_add(self.callbacks['StatusReq'], self.on_StatusReq)
+        self.client.message_callback_add(self.callbacks['HealthReq'], self.on_HealthReq)
         # print("------------------------> DTmqtt_messloop: loop forever")
         # self.client.loop_forever()
         # print("------------------------> DTmqtt_messloop: FINE metodo")
@@ -483,6 +484,23 @@ class DTmqtt(object):
         currstatus_dict['status'] = status
 
         self.client.publish(self.posts['status'],json.dumps(currstatus_dict))   
+
+    def on_HealthReq(self, client, userdata, message):
+        print(f'------------------------>on_HealthReq: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
+        
+        userdata=1
+        if userdata == 1:
+            payl=json.loads(message.payload.decode("utf-8"))    # converte in dict
+        else:
+            payl={}
+            payl['id']="uidx"
+
+        currstatus_dict = {}
+        currstatus_dict['command']=self.posts['health']
+        currstatus_dict['id']=payl['id']
+        currstatus_dict['description'] = "ALIVE"
+
+        self.client.publish(self.posts['health'],json.dumps(currstatus_dict))   
 
   
 def CheckForTmaxLoop(world, model, dtsdamng, tRun, TMAX):

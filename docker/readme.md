@@ -30,8 +30,14 @@ docker-compose -f docker-compose_conRedis.yaml logs
 docker-compose -f docker-compose_conRedis.yaml restart DTredis
 
 ### Apertura console MinIO
+locale:
 127.0.0.1:9090
 user: admin
 password: password
 
-comandi a DT:   mqtt-explorer
+remoto:
+http://172.25.102.102:9090/
+user: admin
+password: password
+
+comandi a DT:   mqtt-explorer oppure mqttx
