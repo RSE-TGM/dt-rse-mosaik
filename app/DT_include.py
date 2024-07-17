@@ -54,7 +54,7 @@ CONFIGDT_SERVLOCAL_PATH = Path(DT_MOSAIK_HOME+"/configDT_locale.yaml")
 if CONFIGDT_SERVLOCAL_PATH.exists():  
     CONFIGDT = "configDT_locale.yaml"
 else:
-    CONFIGDT = "configDT.yaml"
+    CONFIGDT = "configDT_MESP.yaml"
 
 
 EXPERIMENT_CONFIG = "experiment_config.yaml" 
