@@ -118,20 +118,20 @@ class DTmqtt(object):
             print(f'{self.callbacks[tag]}')
             self.client.subscribe(self.callbacks[tag])
 
-        self.command = self.configDT['mqtt']['DTSDA']['COMMAND']   # lista delle callbacks associate ai comandi mqtt e subscribe degli stessi
-        for tag in self.command:
-            print(f'{self.command[tag]}')
-            self.client.subscribe(self.command[tag])
+        # self.command = self.configDT['mqtt']['DTSDA']['COMMAND']   # lista delle callbacks associate ai comandi mqtt e subscribe degli stessi
+        # for tag in self.command:
+        #     print(f'{self.command[tag]}')
+        #     self.client.subscribe(self.command[tag])
 
         self.posts = self.configDT['mqtt']['DTSDA']['POST']
         for tag in self.posts:
             print(f'post da pubblicare: {self.posts[tag]}')
             self.client.subscribe(self.posts[tag])    # eseguo il subcribe comunque perchè le informazioni potrebbero essere generate da altri
                    
-        self.posts2 = self.configDT['mqtt']['DTSDA']['POST2']
-        for tag in self.posts2:
-            print(f'post da pubblicare: {self.posts2[tag]}')
-            self.client.subscribe(self.posts2[tag])    # eseguo il subcribe comunque perchè le informazioni potrebbero essere generate da altri
+        # self.posts2 = self.configDT['mqtt']['DTSDA']['POST2']
+        # for tag in self.posts2:
+        #     print(f'post da pubblicare: {self.posts2[tag]}')
+        #     self.client.subscribe(self.posts2[tag])    # eseguo il subcribe comunque perchè le informazioni potrebbero essere generate da altri
                    
         self.misure = self.configDT['mqtt']['DTSDA']['MISURE']['BATT1']
         for tag in self.misure:
@@ -195,37 +195,37 @@ class DTmqtt(object):
         global world, model, dtsdamng, tRun_on_message
         print(f'------------------------>on_message: Received con topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
 
-    def on_switch(self, client, userdata, message):
-        payl=json.loads(message.payload.decode("utf-8"))
-        if payl['command'] == self.command['EndProg'] :
-            self.on_EndProg(client, userdata, message)
-        elif payl['command'] == self.command['SetModoSIM'] :
-            self.on_SetModoSIM(client, userdata, message)
-        elif payl['command'] == self.command['SetModoLEARN'] :
-            self.on_SetModoLEARN(client, userdata, message)
-        elif payl['command'] ==  self.command['InitSIM'] :
-            self.on_InitSIM(client, userdata, message)
-        elif payl['command'] == self.command['RunSIM'] :
-            self.on_RunSIM(client, userdata, message)
-        elif payl['command'] == self.command['StopSIM'] :
-            self.on_StopSIM(client, userdata, message)
-        elif payl['command'] == self.command['PlotGraf'] :
-            self.on_PlotGraf(client, userdata, message)
-        elif payl['command'] == self.command['ListaConfReq'] :
-            userdata = 1    # per abilitare la modalià con topic DTSDA + comando in payload
-            self.on_ListaConfReq(client, userdata, message)
-        elif payl['command'] == self.command['LoadConf'] :
-            userdata = 1    # per abilitare la modalià con topic DTSDA + comando in payload
-            self.on_LoadConf(client, userdata, message)
-        elif payl['command'] == self.command['SaveConf'] :
-            userdata = 1     # per abilitare la modalià con topic DTSDA + comando in payload
-            self.on_SaveConf(client, userdata, message)
-        elif payl['command'] == self.command['DelConf'] :
-            userdata = 1    # per abilitare la modalià con topic DTSDA + comando in payload
-            self.on_DelConf(client, userdata, message)
-        elif payl['command'] == self.command['CurrConfReq'] :
-            userdata = 1    # per abilitare la modalià con topic DTSDA + comando in payload
-            self.on_CurrConfReq(client, userdata, message)
+    # def on_switch(self, client, userdata, message):
+    #     payl=json.loads(message.payload.decode("utf-8"))
+    #     if payl['command'] == self.command['EndProg'] :
+    #         self.on_EndProg(client, userdata, message)
+    #     elif payl['command'] == self.command['SetModoSIM'] :
+    #         self.on_SetModoSIM(client, userdata, message)
+    #     elif payl['command'] == self.command['SetModoLEARN'] :
+    #         self.on_SetModoLEARN(client, userdata, message)
+    #     elif payl['command'] ==  self.command['InitSIM'] :
+    #         self.on_InitSIM(client, userdata, message)
+    #     elif payl['command'] == self.command['RunSIM'] :
+    #         self.on_RunSIM(client, userdata, message)
+    #     elif payl['command'] == self.command['StopSIM'] :
+    #         self.on_StopSIM(client, userdata, message)
+    #     elif payl['command'] == self.command['PlotGraf'] :
+    #         self.on_PlotGraf(client, userdata, message)
+    #     elif payl['command'] == self.command['ListaConfReq'] :
+    #         userdata = 1    # per abilitare la modalià con topic DTSDA + comando in payload
+    #         self.on_ListaConfReq(client, userdata, message)
+    #     elif payl['command'] == self.command['LoadConf'] :
+    #         userdata = 1    # per abilitare la modalià con topic DTSDA + comando in payload
+    #         self.on_LoadConf(client, userdata, message)
+    #     elif payl['command'] == self.command['SaveConf'] :
+    #         userdata = 1     # per abilitare la modalià con topic DTSDA + comando in payload
+    #         self.on_SaveConf(client, userdata, message)
+    #     elif payl['command'] == self.command['DelConf'] :
+    #         userdata = 1    # per abilitare la modalià con topic DTSDA + comando in payload
+    #         self.on_DelConf(client, userdata, message)
+    #     elif payl['command'] == self.command['CurrConfReq'] :
+    #         userdata = 1    # per abilitare la modalià con topic DTSDA + comando in payload
+    #         self.on_CurrConfReq(client, userdata, message)
 
     
 
@@ -455,7 +455,7 @@ class DTmqtt(object):
         # si deve leggere il file index nella directory 'configurazione" dell'app ... per ora ci metto una stringa fissa
 #        currconf =  '"currconf": "Questa è la descrizione della configurazione"'  # variabile di tipo text
         currconf_dict={}
-        currconf_dict['command']=self.posts2['currconf']
+        currconf_dict['command']=self.posts['currconf']
         currconf_dict['id']=payl['id']
         currconf_dict['description'] = currconf
         self.client.publish(self.posts['currconf'], json.dumps(currconf_dict))
@@ -498,7 +498,7 @@ class DTmqtt(object):
         currstatus_dict = {}
         currstatus_dict['command']=self.posts['health']
         currstatus_dict['id']=payl['id']
-        currstatus_dict['description'] = "ALIVE"
+        currstatus_dict['description'] = self.callbacks['MainCall']+" is ALIVE"
 
         self.client.publish(self.posts['health'],json.dumps(currstatus_dict))   
 
