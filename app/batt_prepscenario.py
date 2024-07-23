@@ -26,8 +26,10 @@ def batt_prepScenario():
             'DTSDA_Mng': {
                 'python': 'batt_mng:DTSDA_Mng',
             },
+#            'InfluxWriter': {
+#                'python': 'mosaik.components.influxdb2.writer:Simulator',
             'InfluxWriter': {
-                'python': 'mosaik.components.influxdb2.writer:Simulator',
+                'python': 'influxdb2_writer:Simulator',
             },
         }
 

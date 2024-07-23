@@ -4,23 +4,18 @@
 # ############################
 versione: "SERVIZI_LOCALI"
 serv_hmi: "https://mesp-sda.rse-web.it/frontend/sda-dt.html"
-# serv_ip:  &MIP "localhost"   # redis host, mqqt brocker, mesp hmi
-# serv_ip9000:  &MIP9090 "localhost:9090"  # endpoint minio
-# serv_ip9090:  &MIP9091 "localgost:9091"  # console minio
-# serv_ip8086:  &MIP8086 "http://localhost:8086"  # influxdb server
-
 redis_host:  &REDISHOST "localhost"
-redis_port:  &REDISPORT 6380
-mqtt_brocker: &MQTTBROCKER "localhost"
-mqtt_port: &MQTTPORT "1883"
-mqtt_user: &MQTTUSER "userDT"
-mqtt_password: &MQTTPASSWORD "userDT"
+redis_port:  &REDISPORT "6380"
+mqtt_brocker:        &MQTTBROCKER "localhost"
+mqtt_port:           &MQTTPORT "1883"
+mqtt_user:           &MQTTUSER "userDT"
+mqtt_password:       &MQTTPASSWORD "userDT"
 mqtt_websocket_port: &MQTTWEBSOCKET_PORT "9001"
-minio_endpoint:  &MINIOENDPOINT "localhost:9090"
-minio_console:   &MINIOCONSOLE "localhost:9091"
+minio_endpoint:   &MINIOENDPOINT "localhost:9090"
+minio_console:    &MINIOCONSOLE "localhost:9091"
 minio_access_key: &MINIOACCESS "oouICbtT7IsE0HQpmVWg"
 minio_secret_key: &MINIOSECRET "8DvNcONsS0TwoCbiuLHdZDxoWgS0IxeQKOqkR1Pv"
-influx_url: &INFLUXURL "http://localhost:8086"
+influx_url:   &INFLUXURL "http://localhost:8086"
 influx_token: &INFLUXTOKEN "aHMudy-R1gicVNWRDzVTWmw4_HPFVCdwzcUTIErKl_i2uVRpCrCpmTOtcOAg0n-qNdnuetSQfTKGHAmgsMeL4A=="
 
 redis:
@@ -96,7 +91,7 @@ minio:
   CONSOLE: *MINIOCONSOLE
   USER: "admin"           # utilizzato solo in console
   PASSWORD: "password"   # utilizzato solo in console
-# per il file di index  
+# per il file di index ... 
   INDEXNAME: "DTindex.jsonld"
   INDEXBUCKET: "dtsda"
   INDEXCONTEXT: "http://schema.org/"

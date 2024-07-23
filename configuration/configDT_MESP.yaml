@@ -4,23 +4,18 @@
 # ############################
 versione: "SERVIZI_MESP"
 serv_hmi: "https://mesp-sda.rse-web.it/frontend/sda-dt.html"
-# serv_ip:  &MIP "172.25.102.102"   # redis host, mqqt brocker, mesp hmi
-# serv_ip9000:  &MIP9000 "172.25.102.102:9000"  # endpoint minio
-# serv_ip9090:  &MIP9090 "172.25.102.102:9090"  # console minio
-# serv_ip8086:  &MIP8086 "http://172.25.102.102:8086"  # influxdb server
-
 redis_host:  &REDISHOST "172.25.102.102"
-redis_port:  &REDISPORT 6379
-mqtt_brocker: &MQTTBROCKER "172.25.102.102"
-mqtt_port: &MQTTPORT "1883"
-mqtt_user: &MQTTUSER "admin"
-mqtt_password: &MQTTPASSWORD "password"
+redis_port:  &REDISPORT "6379"
+mqtt_brocker:        &MQTTBROCKER "172.25.102.102"
+mqtt_port:           &MQTTPORT "1883"
+mqtt_user:           &MQTTUSER "admin"
+mqtt_password:       &MQTTPASSWORD "password"
 mqtt_websocket_port: &MQTTWEBSOCKET_PORT "9001"
-minio_endpoint:  &MINIOENDPOINT "172.25.102.102:9000"
-minio_console:   &MINIOCONSOLE "172.25.102.102:9090"
+minio_endpoint:   &MINIOENDPOINT "172.25.102.102:9000"
+minio_console:    &MINIOCONSOLE "172.25.102.102:9090"
 minio_access_key: &MINIOACCESS "3XH4IscBBGH1FB4M8cDu"
 minio_secret_key: &MINIOSECRET "7kTXv8kSnZ5jmMDu9Fbcj0McH2fDIbr5OInLdnPc"
-influx_url: &INFLUXURL "http://172.25.102.102:8086"
+influx_url:   &INFLUXURL "http://172.25.102.102:8086"
 influx_token: &INFLUXTOKEN ""
 
 redis:
@@ -89,14 +84,14 @@ mqtt:
       health: "DTSDA/HEALTHCHECK"         # payload: {"command": "HEALTHCHECK", "id": "timestamp of the req.", "description":"ALIVE"}
 
 minio:
-  ENDPOINT: *MINIOENDPOINT
+  ENDPOINT:    *MINIOENDPOINT
   ACCESS_KEY:  *MINIOACCESS
-  SECRET_KEY: *MINIOSECRET
+  SECRET_KEY:  *MINIOSECRET
   SECURE: False
-  CONSOLE: *MINIOCONSOLE
+  CONSOLE:     *MINIOCONSOLE
   USER: "admin"           # utilizzato solo in console
   PASSWORD: "password"   # utilizzato solo in console
-# per il file di index  
+# per il file di index ...
   INDEXNAME: "DTindex.jsonld"
   INDEXBUCKET: "dtsda"
   INDEXCONTEXT: "http://schema.org/"
