@@ -5,7 +5,7 @@ import mosaik_api
 import numpy as np
 import influxdb_client as influx
 import os
-from pytz import timezone
+# from pytz import timezone
 from datetime import datetime
 from dateutil import parser
 
@@ -96,7 +96,7 @@ class Simulator(mosaik_api.Simulator):
         return [{"eid": EID, "type": model}]
 
     def step(self, time, inputs, max_advance):
-        print(f"influxdb2_write: 1 time={time} inputs={inputs} type={type(time)}")
+#        print(f"influxdb2_write: 1 time={time} inputs={inputs} type={type(time)}")
         data = inputs.get(EID, {})
         if "local_time" in data:
             timestamp = next(iter(data["local_time"].values()))
@@ -104,7 +104,10 @@ class Simulator(mosaik_api.Simulator):
         elif self._time_converter:
             timestamp = self._time_converter.isoformat_from_step(time)
 #            timestamp = timestamp.astimezone(timezone('Europe/Rome'))
-            print(f"influxdb2_write: 1B timestamp={timestamp} - conzero={self._time_converter.isoformat_from_step(0)} time={time} type={type(timestamp)}")
+#            print(f"influxdb2_write: 1B timestamp={timestamp} - conzero={self._time_converter.isoformat_from_step(0)} time={time} type={type(timestamp)}")
+         # scommentare per forzare il time zone    
+            # timestamp_obj = parser.parse(timestamp)
+            # timestamp=timezone('Europe/Rome').localize(timestamp_obj).isoformat()
         else:
             raise ValueError(
                 "The Influx simulator needs to be supplied with an ISO timestamp on "
@@ -114,10 +117,8 @@ class Simulator(mosaik_api.Simulator):
                 "Alternatively, you can provide a `start_date` when initializing the "
                 "simulator."
             )
-#        timestamp_obj = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S.mmmmmm')
-        timestamp_obj = parser.parse(timestamp)
-        timestamp=timezone('Europe/Rome').localize(timestamp_obj).isoformat()
-        print(f"influxdb2_write: 2 t={time} ")
+       
+#        print(f"influxdb2_write: 2 t={time} ")
         for attr, src_ids in data.items():
             for src_id, val in src_ids.items():
                 if isinstance(val, np.generic):
@@ -134,7 +135,7 @@ class Simulator(mosaik_api.Simulator):
                 )
                 bb=self._bucket
                 tt=time
-                print(f"influxdb2_write: 3 time={time} timestamp={timestamp}-- bucket={self._bucket} -- record={record} " )
+                print(f"influxdb2_write: time={time} timestamp={timestamp}-- bucket={self._bucket} -- record={record} " )
                 self._influx_writer.write(
                     bucket=self._bucket,
                     record=record,
@@ -142,7 +143,7 @@ class Simulator(mosaik_api.Simulator):
 
         # Only return a next step if running in time-based mode
         if self._step_size:
-            print(f"influxdb2_write: 4 t=", time + self._step_size)
+#            print(f"influxdb2_write: 4 t=", time + self._step_size)
             return time + self._step_size
 
     def get_data(self, outputs):

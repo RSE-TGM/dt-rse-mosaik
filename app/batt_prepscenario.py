@@ -7,6 +7,8 @@ from loguru import logger
 
 import mosaik
 import datetime
+import pytz
+from pytz import timezone
 
 from  DT_include import *
 
@@ -39,7 +41,7 @@ def batt_prepScenario():
 
     
     #START = '2023-01-01 01:00:00'
-    now = datetime.datetime.now()
+    now = datetime.datetime.now(pytz.timezone('Europe/Rome'))
     START = f"{now}"
     ### INPUT_DATA = 'mosaik/configuration/data/input_data.csv' # .csv in your setup
     INPUT_DATA = CONFIG_DATA_PATH + 'data/input_data.csv'
