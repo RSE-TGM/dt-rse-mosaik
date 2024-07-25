@@ -18,55 +18,9 @@ from minio.error import  S3Error
 
 from  DT_rdf import *
 
-SRC_DTRSE=False  # con false il modello della batteria è locale a dt-rse-mosaik,  con true è quello di DT-rse
-
-S_IDLE    = 'S_IDLE'
-S_RUNNING = 'S_RUNNING'
-S_READY  = 'S_READY'
-S_ENDED   = 'S_ENDED'
-
-S_SIM ='S_SIM'
-S_LEARN ='S_LEARN'
-S_ON ='1'
-S_OFF='0'
-StrToNum={
-        S_OFF  :100,
-        S_ON   :111,
-        S_SIM  :122,
-        S_LEARN:133
-        }
-
-MODSIM = StrToNum[S_SIM]    # era 1
-MODLEARN = StrToNum[S_LEARN]  # era 10
-NOFORZ =  StrToNum[S_OFF]      # era 0
-FORZSIM = MODSIM
-FORZLEARN = MODLEARN
-STOP = -1
-
-
-DT_MOSAIK_HOME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-CONFIG_DATA_PATH = DT_MOSAIK_HOME + "/configuration/"
-
-
-CONFIGDT_SERVLOCAL_PATH = Path(DT_MOSAIK_HOME+"/configDT_locale.yaml")
-
-if CONFIGDT_SERVLOCAL_PATH.exists():  
-    CONFIGDT = "configDT_locale.yaml"
-else:
-    CONFIGDT = "configDT_MESP.yaml"
-
-
-EXPERIMENT_CONFIG = "experiment_config.yaml" 
-
-DTINDEX="DTindex.json"
-INDEXPATHDEF=CONFIG_DATA_PATH+"/"+DTINDEX
-INDEXPATHTMP="/tmp"+"/"+DTINDEX
-
-NAMESPACEDEF="http://tgm-sda.rse-web.it/"
-
 def readConfig(config_path, namefile):
-        # Read in memory a yalm file
+        global TZONE
+ # Read in memory a yalm file
         
         #config_path = "mosaik/configuration/"
         #namefile = "experiment_config.yaml"
@@ -74,15 +28,21 @@ def readConfig(config_path, namefile):
             with open(Path(config_path) / Path(namefile), 'r') as fin:
                 ret = yaml.safe_load(fin)
                 logger.info("readConfig: Opening the conf file: {config_path}{namefile}", config_path=config_path, namefile=namefile )
+
                 if "versione" in ret:
                     print(ret['versione'])
+                     
+                if "tzone" in ret:
+                    TZONE=ret['tzone']
+                else:
+                    TZONE="Europe/Rome"
+                
                 fin.close()
                 return ret
         except Exception:
             raise FileExistsError("Selected configuration file doesn't exist.")
             return None 
 
-readConfig(CONFIG_DATA_PATH, CONFIGDT)
 
 class  redisDT(object):
     def __init__(self):
@@ -150,7 +110,6 @@ class  redisDT(object):
             print(f'------------------------------>  hset {htag}  {field} {val}')
             return(self.red.hset(htag, field,val))
 
-            
     
     def hhset(self, simbtag, val, id):
         htag = self.configDT['redis']['htags'][0]           # è il tag del hash redis
@@ -210,11 +169,6 @@ class DTMinioClient(object):
         self._indexname = self.configDT['minio']['INDEX_NAME']
         self._indexdescription = self.configDT['minio']['INDEX_DESCRIPTION']
         self._indexdata = self.configDT['minio']['INDEX_DATA']
-
-        # self.endpoint=endpoint
-        # self.access_key=access_key
-        # self.secret_key=secret_key
-        # self.secure=secure
 
         self.client = Minio( endpoint   = self.endpoint,
                              access_key = self.access_key,
@@ -289,10 +243,7 @@ class DTMinioClient(object):
 #                print(resp)
                 self.listaconf.append([resp['name'],resp['description']])
                 self.listaconf_dict[resp['name']] = resp
-        #print("---->", self.listaconf_dict)
-        # lista fake per prova ...
-        # self.listaconf = '"conf1":"descr conf1", "conf2":"descr conf2","conf3":"descr conf3"'
-#        return (self.listaconf_dict)
+
         return (json.dumps(self.listaconf_dict))  # invio un json
 
     def read_index(self):
@@ -347,3 +298,58 @@ class InfluxDBCli(object):
                   
     def getinflux(self):
         return (self.influx)
+
+
+
+#### Definizioni costanti per path nomi file
+DT_MOSAIK_HOME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+CONFIG_DATA_PATH = DT_MOSAIK_HOME + "/configuration/"
+CONFIGDT_SERVLOCAL_PATH = Path(DT_MOSAIK_HOME+"/configDT_locale.yaml")
+
+if CONFIGDT_SERVLOCAL_PATH.exists():  
+    CONFIGDT = "configDT_locale.yaml"
+else:
+    CONFIGDT = "configDT_MESP.yaml"
+
+EXPERIMENT_CONFIG = "experiment_config.yaml" 
+
+ret = readConfig(CONFIG_DATA_PATH, CONFIGDT)
+
+if "rdf" in ret:
+    NAMESPACEDEF=ret['rdf']['NAMESPACE']
+    DTINDEX=ret['rdf']['INDEXNAME']
+else:
+    NAMESPACEDEF="https://www.rse-web.it/" 
+    DTINDEX= "DTindex.json"  
+
+INDEXPATHDEF=CONFIG_DATA_PATH+"/"+DTINDEX
+INDEXPATHTMP="/tmp"+"/"+DTINDEX
+############################################
+
+#### Definizioni costanti e alias
+SRC_DTRSE=False  # con false il modello della batteria è locale a dt-rse-mosaik,  con true è quello di DT-rse
+
+S_IDLE    = 'S_IDLE'
+S_RUNNING = 'S_RUNNING'
+S_READY  = 'S_READY'
+S_ENDED  = 'S_ENDED'
+
+S_SIM ='S_SIM'
+S_LEARN ='S_LEARN'
+S_ON ='1'
+S_OFF='0'
+StrToNum={
+        S_OFF  :100,
+        S_ON   :111,
+        S_SIM  :122,
+        S_LEARN:133
+        }
+
+MODSIM = StrToNum[S_SIM]    # era 1
+MODLEARN = StrToNum[S_LEARN]  # era 10
+NOFORZ =  StrToNum[S_OFF]      # era 0
+FORZSIM = MODSIM
+FORZLEARN = MODLEARN
+STOP = -1
+#######################################

@@ -41,7 +41,7 @@ def batt_prepScenario():
 
     
     #START = '2023-01-01 01:00:00'
-    now = datetime.datetime.now(pytz.timezone('Europe/Rome'))
+    now = datetime.datetime.now(pytz.timezone(TZONE))
     START = f"{now}"
     ### INPUT_DATA = 'mosaik/configuration/data/input_data.csv' # .csv in your setup
     INPUT_DATA = CONFIG_DATA_PATH + 'data/input_data.csv'
@@ -70,7 +70,7 @@ def batt_prepScenario():
     
 
     # Connessione a influxdb server e get instance
-    infl_inst = InfluxDBCli(influx_sim)
+    infl_inst = InfluxDBCli(influx_sim)   # i parametri di connessione sono nel file config yaml
     influx = infl_inst.getinflux()
     # influx = influx_sim.Database(
     #     url="http://localhost:8086",

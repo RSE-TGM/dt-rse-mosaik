@@ -2,7 +2,7 @@ import datetime
 
 from rdflib import Graph, Namespace, Literal, URIRef
 import uuid
-
+import pytz
 
 
 def rdfcreate(namespace="http://tgm-sda.rse-web.it/",indexpath="DTindex.json", name="MinioFolder1", description="Questa è una descrizione"):
@@ -16,7 +16,7 @@ def rdfcreate(namespace="http://tgm-sda.rse-web.it/",indexpath="DTindex.json", n
 
         g.add((new_config, sda["name"], Literal(name)))
         g.add((new_config, sda["description"], Literal(description)))
-        g.add((new_config, sda["date"], Literal(f"{datetime.datetime.now()}")))
+        g.add((new_config, sda["date"], Literal(f"{datetime.datetime.now(pytz.timezone('Europe/Rome'))}")))
         g.serialize(indexpath, format="json-ld")
 
 def rdfquery(namespace="http://tgm-sda.rse-web.it/",indexpath="DTindex.json") -> dict:

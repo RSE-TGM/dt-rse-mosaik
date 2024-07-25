@@ -103,7 +103,7 @@ class Simulator(mosaik_api.Simulator):
             print(f"influxdb2_write: 1A timestamp={timestamp} ")
         elif self._time_converter:
             timestamp = self._time_converter.isoformat_from_step(time)
-#            timestamp = timestamp.astimezone(timezone('Europe/Rome'))
+#   timestamp = timestamp.astimezone(timezone('Europe/Rome'))
 #            print(f"influxdb2_write: 1B timestamp={timestamp} - conzero={self._time_converter.isoformat_from_step(0)} time={time} type={type(timestamp)}")
          # scommentare per forzare il time zone    
             # timestamp_obj = parser.parse(timestamp)

@@ -3,6 +3,7 @@
 # VERSIONE MESP              #
 # ############################
 versione: "SERVIZI_MESP"
+tzone: "Europe/Rome"
 serv_hmi: "https://mesp-sda.rse-web.it/frontend/sda-dt.html"
 redis_host:  &REDISHOST "172.25.102.102"
 redis_port:  &REDISPORT "6379"
@@ -105,13 +106,13 @@ minio:
 influxdb:
   URL: *INFLUXURL
   ORG: "RSE"
-  BUCKET: "nuovobuck"    # il bucket deve essere già esistente
+  BUCKET: "dtsda"    # il bucket deve essere già esistente
   TOKEN: *INFLUXTOKEN
-  MEASUREMENT: "experiment_0001"
+  MEASUREMENT: "measurement_1"
   USER: "influxuser"     # utilizzato solo in console
   PASSWORD: "DTpass!!"   # utilizzato solo in console
 
 rdf:
   NAMESPACE: "http://tgm-sda.rse-web.it/"
-  INDEXPATH: "index.json"
+  INDEXNAME: "DTindex.json"
 

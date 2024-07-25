@@ -534,7 +534,7 @@ def CheckForTmax(world, model, dtsdamng, tRun, TMAX):
         return False
     
 
-def SIMtest():
+def SIMtest( tfin ):
     #
     # Viene eseguito un transitorio in batch e visulaizzati i plot di prestazione       
     #
@@ -546,7 +546,7 @@ def SIMtest():
     # lancio simulazione
     #taskRun()
     debug=True
-    END=10
+    END=tfin
     world.run(until=END,rt_factor=1.1)
 
     ## grafici attivati con il debug mode
@@ -557,28 +557,36 @@ def SIMtest():
         
 
 def main():
-    global END, cli_minio
+    global cli_minio
     parser = argparse.ArgumentParser()
-    parser.add_argument('--test', action='store_true')
+    parser.add_argument('--test', action='store_true', help="Modalità test, Esegue una simulazione in batch (durata di default 10 secondi) e termina")
+    parser.add_argument('-tfin', help="Tempo di fine simulazione della duratanella modalità test")
     args = parser.parse_args()
-    
-    if args.test:
-        print(f'Modalità TEST, {args.test}!') 
-# carico e lancio la configurazione di default
-        SIMtest()
+    if args.test:        
+        if args.tfin:
+            END=int(args.tfin)
+            print(f'Modalità TEST, {args.test}, t fine simulazione: {args.tfin}!') 
+        else:
+            # run test, durata di default 10 secondi
+            END=10
+            print(f'Modalità TEST, {args.test} , t fine simulazione: {END}!')
+
+        SIMtest(END)
     else:
-# modalità normale in "mqtt message loop"
-        # Connessione a mqtt e sua configurazione, la classe si connette inoltre a Redis. 
+#
+# Modalità normale in "mqtt message loop"
+#
+        # Connessione a mqtt e sua configurazione. La classe DTmqtt si connette anche a Redis. 
         # Invece il modello della batteria ( modulo batt_prepscenario ) si connette direttamente a InfluxDB
         cli_mqtt = DTmqtt()
 
         ## Connessione al object DB Minio      
         cli_minio = DTMinioClient()
         
-        # eseguo il backup della configurazione iniziale ...
+        # Eseguo il backup della configurazione iniziale ...
         confActual=rdfquery(indexpath=INDEXPATHDEF)
 
-        adesso=datetime.datetime.now()
+        adesso=datetime.datetime.now(pytz.timezone(TZONE))
         confbackName='CurrConfBackup'+adesso.strftime("-%d%m%Y-%H_%M_%S_%f") 
         descrActual=confActual['description']
         idActual=confActual['date']
