@@ -39,7 +39,7 @@ def taskRun():
     # run normale, nel processo del thread principale
     #END = 20  # 10 seconds
     END = 1 * 24 * 60 * 60 # one day in seconds
-    world.run(until=END,rt_factor=1.1)
+    world.run(until=END,rt_factor=1)
     # Run simulation
     #world.set_initial_event(dtsdamng.sid)
     #world.run(until=END)
@@ -547,7 +547,13 @@ def SIMtest( tfin ):
     #taskRun()
     debug=True
     END=tfin
-    world.run(until=END,rt_factor=1.1)
+    world.run(until=END,rt_factor=1)
+
+        # until: int,
+        # rt_factor: Optional[float] = None,
+        # rt_strict: bool = False,
+        # print_progress: Union[bool, Literal["individual"]] = True,
+        # lazy_stepping: bool = True,
 
     ## grafici attivati con il debug mode
     mosaik.util.plot_dataflow_graph (world, folder='util_figures')
