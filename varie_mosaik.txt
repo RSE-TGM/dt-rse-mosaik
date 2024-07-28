@@ -1,6 +1,6 @@
+https://github.com/OFFIS-mosaik
 https://lists.offis.de/mailman/listinfo/mosaik-users
 https://github.com/OFFIS-mosaik/mosaik
-https://github.com/OFFIS-mosaik
 
 https://mosaik.readthedocs.io/en/latest/tutorials/graphs.html
 

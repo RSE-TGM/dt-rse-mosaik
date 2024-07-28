@@ -94,7 +94,7 @@ target/
 /references
 /reports
 mosaik/tutorial/
-util_figures/
+#util_figures/
 mosaik/old/
 
 redis_data/
@@ -121,4 +121,5 @@ mosaik/noteb.ipynb
 mosaik/ServicesEtc
 
 .venv
+.venvtest
 DT-rse-backup/

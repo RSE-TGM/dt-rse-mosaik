@@ -547,8 +547,15 @@ def SIMtest( tfin ):
     #taskRun()
     debug=True
     END=tfin
-    world.run(until=END,rt_factor=1)
-
+        # rt_passed = perf_counter() - rt_start
+    
+    RunInizTime=perf_counter()
+    rt_factor=1   # con 0.1 rimane in passo; In 1 secondo produce 10 passi di 1 secondo di step di integrazione, cioè 10 volte il tempo reale, test fatto con END=200
+    #logger.disable("mosaik.scheduler")
+    world.run(until=END,rt_factor=rt_factor)
+    RunEndTime=perf_counter()
+    print(f'rt_factor={rt_factor} END={END} rt_time forcast={rt_factor*END}')
+    print(f'RunEndTime={RunEndTime} RunInizTime={RunInizTime} rt_time={RunEndTime-RunInizTime}')
         # until: int,
         # rt_factor: Optional[float] = None,
         # rt_strict: bool = False,
@@ -568,6 +575,10 @@ def main():
     parser.add_argument('--test', action='store_true', help="Modalità test, Esegue una simulazione in batch (durata di default 10 secondi) e termina")
     parser.add_argument('-tfin', help="Tempo di fine simulazione della duratanella modalità test")
     args = parser.parse_args()
+
+    # disablito il wanring sul passo di tempo 
+    logger.disable("mosaik.scheduler")
+
     if args.test:        
         if args.tfin:
             END=int(args.tfin)

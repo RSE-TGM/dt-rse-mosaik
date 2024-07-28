@@ -4,6 +4,7 @@ sudo apt-get update -y
 sudo apt-get upgrade -y
 sudo apt install python3-pip
 sudo apt install python3-virtualenv
+sudo apt-get install python3-tk
 sudo apt  install docker.io -y
 sudo apt  install docker-compose -y
 sudo usermod -aG docker $USER
