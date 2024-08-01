@@ -39,7 +39,7 @@ def taskRun():
     # run normale, nel processo del thread principale
     #END = 20  # 10 seconds
     END = 1 * 24 * 60 * 60 # one day in seconds
-    world.run(until=END,rt_factor=1)
+    world.run(until=END,rt_factor=1.)
     # Run simulation
     #world.set_initial_event(dtsdamng.sid)
     #world.run(until=END)
@@ -534,7 +534,7 @@ def CheckForTmax(world, model, dtsdamng, tRun, TMAX):
         return False
     
 
-def SIMtest( tfin ):
+def SIMtest( tfin, plotfig=False, rt_factor=1.):
     #
     # Viene eseguito un transitorio in batch e visulaizzati i plot di prestazione       
     #
@@ -550,7 +550,7 @@ def SIMtest( tfin ):
         # rt_passed = perf_counter() - rt_start
     
     RunInizTime=perf_counter()
-    rt_factor=1   # con 0.1 rimane in passo; In 1 secondo produce 10 passi di 1 secondo di step di integrazione, cioè 10 volte il tempo reale, test fatto con END=200
+    #rt_factor=1.  così la simulazione è in tempo reale. Ad esempio con 0.1 rimane in passo; In 1 secondo produce 10 passi di 1 secondo di step di integrazione, cioè 10 volte il tempo reale, test fatto con END=200
     #logger.disable("mosaik.scheduler")
     world.run(until=END,rt_factor=rt_factor)
     RunEndTime=perf_counter()
@@ -562,24 +562,28 @@ def SIMtest( tfin ):
         # print_progress: Union[bool, Literal["individual"]] = True,
         # lazy_stepping: bool = True,
 
+    if plotfig:
     ## grafici attivati con il debug mode
-    mosaik.util.plot_dataflow_graph (world, folder='util_figures')
-    mosaik.util.plot_execution_graph(world, folder='util_figures')
-    mosaik.util.plot_execution_time (world, folder='util_figures')
-    mosaik.util.plot_execution_time_per_simulator(world, folder='util_figures')
+        mosaik.util.plot_dataflow_graph (world, folder='util_figures')
+        mosaik.util.plot_execution_graph(world, folder='util_figures')
+        mosaik.util.plot_execution_time (world, folder='util_figures')
+        mosaik.util.plot_execution_time_per_simulator(world, folder='util_figures')
         
 
 def main():
     global cli_minio
     parser = argparse.ArgumentParser()
-    parser.add_argument('--test', action='store_true', help="Modalità test, Esegue una simulazione in batch (durata di default 10 secondi) e termina")
-    parser.add_argument('-tfin', help="Tempo di fine simulazione della duratanella modalità test")
+    parser.add_argument('-test', action='store_true', help="Modalità test. Esegue una simulazione in batch (durata di default 10 secondi) e termina")
+    parser.add_argument('-rt_factor', help="rapporto tempoSimulazione/tempoReale")
+    parser.add_argument('-tfin', help="Durata della simulazione nella modalità test")
+    parser.add_argument('-plot', action='store_true', help="In modalità test, stampa grafi di debug")
+
     args = parser.parse_args()
 
     # disablito il wanring sul passo di tempo 
     logger.disable("mosaik.scheduler")
-
     if args.test:        
+        
         if args.tfin:
             END=int(args.tfin)
             print(f'Modalità TEST, {args.test}, t fine simulazione: {args.tfin}!') 
@@ -587,8 +591,14 @@ def main():
             # run test, durata di default 10 secondi
             END=10
             print(f'Modalità TEST, {args.test} , t fine simulazione: {END}!')
+        
+        if args.plot: plotfig=True 
+        else: plotfig=False
+    
+        if args.rt_factor : rt_factor=float(args.rt_factor)
+        else:  rt_factor=1.
 
-        SIMtest(END)
+        SIMtest(END, plotfig=plotfig, rt_factor=rt_factor)
     else:
 #
 # Modalità normale in "mqtt message loop"

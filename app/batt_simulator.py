@@ -70,26 +70,22 @@ class ModelSim(mosaik_api.Simulator):
                     if attr == 'DTmode':
                         model_instance.DTmode = list(values.values())[0]
                     if attr == 'load_current':
-                        model_instance.delta = list(values.values())[0] #  era sum(values.values())
+                        model_instance.delta = list(values.values())[0] #  era sum(values.values()), corrente allo step successivo
             
             sampling_time=model_instance.sampling_time   # model_instance.sampling_time è letto dal file di config experiment
             
             if model_instance.DTmode == MODSIM :
                 model_instance.step(sampling_time, time)   # sono in modo "simulazione"
+                modo=S_SIM
             else:
                 model_instance.learn(sampling_time, time)  # sono in modo "learn"
+                modo=S_LEARN
                
         
-        
-        # if time >= 5 :
-        #     extra = 10000000
-        # else:
-        #     extra = 0
-        # 
-        # next_step = time + sampling_time + extra
-        
         next_step = time + sampling_time 
-        logger.info('batt_model: {time} La batteria è in modalità self.DTmode {DTmode}, nextstep ={next_step}', time=time, DTmode=model_instance.DTmode, next_step=next_step)
+        logger.info('batt_model: time={time} sampling_time={sampling_time} - La batteria è in modalità {modo}, current[A]={current} voltage[V]={voltage} next_current[A]={next_step_current}', time=time, sampling_time=sampling_time, modo=modo, 
+                    current=model_instance.load_current, voltage=model_instance.output_voltage, next_step_current=model_instance.delta)
+        
         return next_step  # Step size, cioè sampling_time, è normalmmente 1 secondo ed è letto dal file di config experiment
 
     def get_data(self, outputs):

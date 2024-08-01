@@ -122,4 +122,5 @@ mosaik/ServicesEtc
 
 .venv
 .venvtest
+.venvRSE
 DT-rse-backup/

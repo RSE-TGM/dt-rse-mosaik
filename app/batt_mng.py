@@ -115,12 +115,12 @@ class DTSDA_Mng(mosaik_api_v3.Simulator):
             self.redis.aset('DTmode',S_LEARN, hmode=True)
         
         #self.redis.aset('tsim',str(time), hmode=True)  # salvo il tempo corrente di simulazione in redis
-        logger.info('step at {time} with inputs {inputs}, DTmode_set={DTmode_set}', time=time, inputs=inputs, DTmode_set=self.DTmodeSTR)
+        logger.info('\nstep at {time} with inputs {inputs}, DTmode_set={DTmode_set}\n', time=time, inputs=inputs, DTmode_set=self.DTmodeSTR)
         #return time + 1   # se è hybrid o time-based
         return None     # se è event-base
 
     def get_data(self, outputs):
-        logger.info('get_data with {outputs}, self.DTmode {DTmode}', outputs=outputs, DTmode=self.DTmodeSTR)
+#debug        logger.info('get_data with {outputs}, self.DTmode {DTmode}', outputs=outputs, DTmode=self.DTmodeSTR)
         return {self.eid: {'DTmode': self.DTmode}}
     
     def finalize(self):

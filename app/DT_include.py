@@ -91,7 +91,7 @@ class  redisDT(object):
 #            return(self.red.get(self.tags[simbtag][0]).decode('utf-8') )
         else:  # hash mode
             #ret=self.red.hget(htag, field).decode('utf-8')
-            print(f'hget {htag}  {field}')
+#debug            print(f'hget {htag}  {field}')
             return(self.red.hget(htag, field).decode('utf-8'))
 
     
@@ -107,7 +107,7 @@ class  redisDT(object):
 #           return(self.red.set(self.tags[simbtag][0],val))
         else:  # hash mode
             #ret=self.red.hset(htag, field, val)
-            print(f'------------------------------>  hset {htag}  {field} {val}')
+#debug            print(f'------------------------------>  hset {htag}  {field} {val}')
             return(self.red.hset(htag, field,val))
 
     
@@ -115,14 +115,14 @@ class  redisDT(object):
         htag = self.configDT['redis']['htags'][0]           # è il tag del hash redis
         field = self.configDT['redis'][id][simbtag]['field']   # id è il tag della batteria, ad esempio 'batt1', simbtag è ad esempio 'DTmode'
         #ret=self.red.hset(htag, field, val)
-        print(f'hget {htag}  {field} {val}')
+#debug        print(f'hget {htag}  {field} {val}')
         return
 
     def hhget(self, simbtag, id):
         htag= self.configDT['redis']['htags'][0]
         field= self.configDT['redis'][id][simbtag]['field']               
         #ret=self.red.hget(htag, field).decode('utf-8')
-        print(f'hget {htag}  {field}')
+#debug        print(f'hget {htag}  {field}')
         return
                  
     def esistetag(self,simbtag, id='batt1', hmode = False):
@@ -301,7 +301,7 @@ class InfluxDBCli(object):
 
 
 
-#### Definizioni costanti per path nomi file
+#### Definizioni costanti per path nomi file ####
 DT_MOSAIK_HOME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 CONFIG_DATA_PATH = DT_MOSAIK_HOME + "/configuration/"
@@ -327,7 +327,10 @@ INDEXPATHDEF=CONFIG_DATA_PATH+"/"+DTINDEX
 INDEXPATHTMP="/tmp"+"/"+DTINDEX
 ############################################
 
-#### Definizioni costanti e alias
+
+
+
+#### Definizioni costanti e alias ##########
 SRC_DTRSE=False  # con false il modello della batteria è locale a dt-rse-mosaik,  con true è quello di DT-rse
 
 S_IDLE    = 'S_IDLE'
@@ -352,4 +355,4 @@ NOFORZ =  StrToNum[S_OFF]      # era 0
 FORZSIM = MODSIM
 FORZLEARN = MODLEARN
 STOP = -1
-#######################################
+##########################################
