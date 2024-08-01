@@ -40,7 +40,7 @@ def readConfig(config_path, namefile):
                 fin.close()
                 return ret
         except Exception:
-            raise FileExistsError("Selected configuration file doesn't exist.")
+            raise FileExistsError("Selected configuration (data) file doesn't exist.")
             return None 
 
 
@@ -304,7 +304,7 @@ class InfluxDBCli(object):
 #### Definizioni costanti per path nomi file ####
 DT_MOSAIK_HOME = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-CONFIG_DATA_PATH = DT_MOSAIK_HOME + "/configuration/"
+CONFIG_DATA_PATH = DT_MOSAIK_HOME + "/data/"
 CONFIGDT_SERVLOCAL_PATH = Path(DT_MOSAIK_HOME+"/configDT_locale.yaml")
 
 if CONFIGDT_SERVLOCAL_PATH.exists():  
