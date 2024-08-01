@@ -72,14 +72,16 @@ class ResistorCapacitorParallel(ECMComponent):
 
         return self._capacity.get_value(input_vars=input_vars)
 
+    # TODO: change setter methods -> cannot be done like this with Variables class
+    """
     @resistance.setter
-    def resistance(self, new_value):
-        self._resistance.set_value(new_value)
-        print()
+    def resistance(self, value: float):
+       self._resistance = value
 
     @capacity.setter
-    def capacity(self, new_value):
-        self._capacity.set_value(new_value)
+    def capacity(self, value: float):
+        self._capacity = value
+    """
 
     def get_r1_series(self, k=None):
         """
@@ -137,36 +139,43 @@ class ResistorCapacitorParallel(ECMComponent):
                 raise IndexError("Current I_c of {} at step K not computed yet".format(self._name))
         return self._i_c_series
 
-    def reset_data(self):
-        self._v_series = []
-        self._i_r1_series = []
-        self._i_c_series = []
-        self._r1_series = []
-        self._c_series = []
-        self._tau_series = []
+    def _update_r1_series(self, value: float):
+        self._r1_series.append(value)
 
-    def init_component(self, r1=None, c=None, i_c=0, i_r1=0, v_rc=None):
+    def _update_c_series(self, value: float):
+        self._c_series.append(value)
+
+    def _update_i_r1_series(self, value: float):
+        self._i_r1_series.append(value)
+
+    def _update_i_c_series(self, value: float):
+        self._i_c_series.append(value)
+
+    def init_component(self, r1=0, c=0, i_c=0, i_r1=0):
         """
         Initialize RC component at t=0
         """
-        r1 = self.resistance if r1 is None else r1
-        c = self.capacity if c is None else c
-        v_rc = 0 if v_rc is None else v_rc
-
-        super().init_component(v=v_rc)
+        super().init_component()
         self._update_r1_series(r1)
         self._update_c_series(c)
         self._update_i_c_series(i_c)
         self._update_i_r1_series(i_r1)
 
-    def compute_v(self, i_r1):
+    def compute_v(self, v_ocv, v_r0, v, i_r1=None):
         """
-        Compute the potential of the RC parallel V_r1=V_c.
+        Compute the potential of the RC parallel V_r1=V_c, given the electric current the other potentials of
+        the circuit. If we don't have those values we can try to use i_r1.
 
         Inputs:
+        :param v_ocv: potential of open circuit
+        :param v_r0: voltage of resistor R0
+        :param v: driving potential v(t) in input to the circuit
         :param i_r1: current I_r1 flowing through the resistor
         """
-        v_rc = i_r1 * self.resistance
+        if None not in (v_ocv, v_r0, v):
+            v_rc = v_ocv - v_r0 - v
+        else:
+            v_rc = i_r1 * self.resistance
         return v_rc
 
     def compute_i_r1(self, v_rc):
@@ -201,7 +210,7 @@ class ResistorCapacitorParallel(ECMComponent):
         elif i is not None and i_r1 is not None:
             i_c = i - i_r1
         else:
-            raise Exception("Not enough preprocessing to compute I_c for element {}".format(self.name))
+            raise Exception("Not enough data to compute I_c for element {}".format(self.name))
 
         return i_c
 
@@ -212,19 +221,7 @@ class ResistorCapacitorParallel(ECMComponent):
         tau = self.resistance * self.capacity
         return tau
 
-    def _update_r1_series(self, value: float):
-        self._r1_series.append(value)
-
-    def _update_c_series(self, value: float):
-        self._c_series.append(value)
-
-    def _update_i_r1_series(self, value: float):
-        self._i_r1_series.append(value)
-
-    def _update_i_c_series(self, value: float):
-        self._i_c_series.append(value)
-
-    def update_step_variables(self, r1, c, v_rc, i_r1, i_c):
+    def update_step_variables(self, r1, c, v_rc, i_r1, i_c, dt:float, k:int):
         """
         Aggiorno le liste delle variabili calcolate
         """
@@ -233,4 +230,5 @@ class ResistorCapacitorParallel(ECMComponent):
         self.update_v(v_rc)
         self._update_i_r1_series(i_r1)
         self._update_i_c_series(i_c)
+        #self.update_t(self.get_t_series(k=k - 1) + dt)
 

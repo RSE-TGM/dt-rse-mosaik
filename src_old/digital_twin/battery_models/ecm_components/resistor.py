@@ -21,8 +21,8 @@ class Resistor(ECMComponent):
 
     """
     def __init__(self,
-                 name: str,
-                 resistance: Union[Scalar, ParametricFunction, LookupTableFunction],
+                 name:str,
+                 resistance:Union[Scalar, ParametricFunction, LookupTableFunction],
                  ):
         super().__init__(name)
         self._resistance = resistance
@@ -50,24 +50,19 @@ class Resistor(ECMComponent):
 
         return self._resistance.get_value(input_vars=input_vars)
 
+    # TODO: setter method to be updated (do we have to set a lookup table or a function?)
+    """
     @resistance.setter
-    def resistance(self, new_value):
-        self._resistance.set_value(new_value)
+    def resistance(self, value: Union[float, pint.Quantity]):
+        self._resistance = value
+    """
 
-    def reset_data(self):
-        self._v_series = []
-        self._r0_series = []
-
-    def init_component(self, v=None, r0=None):
+    def init_component(self, r0=0):
         """
         Initialize R0 component at t=0
         """
-        r0 = self.resistance if r0 is None else r0
-        v = 0 if v is None else v
-
-        super().init_component(v)
+        super().init_component()
         self._update_r0_series(r0)
-
     def get_r0_series(self, k=None):
         """
         Getter of the specific value at step K, if specified, otherwise of the entire collection
@@ -81,6 +76,9 @@ class Resistor(ECMComponent):
             else:
                 raise IndexError("Resistance R0 of {} at step K not computed yet".format(self._name))
         return self._r0_series
+
+    def _update_r0_series(self, value: float):
+        self._r0_series.append(value)
 
     def compute_v(self, i):
         """
@@ -110,13 +108,17 @@ class Resistor(ECMComponent):
         dv_r0 = (i - i_) / dt * self.resistance
         return dv_r0
 
-    def _update_r0_series(self, value: float):
-        self._r0_series.append(value)
-
-    def update_step_variables(self, r0, v_r0):
+    def update_step_variables(self, r0, v_r0, dt, k):
         """
         Aggiorno le liste delle variabili calcolate
         """
         self._update_r0_series(r0)
         self.update_v(v_r0)
 
+    def compute_decay(self, temp, soc, soh):
+        """
+        # TODO: Update the resistance wrt the degradation of the resistor
+
+        QUESTO METODO RICEVE LO STEP K, FA LE COMPUTAZIONI E AGGIORNA LE COLLECTIONS
+        """
+        pass

@@ -87,12 +87,20 @@ class Model:
                               self.experiment_config['models'][model]['file'])
             models_config_files.append(config_data_path / model_file)
 
-        self.battery = BatteryEnergyStorageSystem(
-            models_config_files=models_config_files,
-            battery_options=self.experiment_config['battery'],
-            input_var=self.experiment_config['load']['var'],
-            sign_convention=self.experiment_config['sign_convention']         
+        self._battery = BatteryEnergyStorageSystem(
+            models_config=self._models_configs,
+            battery_options=self._settings['battery'],
+            input_var=self._input_var,
+            check_soh_every=self._settings['check_soh_every'] if 'check_soh_every' in self._settings else None,
+            ground_data=self._ground_data
         )
+
+        # self.battery = BatteryEnergyStorageSystem(
+        #     models_config_files=models_config_files,
+        #     battery_options=self.experiment_config['battery'],
+        #     input_var=self.experiment_config['load']['var'],
+        #     sign_convention=self.experiment_config['sign_convention']         
+        # )
 
         self.battery.reset_data()
         self.battery.simulation_init(initial_conditions=self.experiment_config['initial_conditions'])
