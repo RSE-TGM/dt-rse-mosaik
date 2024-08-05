@@ -80,7 +80,8 @@ class GeneralPurposeManager:
 
     def run(self):
         raise NotImplementedError
-
+    def run_step(self):
+        raise NotImplementedError
     def render(self):
         raise NotImplementedError
 
