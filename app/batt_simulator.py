@@ -2,12 +2,29 @@
 Mosaik interface for the example simulator.
 
 """
-
+import os, sys;
 #import import_ipynb
 from loguru import logger
 import mosaik_api_v3 as mosaik_api
-import batt_model
+# import batt_model
 from  DT_include import *
+
+from pathlib import Path
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+# aggiunge nel path la directory base del package, ad esempio: /home/antonio/dtwin/dt-rse-mosaik
+### sys.path.append(os.path.dirname(os.path.dirname(SCRIPT_DIR)))  
+
+# sys.path.append(os.path.dirname(SCRIPT_DIR)) # per src locale 
+
+#######################################################################
+if SRC_DTRSE:
+    SRC_DT_RSE=  os.path.dirname(SCRIPT_DIR)+'/DT-rse'
+    sys.path.append(SRC_DT_RSE)                  # per src di DT-rse
+else:
+    sys.path.append(os.path.dirname(SCRIPT_DIR)) # per src locale
+#######################################################################
+
+from src.digital_twin.orchestrator.base_manager import GeneralPurposeManager
 
 META_Battmodel = {
 #    'type': 'time-based',
@@ -35,6 +52,45 @@ class ModelSim(mosaik_api.Simulator):
         self.time = 0
 
     def init(self, sid, time_resolution, eid_prefix=None):     # init(self, sid, time_resolution, eid_prefix=None, step_size=1):
+
+        args={  'config_folder': './data/config', 
+            'output_folder': './data/output', 
+            'ground_folder': './data/ground', 
+            'assets': './data/config/assets.yaml', 
+            'battery_model': ['thevenin'], 
+            'thermal_model': ['mlp_thermal'], 
+            'aging_model': None, 
+            'save_results': False, 
+            'save_metrics': False, 
+            'plot': False, 
+            'n_cores': 1, 
+            'verbose': True, 
+            'mode': 'simulation', 
+            'config_files': ['./data/config/sim_config_example.yaml']
+            }
+
+        # Parsing of models employed in the current experiment
+        args['models'] = []
+        if args['battery_model']:
+            args['models'].extend(args['battery_model'])
+            del args['battery_model']
+
+        if args['thermal_model']:
+            args['models'].extend(args['thermal_model'])
+            del args['thermal_model']
+
+        if args['aging_model']:
+            args['models'].extend(args['aging_model'])
+            del args['aging_model']
+
+        self.config_file = args['config_files']
+        del args['config_files']
+
+        n_cores = args['n_cores']
+        del args['n_cores']
+        
+        self.args=args
+
         if float(time_resolution) != 1.:
             raise ValueError('ModelSim only supports time_resolution=1., but'
                              ' %s was set.' % time_resolution)
@@ -49,7 +105,13 @@ class ModelSim(mosaik_api.Simulator):
 
         for i in range(next_eid, next_eid + num):
 #            model_instance = batt_model.Model(init_val)
-            model_instance = batt_model.Model()
+
+#            model_instance = batt_model.Model()
+
+            model_instanceGen = GeneralPurposeManager.get_instance(self.args['mode'])
+            self.args['config'] = self.config_file[0]        
+            model_instance= model_instanceGen(**self.args)
+
             model_instance.DTmode_set = NOFORZ  # é un'uscita per un eventuale forzamento di DTmode
             model_instance.DTmode = None
             eid = '%s%d' % (self.eid_prefix, i)
@@ -70,22 +132,27 @@ class ModelSim(mosaik_api.Simulator):
                     if attr == 'DTmode':
                         model_instance.DTmode = list(values.values())[0]
                     if attr == 'load_current':
-                        model_instance.delta = list(values.values())[0] #  era sum(values.values()), corrente allo step successivo
+                        #model_instance.load_current = list(values.values())[0] #  era sum(values.values()), corrente allo step successivo
+                        model_instance._input_var='current'
+                        model_instance._ground_data[model_instance._input_var][0]=list(values.values())[0]
             
-            sampling_time=model_instance.sampling_time   # model_instance.sampling_time è letto dal file di config experiment
+            sampling_time=model_instance._stepsize   # model_instance.sampling_time è letto dal file di config experiment
             
             if model_instance.DTmode == MODSIM :
-                model_instance.step(sampling_time, time)   # sono in modo "simulazione"
+                model_instance.run_step()   # sono in modo "simulazione"
                 modo=S_SIM
             else:
                 model_instance.learn(sampling_time, time)  # sono in modo "learn"
                 modo=S_LEARN
                
         
-        next_step = time + sampling_time 
+        next_step = time + int(sampling_time) 
+        model_instance.load_current=9
+        model_instance.output_voltage=99
+        model_instance.delta=999
         logger.info('batt_model: time={time} sampling_time={sampling_time} - La batteria è in modalità {modo}, current[A]={current} voltage[V]={voltage} next_current[A]={next_step_current}', time=time, sampling_time=sampling_time, modo=modo, 
                     current=model_instance.load_current, voltage=model_instance.output_voltage, next_step_current=model_instance.delta)
-        
+        print(f'------>  {model_instance._results}')
         return next_step  # Step size, cioè sampling_time, è normalmmente 1 secondo ed è letto dal file di config experiment
 
     def get_data(self, outputs):

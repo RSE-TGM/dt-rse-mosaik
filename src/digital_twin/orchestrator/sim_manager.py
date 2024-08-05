@@ -153,7 +153,7 @@ class SimulationManager(GeneralPurposeManager):
         self._battery.step(load=self._ground_data[self._input_var][k], dt=dt, k=k)
         self._battery.t_series.append(self._elapsed_time)
         self._elapsed_time += dt
-
+        self._results = self._battery.build_results_table()
         #k += 1
         #pbar.update(dt)
 

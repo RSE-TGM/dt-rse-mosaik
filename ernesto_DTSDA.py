@@ -122,7 +122,23 @@ def run_experiment(args, config_file):
 #        orchestrator.evaluate()
 
 if __name__ == '__main__':
-    args = get_args()
+#    args = get_args()
+
+    args={  'config_folder': './data/config', 
+            'output_folder': './data/output', 
+            'ground_folder': './data/ground', 
+            'assets': './data/config/assets.yaml', 
+            'battery_model': ['thevenin'], 
+            'thermal_model': ['mlp_thermal'], 
+            'aging_model': None, 
+            'save_results': False, 
+            'save_metrics': False, 
+            'plot': False, 
+            'n_cores': 1, 
+            'verbose': True, 
+            'mode': 'simulation', 
+            'config_files': ['./data/config/sim_config_example.yaml']
+            }
 
     # Setup logger
     #logging.basicConfig(format='%(asctime)s | %(name)s-%(levelname)s: %(message)s')

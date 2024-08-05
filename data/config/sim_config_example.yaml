@@ -52,7 +52,7 @@ ground_data:
 #   the timestep of the simulator in seconds.
 # ------------------------------------------------------------------------------- #
 iterations: null
-timestep: 2.4
+timestep: 1.0 # era 2.4
 # todo: interp_ground_data: null
 
 # Battery options
