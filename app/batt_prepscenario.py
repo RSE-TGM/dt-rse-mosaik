@@ -87,7 +87,7 @@ def batt_prepScenario():
 
     # Connect entities
     world.connect(LCUdata[0], model, ('LCU', 'load_current'))  # 1 output di LCUdata ('LCU'), connesso con 1 imput di model ('load_curremt')
-    world.connect(model, monitor, 'load_current', 'output_voltage')  # 2 outputs di model ('load_current' e 'output_voltage') connessi  a  2 inputs di monitor con lo stesso nome
+    world.connect(model, monitor, 'load_current', 'output_voltage','soc','soh','Vocv','power','temperature','heat','C','R0','R1')  # 11 outputs di model ('load_current' e 'output_voltage') connessi  a  2 inputs di monitor con lo stesso nome
     world.connect(model, influx, 'load_current', 'output_voltage')
     world.connect(model, dtsdamng, 'DTmode_set', time_shifted=True, initial_data={'DTmode_set': NOFORZ})
     world.connect(dtsdamng, model, 'DTmode')

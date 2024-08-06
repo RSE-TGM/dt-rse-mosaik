@@ -1,0 +1,20 @@
+[
+  {
+    "@id": "http://tgm-sda.rse-web.it/DTSDA_cb86d294-a662-4418-9db4-b0130e2c2793",
+    "http://tgm-sda.rse-web.it/date": [
+      {
+        "@value": "2024-07-04 15:28:03.852753"
+      }
+    ],
+    "http://tgm-sda.rse-web.it/description": [
+      {
+        "@value": "prova prova"
+      }
+    ],
+    "http://tgm-sda.rse-web.it/name": [
+      {
+        "@value": "configEsempioMOD"
+      }
+    ]
+  }
+]

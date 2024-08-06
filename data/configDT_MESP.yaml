@@ -32,21 +32,64 @@ redis:
     DTmode:
       field: mode
       value: S_SIM
+      unit: 'dig'
     DTmode_set:
       field: mode_set
       value: S_SIM
+      unit: 'dig'
     DTSDA_State:
       field: state
       value: S_IDLE
+      unit: 'dig'
     tsim:
       field: tsim
       value: 0
+      unit: 's'
     output_voltage:
-      field: output_voltage
+      field: output_voltage[V]
       value: 0
+      unit: 'V'
     load_current:
-      field: load_current
+      field: load_current[A]
       value: 0
+      unit: 'V'
+    soc:
+      field: soc[p.u.]
+      value: 1.
+      unit: 'p.u.'
+    soh:
+      field: soh[p.u.]
+      value: 1.
+      unit: 'p.u.'
+    Vocv:
+      field: Vocv[V]
+      value: 0
+      unit: 'V'      
+    power:
+      field: power[W]
+      value: 0
+      unit: 'W'
+    temperature:
+      field: temperature[K]
+      value: 296.15
+      unit: 'K'
+    heat:
+      field: heat[kJ]
+      value: 0
+      unit: 'kJ'
+    C:
+      field: C[F]
+      value: 20
+      unit: 'F'
+    R0:
+      field: R0[Ω]
+      value: 0.003
+      unit: 'Ω'
+    R1:
+      field: R1[Ω]
+      value: 0.003
+      unit: 'Ω'      
+
 
 mqtt:
   SERVER: *MQTTBROCKER

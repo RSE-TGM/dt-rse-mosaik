@@ -1,0 +1,161 @@
+# ############################
+# Communication MESP Options #
+# VERSIONE MESP              #
+# ############################
+versione: "SERVIZI_MESP"
+tzone: "Europe/Rome"
+serv_hmi: "https://mesp-sda.rse-web.it/frontend/sda-dt.html"
+redis_host:  &REDISHOST "172.25.102.102"
+redis_port:  &REDISPORT "6379"
+mqtt_brocker:        &MQTTBROCKER "172.25.102.102"
+mqtt_port:           &MQTTPORT "1883"
+mqtt_user:           &MQTTUSER "admin"
+mqtt_password:       &MQTTPASSWORD "password"
+mqtt_websocket_port: &MQTTWEBSOCKET_PORT "9001"
+minio_endpoint:   &MINIOENDPOINT "172.25.102.102:9000"
+minio_console:    &MINIOCONSOLE "172.25.102.102:9090"
+minio_access_key: &MINIOACCESS "3XH4IscBBGH1FB4M8cDu"
+minio_secret_key: &MINIOSECRET "7kTXv8kSnZ5jmMDu9Fbcj0McH2fDIbr5OInLdnPc"
+influx_url:   &INFLUXURL "http://172.25.102.102:8086"
+influx_token: &INFLUXTOKEN ""
+
+redis:
+  redis_host: REDIS_HOST
+  redis_host_default: *REDISHOST
+  redis_port: REDIS_PORT
+  redis_port_default: *REDISPORT
+  redis_password: mypassw
+  htags:
+    - DTSDA:batt1
+  batt1:
+    id: batt1
+    DTmode:
+      field: mode
+      value: S_SIM
+      unit: 'dig'
+    DTmode_set:
+      field: mode_set
+      value: S_SIM
+      unit: 'dig'
+    DTSDA_State:
+      field: state
+      value: S_IDLE
+      unit: 'dig'
+    tsim:
+      field: tsim
+      value: 0
+      unit: 's'
+    output_voltage:
+      field: output_voltage[V]
+      value: 0
+      unit: 'V'
+    load_current:
+      field: load_current[A]
+      value: 0
+      unit: 'V'
+    soc:
+      field: soc[p.u.]
+      value: 1.
+      unit: 'p.u.'
+    soh:
+      field: soh[p.u.]
+      value: 1.
+      unit: 'p.u.'
+    Vocv:
+      field: Vocv[V]
+      value: 0
+      unit: 'V'      
+    power:
+      field: power[W]
+      value: 0
+      unit: 'W'
+    temperature:
+      field: temperature[K]
+      value: 296.15
+      unit: 'K'
+    heat:
+      field: heat[kJ]
+      value: 0
+      unit: 'kJ'
+    C:
+      field: C[F]
+      value: 20
+      unit: 'F'
+    R0:
+      field: R0[Ω]
+      value: 0.003
+      unit: 'Ω'
+    R1:
+      field: R1[Ω]
+      value: 0.003
+      unit: 'Ω'      
+
+
+mqtt:
+  SERVER: *MQTTBROCKER
+  PORT: *MQTTPORT
+  USER: *MQTTUSER
+  PASSWORD: *MQTTPASSWORD
+  WEBSOCKETPORT: *MQTTWEBSOCKET_PORT
+  DTSDA:
+    MISURE:
+      BATT1:
+        temperatura: "DTSDA/BATT1/T"
+        tensione: "DTSDA/BATT1/V"
+        corrente: "DTSDA/BATT1/I"
+    # associazione Callback --> TagComando_mqtt
+    CALLBACK:                             # Comandi GET ricevuti dal HMI e callbacks associate
+      MainCall:  "DTSDA"
+      SetModoSIM:   "DTSDA/SET_SIM"       # payload: {"command":"SET_SIM"}
+      SetModoLEARN: "DTSDA/SET_LEARN"     # payload: {"command":"SET_LEARN"}
+      InitSIM:      "DTSDA/INIT_SIM"      # payload: {"command":"INIT_SIM"}
+      RunSIM:       "DTSDA/RUN_SIM"       # payload: {"command": "RUN_SIM"}
+      StopSIM:      "DTSDA/STOP_SIM"      # payload: {"command": "STOP_SIM"}
+      EndProg:      "DTSDA/END"            # payload: {"command": "END"}
+      PlotGraf:     "DTSDA/PLOTGRAF"       # payload: {"command": "PLOTGRAF"}      
+      CurrConfReq:  "DTSDA/CURRCONF_REQ"    # payload: {"command": "CURRCONF_REQ","id":"uidx"}        Richiesta della configurazione corrente, es:  "DTSDA/CURRCONF_REQ"
+      LoadConf:     "DTSDA/LOADCONF"        # payload: {"command": "LOADCONF", "id": "conf1"}         Richiesta configurazione da caricare, es:  "DTSDA/LOADCONF  conf1"
+      SaveConf:     "DTSDA/SAVECONF"        # payload: {"command": "SAVECONF", "id": "conf1", "descr":"descrizione di descr"}            Richiesta configurazione da salvare, es:  "DTSDA/SAVECONF  conf1"
+      ListaConfReq: "DTSDA/LISTCONF_REQ"    # payload: {"command": "LISTCONF_REQ","id":"uidx"}         Richiesta della lista delle configurazioni salvate in minio. Ad es: "DTSDA/LISTCONF_REQ"
+      DelConf:      "DTSDA/DELCONF"         #  payload: {"command": "DELCONF", "id": "conf1"}          Rimozione di una configurazione salvata in minio. es: "DTSDA/DELCONF  conf1"
+      StatusReq:    "DTSDA/STATUS_REQ"      # payload: {"command": "STATUS_REQ"} Richiesta stato redis hash DTSDA:batt
+      HealthReq:    "DTSDA/HEALTHCHECK_REQ" # Richiesta di haelthcheck, payload: {"command": "HEALTHCHECK_REQ", "id": "timestamp of the request", "description":""}
+    
+    POST:
+      listaconf: "DTSDA/LISTCONF"         # Lista delle configurazioni (per HMI)  salvate in minio e pubblicata da DTSDA nel mqtt brocker (come testo).      # Esempio comando di pubblicazione: "DTSDA/LIST_CONF  listaconf"
+      currconf: "DTSDA/CURRCONF"          # Configurazione corrente, es:  "DTSDA/CURRCONF  currconf"
+      status: "DTSDA/STATUS"              # esempio payload: {"state": "S_IDLE", "mode": "S_SIM", "mode_set": "S_SIM", "tsim": "6", "output_voltage": "4.254", "load_current": "32.000"}
+      health: "DTSDA/HEALTHCHECK"         # payload: {"command": "HEALTHCHECK", "id": "timestamp of the req.", "description":"ALIVE"}
+
+minio:
+  ENDPOINT:    *MINIOENDPOINT
+  ACCESS_KEY:  *MINIOACCESS
+  SECRET_KEY:  *MINIOSECRET
+  SECURE: False
+  CONSOLE:     *MINIOCONSOLE
+  USER: "admin"           # utilizzato solo in console
+  PASSWORD: "password"   # utilizzato solo in console
+# per il file di index ...
+  INDEXNAME: "DTindex.jsonld"
+  INDEXBUCKET: "dtsda"
+  INDEXCONTEXT: "http://schema.org/"
+  INDEX_CTX: "@context"
+  INDEX_UID: "@id"
+  INDEX_NAME: "name"
+  INDEX_DESCRIPTION: "description"
+  INDEX_DATA: "data"
+
+
+influxdb:
+  URL: *INFLUXURL
+  ORG: "RSE"
+  BUCKET: "dtsda"    # il bucket deve essere già esistente
+  TOKEN: *INFLUXTOKEN
+  MEASUREMENT: "measurement_1"
+  USER: "influxuser"     # utilizzato solo in console
+  PASSWORD: "DTpass!!"   # utilizzato solo in console
+
+rdf:
+  NAMESPACE: "http://tgm-sda.rse-web.it/"
+  INDEXNAME: "DTindex.json"
+
