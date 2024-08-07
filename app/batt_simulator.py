@@ -26,22 +26,6 @@ else:
 
 from src.digital_twin.orchestrator.base_manager import GeneralPurposeManager
 
-# META_Battmodel = {
-# #    'type': 'time-based',
-#     'type': 'hybrid',
-#     'models': {
-#         'BattModel': {
-#             'public': True,
-#             'params': ['init_val'],
-#             'attrs': ['load_current', 
-#                       'output_voltage',
-#                       'DTmode_set',
-#                       'DTmode'],
-#             'trigger': ['DTmode'],                # input: trigger per gli eventi
-#             'non-persistent': ['DTmode_set'],     # output: non-persistent per gli eventi
-#         },
-#     },
-# }
 
 META_Battmodel = {
     'type': 'time-based',
@@ -130,9 +114,6 @@ class ModelSim(mosaik_api.Simulator):
         entities = []
 
         for i in range(next_eid, next_eid + num):
-#            model_instance = batt_model.Model(init_val)
-
-#            model_instance = batt_model.Model()
 
             model_instanceGen = GeneralPurposeManager.get_instance(self.args['mode'])
             self.args['config'] = self.config_file[0]        
@@ -166,29 +147,28 @@ class ModelSim(mosaik_api.Simulator):
             sampling_time=model_instance._stepsize   # model_instance.sampling_time è letto dal file di config experiment
             
             if model_instance.DTmode == MODSIM :
-                model_instance.run_step()   # sono in modo "simulazione", eseguo lo STEP
+                self.results = model_instance.run_step()   # sono in modo "simulazione", eseguo lo STEP
                 modo=S_SIM
             else:
                 model_instance.learn(sampling_time, time)  # sono in modo "learn"
                 modo=S_LEARN
                
+            model_instance.load_current = self.results['operations']['current'][-1]
+            model_instance.output_voltage = self.results['operations']['voltage'][-1]
+            model_instance.soc= self.results['operations']['soc'][-1]
+            model_instance.soh= self.results['operations']['soh'][-1]
+            model_instance.Vocv= self.results['operations']['Vocv'][-1]
+            model_instance.power= self.results['operations']['power'][-1]
+            model_instance.temperature= self.results['operations']['temperature'][-1]
+            model_instance.heat= self.results['operations']['heat'][-1]
+            model_instance.C= self.results['operations']['C'][-1]        
+            model_instance.R0= self.results['operations']['R0'][-1]
+            model_instance.R1= self.results['operations']['R1'][-1]
         
-         
-        model_instance.load_current=model_instance._results['operations']['current'][-1]
-        model_instance.output_voltage=model_instance._results['operations']['voltage'][-1]
-        model_instance.soc=model_instance._results['operations']['soc'][-1]
-        model_instance.soh=model_instance._results['operations']['soh'][-1]
-        model_instance.Vocv=model_instance._results['operations']['Vocv'][-1]
-        model_instance.power=model_instance._results['operations']['power'][-1]
-        model_instance.temperature=model_instance._results['operations']['temperature'][-1]
-        model_instance.heat=model_instance._results['operations']['heat'][-1]
-        model_instance.C=model_instance._results['operations']['C'][-1]        
-        model_instance.R0=model_instance._results['operations']['R0'][-1]
-        model_instance.R1=model_instance._results['operations']['R1'][-1]
-
-        next_time = time + int(sampling_time)
-        logger.info('batt_model: time={time} sampling_time={sampling_time} - La batteria è in modalità {modo}, current[A]={current} voltage[V]={voltage} next_current[A]={next_step_current}', time=time, sampling_time=sampling_time, modo=modo, 
+            logger.info('time={time} sampling_time={sampling_time} - La batteria è in modalità {modo}, current[A]={current} voltage[V]={voltage} next_current[A]={next_step_current}', time=time, sampling_time=sampling_time, modo=modo, 
                     current=model_instance.load_current, voltage=model_instance.output_voltage, next_step_current=model_instance.delta)
+        
+        next_time = time + int(sampling_time)
 #        print(f'------>  {model_instance._results}')
         return next_time  # Step size, cioè sampling_time, è normalmmente 1 secondo ed è letto dal file di config experiment
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-versione=aguagliardi/dtsda:2.2
+versione=aguagliardi/dtsda:2.3
 
 while true; do
 

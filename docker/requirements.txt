@@ -42,8 +42,9 @@ matplotlib-inline==0.1.6
 minio==7.2.4
 #mosaik==3.3.0b1
 mosaik==3.3.3
-mosaik-api==3.0.3
-mosaik-api-v3==3.0.7
+mosaik-api
+#mosaik-api==3.0.3
+#mosaik-api-v3==3.0.7
 mosaik-csv==2.0.0
 mosaik-fmi==1.0
 mosaik-influxdb2==0.3.0
@@ -60,6 +61,7 @@ pathlib==1.0.1
 pexpect==4.9.0
 Pillow==10.1.0
 Pint==0.20.1
+ply~=3.11
 platformdirs==4.1.0
 plotly==5.18.0
 pluggy==1.3.0
@@ -87,13 +89,17 @@ rdflib==7.0.0
 reactivex==4.0.4
 redis==5.0.1
 requests==2.31.0
+rich
+scikit-learn
 scipy==1.9.3
+schema~=0.7.5
 simpy==3.0.13
 six==1.16.0
 stack-data==0.6.3
 tenacity==8.2.3
 testresources
 tomli==2.0.1
+torch
 tornado==6.4
 tqdm==4.65.2
 traitlets==5.14.1

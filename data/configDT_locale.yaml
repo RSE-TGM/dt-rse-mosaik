@@ -78,9 +78,9 @@ redis:
       value: 0
       unit: 'kJ'
     C:
-      field: C[F]
+      field: Capacity[Ah]
       value: 20
-      unit: 'F'
+      unit: 'Ah'
     R0:
       field: R0[Ω]
       value: 0.003

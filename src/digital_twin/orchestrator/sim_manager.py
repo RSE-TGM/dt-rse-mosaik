@@ -139,37 +139,26 @@ class SimulationManager(GeneralPurposeManager):
 
     def run_step(self):
         """
-        Run a single step imposing a given timestep. 
+        Run a single step imposing a given timestep (self._stepsize). 
         """
         k = 0
         dt = self._stepsize
-        #pbar = tqdm(total=int(self._duration), position=0, leave=True)
 
-        # Main loop of the simulation
-        #while self._elapsed_time <= self._duration and not self._done:
-
-        # Having manipulated the ground dataset before, we can be sure about the sync with elapsed time
+        # purge dei primi nn elementi delle liste delle variabi calcolate dal modello
+        nn=5
+        if len(self._battery.t_series) > nn :
+            del self._battery.soc_series[:nn]
+            del self._battery.soh_series[:nn]
+            del self._battery.t_series[:nn]
 
         self._battery.step(load=self._ground_data[self._input_var][k], dt=dt, k=k)
         self._battery.t_series.append(self._elapsed_time)
         self._elapsed_time += dt
         self._results = self._battery.build_results_table()
-        #k += 1
-        #pbar.update(dt)
 
-        # if k < len(self._ground_times):
-            # dt = round(self._ground_times[k] - self._ground_times[k - 1], 2)
-        # else:
-            # self._done = True
-
-        #pbar.close()
         logger.info(f'Step dt={dt} ended without errors. elaps_time: {self._elapsed_time}')
-#        print(f'Step dt={dt} ended without errors. elaps_time: {self._elapsed_time}')
 
-        # Cleaning all remaining data (e.g. with dt=0 at the end of the simulation)
-        # self._ground_times = self._ground_times[:k]
-        # for key in self._ground_data.keys():
-            # self._ground_data[key] = self._ground_data[key][:k]
+        return( self._results )
 
     def _fitted_run(self):
         """
