@@ -23,10 +23,10 @@ from threading import Thread
 import paho.mqtt.client as mqtt
 
 ##### import packages locali
-from batt_simulator import *
-from batt_collector import *
+from batt_model import *
+from DT_collector import *
 from batt_mng import *
-from batt_prepscenario import *
+from DT_prepscenario import *
 #from DT_include import INDEXPATHDEF
 from DT_include import *
 
@@ -258,7 +258,7 @@ class DTmqtt(object):
         print(f'------------------------>on_InitSIM:   INIT DELLA SIMULAZIONE')
         if self.redis.aget('DTSDA_State', hmode=True) == S_IDLE :
             self.redis.aset('DTSDA_State', S_READY , hmode=True)
-            world, model, dtsdamng = batt_prepScenario()
+            world, model, dtsdamng = DT_prepScenario()
         else:
             print(f'------------------------>on_InitSIM:  SIM NOT in IDLE!! ')
             logger.warning('LOAD Request IGNORED. Simulator in state: {state} NOT changed! Simulator must be {state2} to be loaded.', 
@@ -541,7 +541,7 @@ def SIMtest( tfin, plotfig=False, rt_factor=1.):
     global world, model, dtsdamng , debug
 
     #carico la configurazione di default
-    world, model, dtsdamng = batt_prepScenario()
+    world, model, dtsdamng = DT_prepScenario()
 
     # lancio simulazione
     #taskRun()
@@ -604,7 +604,7 @@ def main():
 # Modalità normale in "mqtt message loop"
 #
         # Connessione a mqtt e sua configurazione. La classe DTmqtt si connette anche a Redis. 
-        # Invece il modello della batteria ( modulo batt_prepscenario ) si connette direttamente a InfluxDB
+        # Invece il modello della batteria ( modulo DT_prepscenario ) si connette direttamente a InfluxDB
         cli_mqtt = DTmqtt()
 
         ## Connessione al object DB Minio      

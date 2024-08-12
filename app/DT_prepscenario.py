@@ -12,15 +12,15 @@ from pytz import timezone
 
 from  DT_include import *
 
-def batt_prepScenario():
+def DT_prepScenario():
 
 # inizializzazzione simulazione di test    
     SIM_CONFIG = {
             'ModelSim': {
-                'python': 'batt_simulator:ModelSim',
+                'python': 'batt_model:ModelSim',
             },
             'Collector': {
-                'python': 'batt_collector:Collector',
+                'python': 'DT_collector:Collector',
             },
             'CSV': {
                 'python': 'mosaik_csv:CSV',
@@ -98,4 +98,4 @@ def batt_prepScenario():
 
 if __name__ == '__main__':
     debug=True
-    batt_prepScenario()
+    DT_prepScenario()

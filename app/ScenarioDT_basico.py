@@ -2,8 +2,8 @@ import mosaik
 import mosaik_api_v3 as mosaik_api
 
 from mosaik.util import connect_randomly, connect_many_to_one
-from batt_simulator import *
-from batt_collector import *
+from app.batt_model import *
+from app.DT_collector import *
 
 # Sim config. and other parameters
 SIM_CONFIG = {

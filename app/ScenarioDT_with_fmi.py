@@ -4,8 +4,8 @@ import mosaik_api_v3 as mosaik_api
 from mosaik_fmi.mosaik_fmi import FmuAdapter
 from mosaik.util import connect_randomly, connect_many_to_one
 
-from batt_simulator import *
-from batt_collector import *
+from app.batt_model import *
+from app.DT_collector import *
 
 # Lo start di questo script deve essere eseguito nella home del package:  dt-rse-mosaik/
 
