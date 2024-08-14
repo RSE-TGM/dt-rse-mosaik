@@ -63,10 +63,12 @@ class Collector(mosaik_api.Simulator):
             timestamp = next(iter(data["local_time"].values()))
             print(f"collector: timestamp={timestamp} ")
         elif self._time_converter:
-            timestamp = self._time_converter.isoformat_from_step(time)
+            timestamp = self._time_converter.isoformat_from_step(time) # timestamp in formato testo 
+            timestamp_ms = int(self._time_converter.datetime_from_step(time).timestamp()*1000) # timestamp in ms, tipo int
 
         self.redis.aset('tsim',str(time), hmode=True)
         self.redis.aset('timestamp',str(timestamp), hmode=True)
+        self.redis.aset('timestamp_ms',str(timestamp_ms), hmode=True)
         
         for attr, values in data.items():
             for src, value in values.items():

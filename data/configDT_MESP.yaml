@@ -51,30 +51,10 @@ redis:
       field: timestamp
       value: 0
       unit: 'datetime'
-    tsim:
-      field: tsim
+    timestamp_ms:
+      field: timestamp_ms
       value: 0
-      unit: 's'
-    timestamp:
-      field: timestamp
-      value: 0
-      unit: 'datetime'm
-    tsim:
-      field: tsim
-      value: 0
-      unit: 's'
-    timestamp:
-      field: timestamp
-      value: 0
-      unit: 'datetime'
-    tsim:
-      field: tsim
-      value: 0
-      unit: 's'
-    timestamp:
-      field: timestamp
-      value: 0
-      unit: 'datetime'
+      unit: 'ms'
     output_voltage:
       field: output_voltage[V]
       value: 0
@@ -119,6 +99,8 @@ redis:
       field: R1[Ω]
       value: 0.003
       unit: 'Ω'      
+
+
 
 
 mqtt:

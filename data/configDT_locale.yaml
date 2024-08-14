@@ -49,6 +49,10 @@ redis:
       field: timestamp
       value: 0
       unit: 'datetime'
+    timestamp_ms:
+      field: timestamp_ms
+      value: 0
+      unit: 'ms'
     output_voltage:
       field: output_voltage[V]
       value: 0

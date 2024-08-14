@@ -143,7 +143,7 @@ class Simulator(mosaik_api.Simulator):
 
         # Only return a next step if running in time-based mode
         if self._step_size:
-#            print(f"influxdb2_write: 4 t=", time + self._step_size)
+            print(f"influxdb2_write: 4 t=", time + self._step_size)
             return time + self._step_size
 
     def get_data(self, outputs):
