@@ -53,7 +53,7 @@ def DT_prepScenario():
     # Start simulators
     #modelsim = world.start('ModelSim', eid_prefix='Model_',step_size=2.8)
     modelsim = world.start('ModelSim', eid_prefix='Model_')
-    collector  = world.start('Collector')
+    collector  = world.start('Collector', step_size=1, start_date=START,saveHistory=False)
 
     STARTDATAFILE= '2023-01-01 01:00:00'
     BATTplug = world.start('CSV', sim_start=STARTDATAFILE, datafile=INPUT_DATA)
@@ -61,8 +61,7 @@ def DT_prepScenario():
     DTsdamng= world.start('DTSDA_Mng')
 
     #INIZTIME= '2024-01-13 17:00:00'
-    INIZTIME= START
-    influx_sim = world.start('InfluxWriter', step_size=1, start_date=INIZTIME)
+    influx_sim = world.start('InfluxWriter', step_size=1, start_date=START, printDebug=False)
 
     # Instantiate models
     #model = examplesim.ExampleModel(init_val=2)

@@ -61,7 +61,8 @@ class Simulator(mosaik_api.Simulator):
         self._time_converter = None
         self._step_size = None
 
-    def init(self, sid, time_resolution, start_date=None, step_size=900):
+    def init(self, sid, time_resolution, start_date=None, step_size=900, printDebug=True):
+        self.printDebug=printDebug
         if step_size is not None:
             self._step_size = step_size
         else:
@@ -117,8 +118,8 @@ class Simulator(mosaik_api.Simulator):
                 "Alternatively, you can provide a `start_date` when initializing the "
                 "simulator."
             )
-       
-#        print(f"influxdb2_write: 2 t={time} ")
+
+        print(f"influxdb2_write: 2 time={time} timestamp={timestamp} ")
         for attr, src_ids in data.items():
             for src_id, val in src_ids.items():
                 if isinstance(val, np.generic):
@@ -133,9 +134,8 @@ class Simulator(mosaik_api.Simulator):
                     .field(attr, val)
                     .time(timestamp)
                 )
-                bb=self._bucket
-                tt=time
-                print(f"influxdb2_write: time={time} timestamp={timestamp}-- bucket={self._bucket} -- record={record} " )
+
+                if self.printDebug: print(f"influxdb2_write: time={time} timestamp={timestamp}-- bucket={self._bucket} -- record={record} " )
                 self._influx_writer.write(
                     bucket=self._bucket,
                     record=record,

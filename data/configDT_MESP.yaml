@@ -17,7 +17,9 @@ minio_console:    &MINIOCONSOLE "172.25.102.102:9090"
 minio_access_key: &MINIOACCESS "3XH4IscBBGH1FB4M8cDu"
 minio_secret_key: &MINIOSECRET "7kTXv8kSnZ5jmMDu9Fbcj0McH2fDIbr5OInLdnPc"
 influx_url:   &INFLUXURL "http://172.25.102.102:8086"
-influx_token: &INFLUXTOKEN ""
+#influx_token: ""
+# aggiungo il "mesp token"
+influx_token: &INFLUXTOKEN "TrjEThE5TCvklWf93bKIGyX3a1Qp0JBg4y1gg60NvcedCNmGhr6ikfTIzEF7WCAaAu81VhZSYpiqVloSbcmIoA=="
 
 redis:
   redis_host: REDIS_HOST
@@ -45,6 +47,34 @@ redis:
       field: tsim
       value: 0
       unit: 's'
+    timestamp:
+      field: timestamp
+      value: 0
+      unit: 'datetime'
+    tsim:
+      field: tsim
+      value: 0
+      unit: 's'
+    timestamp:
+      field: timestamp
+      value: 0
+      unit: 'datetime'm
+    tsim:
+      field: tsim
+      value: 0
+      unit: 's'
+    timestamp:
+      field: timestamp
+      value: 0
+      unit: 'datetime'
+    tsim:
+      field: tsim
+      value: 0
+      unit: 's'
+    timestamp:
+      field: timestamp
+      value: 0
+      unit: 'datetime'
     output_voltage:
       field: output_voltage[V]
       value: 0

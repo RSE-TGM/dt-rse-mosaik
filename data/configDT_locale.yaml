@@ -45,6 +45,10 @@ redis:
       field: tsim
       value: 0
       unit: 's'
+    timestamp:
+      field: timestamp
+      value: 0
+      unit: 'datetime'
     output_voltage:
       field: output_voltage[V]
       value: 0
