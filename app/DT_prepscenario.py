@@ -22,8 +22,11 @@ def DT_prepScenario():
             'Collector': {
                 'python': 'DT_collector:Collector',
             },
+            # 'CSV': {
+            #     'python': 'mosaik_csv:CSV',
+            # },
             'CSV': {
-                'python': 'mosaik_csv:CSV',
+                'python': 'DT_mosaik_csv:CSV',
             },
             'DTSDA_Mng': {
                 'python': 'batt_mng:DTSDA_Mng',
@@ -56,7 +59,7 @@ def DT_prepScenario():
     collector  = world.start('Collector', step_size=1, start_date=START,saveHistory=False)
 
     STARTDATAFILE= '2023-01-01 01:00:00'
-    BATTplug = world.start('CSV', sim_start=STARTDATAFILE, datafile=INPUT_DATA)
+    BATTplug = world.start('CSV', sim_start=STARTDATAFILE, datafile=INPUT_DATA, replay=True)    # replay=True ripete periodicamente la perturbazione
 
     DTsdamng= world.start('DTSDA_Mng')
 
