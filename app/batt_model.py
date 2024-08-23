@@ -118,7 +118,10 @@ class ModelSim(mosaik_api.Simulator):
             model_instanceGen = GeneralPurposeManager.get_instance(self.args['mode'])
             self.args['config'] = self.config_file[0]        
             model_instance= model_instanceGen(**self.args)
-
+# reset dei dati
+            model_instance._battery.reset()
+            model_instance._battery.init()     
+#
             model_instance.DTmode_set = NOFORZ  # é un'uscita per un eventuale forzamento di DTmode
             model_instance.DTmode = None
             eid = '%s%d' % (self.eid_prefix, i)

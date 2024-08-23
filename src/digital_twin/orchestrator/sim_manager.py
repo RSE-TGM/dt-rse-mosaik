@@ -72,8 +72,6 @@ class SimulationManager(GeneralPurposeManager):
             check_soh_every=self._settings['check_soh_every'] if 'check_soh_every' in self._settings else None,
             ground_data=self._ground_data
         )
-        self._battery.reset()
-        self._battery.init()        
 
     def run(self):
         """
@@ -84,8 +82,8 @@ class SimulationManager(GeneralPurposeManager):
         self._battery.init()
 
         if self._stepsize is not None:
-#            self._imposed_run()
-            self.run_step()
+            self._imposed_run()
+#            self.run_step()
         else:
             self._fitted_run()
 
@@ -142,21 +140,24 @@ class SimulationManager(GeneralPurposeManager):
         Run a single step imposing a given timestep (self._stepsize). 
         """
         k = 0
-        dt = self._stepsize
-
+        #dt = self._stepsize
+        #### self._battery.reset()
         # purge dei primi nn elementi delle liste delle variabi calcolate dal modello
         nn=5
         if len(self._battery.t_series) > nn :
             del self._battery.soc_series[:nn]
             del self._battery.soh_series[:nn]
             del self._battery.t_series[:nn]
+        
+        # for model in self._battery.models:
+        #     model.reset_model(**init_info)
 
-        self._battery.step(load=self._ground_data[self._input_var][k], dt=dt, k=k)
+        self._battery.step(load=self._ground_data[self._input_var][k], dt=self._stepsize, k=k)
         self._battery.t_series.append(self._elapsed_time)
-        self._elapsed_time += dt
+        self._elapsed_time += self._stepsize
         self._results = self._battery.build_results_table()
 
-        logger.info(f'Step dt={dt} ended without errors. elaps_time: {self._elapsed_time}')
+        logger.info(f'Step dt={self._stepsize} ended without errors. elaps_time: {self._elapsed_time}')
 
         return( self._results )
 

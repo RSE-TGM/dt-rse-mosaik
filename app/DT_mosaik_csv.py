@@ -118,7 +118,7 @@ class CSV(mosaik_api.Simulator):
             next_step = int((next_date - self.start_date)/self.time_res) + self.timereplay
         except IndexError:
             if self.replay:           # se è attivo il replay, ricomincio dal primo elemento del file csv. 
-                self.timereplay= time + self.time_res
+                self.timereplay= time + int(self.time_res.total_seconds())
                 self.next_index=0
                 next_date = self.data.index[self.next_index]
                 next_step = int((next_date - self.start_date)/self.time_res) + self.timereplay

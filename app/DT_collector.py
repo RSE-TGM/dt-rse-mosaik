@@ -12,7 +12,7 @@ import collections
 import mosaik_api_v3 as mosaik_api
 from mosaik_api.datetime import Converter
 
-from  DT_include import *
+from  DT_include import redisDT
 
 
 META_Monitor = {

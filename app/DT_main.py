@@ -358,7 +358,6 @@ class DTmqtt(object):
         # a questo punto copio solo DTindex.json giusto, prodotto nella directory /tmp (con indexFlag a true)
         cli_minio.upload_to_minio(local_path=INDEXPATHTMP,  minio_path=minio_path, indexFlag=True)
 
-
 #         for key, value in minio_path_dict.items():
 # #            print( key, value)
 #             rdfcreate(indexpath=INDEXPATHTMP, name=key, description=value)
@@ -583,7 +582,9 @@ def main():
     # disablito il wanring sul passo di tempo 
     logger.disable("mosaik.scheduler")
     if args.test:        
-        
+#
+# Modalità test
+#        
         if args.tfin:
             END=int(args.tfin)
             print(f'Modalità TEST, {args.test}, t fine simulazione: {args.tfin}!') 
@@ -610,21 +611,21 @@ def main():
         ## Connessione al object DB Minio      
         cli_minio = DTMinioClient()
         
-        # Eseguo il backup della configurazione iniziale ...
-        confActual=rdfquery(indexpath=INDEXPATHDEF)
 
+####### Eseguo il backup della configurazione iniziale ...
+        confActual=rdfquery(indexpath=INDEXPATHDEF)
         adesso=datetime.datetime.now(pytz.timezone(TZONE))
         confbackName='CurrConfBackup'+adesso.strftime("-%d%m%Y-%H_%M_%S_%f") 
         descrActual=confActual['description']
         idActual=confActual['date']
         commandActual='Currconf init'
         payl = f"""{{"command":"{commandActual}", "id":"{confbackName}", "description":"{descrActual}"}}"""
-#        payl = f"""{{"{confbackName}":"{descrActual}"}}"""
         cli_mqtt.publish(cli_mqtt.callbacks['SaveConf'], payl)
+######
+
 
         ## lancio del loop senza fine mqtt   
         cli_mqtt.run()
-
 
 # # test per gui
 # from PySide6.QtWidgets import QApplication, QWidget
