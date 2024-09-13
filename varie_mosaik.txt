@@ -46,6 +46,19 @@ https://pypi.org/project/pythonfmu3/
 pip freeze senza numero versione:
 pip list --format=json | jq -r ".[].name"
 ---------------
+
+submodules ...
+https://dev.to/jjokah/submodules-a-git-repo-inside-a-git-repo-36l9
+definire il submodule:
+git submodule add https://github.com/<user>/rock rock
+per aggiornare esplicitamente i submodule:   
+git submodule update --init --recursive
+
+clonare da zero un progetto con submodule
+git clone https://github.com/mirumee/saleor-platform.git --recursive --jobs 3
+
+-------------
+
 ####   Obsoleto con la nuoa versione di mosaik 3.3.3
 ATTENZIONE: ho modificato
 /home/antonio/dtwin/dt-rse-mosaik/.venv/lib/python3.8/site-packages/mosaik/scheduler.py

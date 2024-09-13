@@ -1,3 +1,6 @@
 [submodule "DT-rse"]
 	path = DT-rse
 	url = https://github.com/Daveonwave/DT-rse.git
+[submodule "ErNESTO-DT"]
+	path = ErNESTO-DT
+	url = https://github.com/Daveonwave/ErNESTO-DT.git
