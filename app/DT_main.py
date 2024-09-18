@@ -53,7 +53,7 @@ def taskRunInThread_and_time_check():
 
     tRun.join(timeout=1) # mi aggancio al thread ed aspetto max 1 secondo, se ha finito esco, se non ha finito allora vado in loop 
     i=0
-    while tRun.is_alive():   # se il thread è vivo, vuol dire che ho aspettato un secondo e non ha finito perchè e vivo
+    while tRun.is_alive():   # se il thread è vivo, vuol dire che ho aspettato un secondo e non ha finito perchè e' vivo
         print(f"-----CHECK-TIMEOUT---Simulazione in RUN-{world.tqdm.total}------------------------------------------------------------------------------------------------------------>")
         tRun.join(timeout=1)  # mi aggancio al thread ed aspetto max 1 secondo, se ha finito esco, se non ha finito allora vado in loop
         if i > 3: 
@@ -68,6 +68,26 @@ def taskRunInThread():
     tRun.start()
     sleep(1)
     return tRun
+
+def heartbeat(dtime=1, cli=None, cliRedis=None): 
+    # apertura di un thread figlio e run nel nuovo thread, non apsetto la fine del nuovo thread 
+    
+    def hb(dtime,cli):
+        n=0
+        logger.info('Eccomi:  iter={n} Wainting ...{dtime} seconds', n=n, dtime=dtime)
+        while True:
+            n=n+1
+#            logger.info('Eccomi:  iter={n} Wainting ...{dtime} seconds', n=n, dtime=dtime)
+            cliRedis.aset('DTHBstate', DT_OFF, hmode=True)
+            if cli.is_connected():
+                cliRedis.aset('DTHBstate', DT_ON, hmode=True)
+                sleep(dtime)
+            else:
+                exit()
+
+    thHB = Thread(target=hb(dtime,cli))
+    thHB.start()
+    return thHB
 
 # async def do_stuff(i):
 #     ran = random.uniform(0.1, 0.5)
@@ -109,6 +129,7 @@ class DTmqtt(object):
         self.client = mqtt.Client(cli)
         self.client.on_message = self.on_message
         self.client.on_connect = self.on_connect
+        self.client.on_disconnect = self.on_disconnect
         self.client.username_pw_set(self.user, self.passw)
 # connessione al broker mqtt
         self.client.connect(self.mqttBroker, self.port)
@@ -171,17 +192,35 @@ class DTmqtt(object):
     def run(self):
 #        while True:    # qui si ritenta la connessione, ma io escludo
 #            redisID=self.redis
+           
+        try:
+            self.client.loop_start()   # invece di self.client.loop()
+            heartbeat(dtime=2, cli=self.client, cliRedis= self.redis)
+            logger.warning('-------------> dopo heartbeat: {server}', server=self.mqttBroker)
+        except KeyboardInterrupt:
+            logger.warning('-------------> disconnessione da MQTT per ctr-C! server: {server}', server=self.mqttBroker)
+            self.client.disconnect()
+        
+
+# vecchia versione senza herat beat, funzionanate !!
+    def run_old(self):
+#        while True:    # qui si ritenta la connessione, ma io escludo
+#            redisID=self.redis
+            logger.warning('-------------> dopo heartbeat: {server}', server=self.mqttBroker)
             try:
                 if self.client.loop_forever() != 0:    # invece di self.client.loop()
                     logger.warning('Disconnected from MQTT server: {server}', server=self.mqttBroker)
             except KeyboardInterrupt:
                 self.client.disconnect()
 #                break
-          
-    def on_connect(self, mosq, obj, msg, rc): 
+
+
+
+    def on_connect(self, mosq, obj, msg, rc):
         logger.info('Connected to MQTT server: {server}. Wainting for commands...', server=self.mqttBroker)
         
-    def disconnect(self):
+    def on_disconnect(self, userdata, reason_code, properties):
+        self.redis.aset('DTHBstate', DT_OFF, hmode=True)
         return(self.client.loop_stop(force=True))
     
     def subscribe(self, topic):

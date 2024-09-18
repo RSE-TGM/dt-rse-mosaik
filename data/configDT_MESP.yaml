@@ -31,6 +31,10 @@ redis:
     - DTSDA:batt1
   batt1:
     id: batt1
+    DTHBstate:
+      field: DTHBstate
+      value: DT_OFF
+      unit: 'dig'      
     DTmode:
       field: mode
       value: S_SIM

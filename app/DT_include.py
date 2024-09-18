@@ -342,11 +342,15 @@ S_SIM ='S_SIM'
 S_LEARN ='S_LEARN'
 S_ON ='1'
 S_OFF='0'
+DT_ON ='DT_ON'
+DT_OFF='DT_OFF'
 StrToNum={
         S_OFF  :100,
         S_ON   :111,
         S_SIM  :122,
-        S_LEARN:133
+        S_LEARN:133,
+        DT_ON  :140,
+        DT_OFF :141
         }
 
 MODSIM = StrToNum[S_SIM]    # era 1
