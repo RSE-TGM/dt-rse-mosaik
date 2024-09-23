@@ -359,4 +359,6 @@ NOFORZ =  StrToNum[S_OFF]      # era 0
 FORZSIM = MODSIM
 FORZLEARN = MODLEARN
 STOP = -1
+
+DTHB=2  # tempo di check per heartbeat HB
 ##########################################

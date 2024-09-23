@@ -69,23 +69,24 @@ def taskRunInThread():
     sleep(1)
     return tRun
 
-def heartbeat(dtime=1, cli=None, cliRedis=None): 
+def heartbeat(dtime=1, cliMQTT=None, cliRedis=None): 
+    # thread per il check periodico di esistenza in vita del digital twin, ogni DTHB secondi scrive su redis lo stato DTHBstate
     # apertura di un thread figlio e run nel nuovo thread, non apsetto la fine del nuovo thread 
     
-    def hb(dtime,cli):
+    def hb(dtime,cliMQTT):
         n=0
         logger.info('Eccomi:  iter={n} Wainting ...{dtime} seconds', n=n, dtime=dtime)
         while True:
             n=n+1
 #            logger.info('Eccomi:  iter={n} Wainting ...{dtime} seconds', n=n, dtime=dtime)
             cliRedis.aset('DTHBstate', DT_OFF, hmode=True)
-            if cli.is_connected():
+            if cliMQTT.is_connected():
                 cliRedis.aset('DTHBstate', DT_ON, hmode=True)
                 sleep(dtime)
             else:
                 exit()
 
-    thHB = Thread(target=hb(dtime,cli))
+    thHB = Thread(target=hb(dtime,cliMQTT))
     thHB.start()
     return thHB
 
@@ -195,7 +196,7 @@ class DTmqtt(object):
            
         try:
             self.client.loop_start()   # invece di self.client.loop()
-            heartbeat(dtime=2, cli=self.client, cliRedis= self.redis)
+            heartbeat(dtime=DTHB, cliMQTT=self.client, cliRedis= self.redis) # attiva in redis lo stato di DT funzionante DTHBstate, il tempo di check è DTHB
             logger.warning('-------------> dopo heartbeat: {server}', server=self.mqttBroker)
         except KeyboardInterrupt:
             logger.warning('-------------> disconnessione da MQTT per ctr-C! server: {server}', server=self.mqttBroker)
@@ -203,7 +204,7 @@ class DTmqtt(object):
         
 
 # vecchia versione senza herat beat, funzionanate !!
-    def run_old(self):
+    def run_noHB(self):
 #        while True:    # qui si ritenta la connessione, ma io escludo
 #            redisID=self.redis
             logger.warning('-------------> dopo heartbeat: {server}', server=self.mqttBroker)
