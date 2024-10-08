@@ -29,6 +29,10 @@ redis:
     - DTSDA:batt1
   batt1:
     id: batt1
+    DTHBstate:
+      field: DTHBstate
+      value: DT_OFF
+      unit: 'dig'      
     DTmode:
       field: mode
       value: S_SIM
@@ -45,6 +49,14 @@ redis:
       field: tsim
       value: 0
       unit: 's'
+    timestamp:
+      field: timestamp
+      value: 0
+      unit: 'datetime'
+    timestamp_ms:
+      field: timestamp_ms
+      value: 0
+      unit: 'ms'
     output_voltage:
       field: output_voltage[V]
       value: 0
@@ -78,9 +90,9 @@ redis:
       value: 0
       unit: 'kJ'
     C:
-      field: C[F]
-      value: 20
-      unit: 'F'
+      field: Capacity[C]
+      value: 10000
+      unit: 'C'
     R0:
       field: R0[Ω]
       value: 0.003

@@ -17,7 +17,9 @@ minio_console:    &MINIOCONSOLE "172.25.102.102:9090"
 minio_access_key: &MINIOACCESS "3XH4IscBBGH1FB4M8cDu"
 minio_secret_key: &MINIOSECRET "7kTXv8kSnZ5jmMDu9Fbcj0McH2fDIbr5OInLdnPc"
 influx_url:   &INFLUXURL "http://172.25.102.102:8086"
-influx_token: &INFLUXTOKEN ""
+#influx_token: ""
+# aggiungo il "mesp token"
+influx_token: &INFLUXTOKEN "TrjEThE5TCvklWf93bKIGyX3a1Qp0JBg4y1gg60NvcedCNmGhr6ikfTIzEF7WCAaAu81VhZSYpiqVloSbcmIoA=="
 
 redis:
   redis_host: REDIS_HOST
@@ -29,6 +31,10 @@ redis:
     - DTSDA:batt1
   batt1:
     id: batt1
+    DTHBstate:
+      field: DTHBstate
+      value: DT_OFF
+      unit: 'dig'      
     DTmode:
       field: mode
       value: S_SIM
@@ -45,6 +51,14 @@ redis:
       field: tsim
       value: 0
       unit: 's'
+    timestamp:
+      field: timestamp
+      value: 0
+      unit: 'datetime'
+    timestamp_ms:
+      field: timestamp_ms
+      value: 0
+      unit: 'ms'
     output_voltage:
       field: output_voltage[V]
       value: 0
@@ -78,9 +92,9 @@ redis:
       value: 0
       unit: 'kJ'
     C:
-      field: C[F]
-      value: 20
-      unit: 'F'
+      field: Capacity[C]
+      value: 10000
+      unit: 'C'
     R0:
       field: R0[Ω]
       value: 0.003
@@ -89,6 +103,8 @@ redis:
       field: R1[Ω]
       value: 0.003
       unit: 'Ω'      
+
+
 
 
 mqtt:

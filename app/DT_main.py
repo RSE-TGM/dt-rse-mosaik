@@ -466,7 +466,7 @@ class DTmqtt(object):
             payl['id']="uidx"
 
         listaconf_dict={}
-        listaconf_dict['command'] = self.posts2['listaconf']
+        listaconf_dict['command'] = self.posts['listaconf']
         listaconf_dict['id'] = payl['id']
         listaconf_dict['description'] = listaconf
 
