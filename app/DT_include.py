@@ -149,6 +149,32 @@ class  redisDT(object):
     def chiudi(self):
         return(self.red.close())
 
+    def readstream(self, stream_name, ind) -> dict :
+                   #messages = r.xread({stream_name: "0-0"}, count=1, block=1000)
+#        messages = self.red.xread({stream_name: "0-0"}).decode('utf-8')
+        messages = self.red.xread({stream_name: "0-0"}) # list di bytes
+        #print(messages,"\n")
+        lastStream={}   
+        tstamp=messages[0][1][ind][0]   # bytes
+        tstamp=str(tstamp).replace('\"', '') # ci sono delle virgolette in più: le elimino
+        
+        messages_dict=messages[0][1][ind][1] # dict of bytes
+        lastStream[tstamp]={key.decode('utf-8'):messages_dict[key].decode('utf-8') for key in messages_dict.keys()} # dict decoded with utf-8
+
+        #lastStream[tstamp]=json.dumps(messages[0][1][ind][1])   # dict
+        #pprint.pp(lastStream)
+    
+        return(lastStream[tstamp])
+                   # esempio: messages[0][1][99][1]['Tensione Cella 1 [V]']
+                   # ms_date_timestamp_id=re.search(r'\d+', response.decode("utf-8")).group()
+                   # str_timestamp=str(datetime.datetime.fromtimestamp(int(ms_date_timestamp_id)/1000.0))
+                   #  messages[0] tutto con il nome del tag redis
+                   #  messages[0][0] nome del tag
+                   #  messages[0][1] tutto lo stream, ad esempio 100 item
+                   #  messages[0][1][n]  ennesimo elemento dello stream, 0 più vecchio 99 più recente
+                   #  messages[0][1][n][0]  timestamp ennesimo elemento
+                   #  messages[0][1][n][1]  dati ennesimo elemento, è in formato json
+    
 
 class DTMinioClient(object):
     def __init__(self, endpoint="localhost:9000", access_key="4K10mbUN3FxVsDxtDYSh", secret_key="sI0zu0b4DlR2Vs0JyO6KhJZzws1w5eL1GzthLtPD", secure=False ):
@@ -276,6 +302,8 @@ class DTMinioClient(object):
                 file.close()
             return ( data )        
         pass
+   
+
 
 
 class InfluxDBCli(object):

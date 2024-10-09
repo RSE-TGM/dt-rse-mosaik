@@ -516,11 +516,19 @@ class DTmqtt(object):
         status_dict = self.r.hgetall(' '.join(self.configDT['redis']['htags']))
         status_dict = {key.decode('utf-8'):value.decode('utf-8') for key,value in status_dict.items()}  # elimino il b'...
        #  status =json.dumps(status_dict) # converto in json per inviare
+        
+        statusRefBatt_dict ={}
+        tagg=self.configDT['redis']['batt1']['RefBattDIM']
+        ind=int(self.redis.red.get(tagg).decode('utf-8'))-1
+        #ind= self.r.aget(self.configDT['redis']['batt1']['RefBattDIM'])-1  # dato più recente
+        statusRefBatt_dict = self.redis.readstream(self.configDT['redis']['batt1']['RefBatt'], ind)
+
 
         currstatus_dict = {}
         currstatus_dict['command']=self.posts['status']
         currstatus_dict['id']=payl['id']
         currstatus_dict['status'] = status_dict
+        currstatus_dict['statusRefBatt'] = statusRefBatt_dict
 
         self.client.publish(self.posts['status'],json.dumps(currstatus_dict))   
 

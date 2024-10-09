@@ -31,6 +31,9 @@ redis:
     - DTSDA:batt1
   batt1:
     id: batt1
+    RefBatt: batt1:modulo1
+    RefBattDIM: batt1:modulo1:config
+    RefBattAlive: batt1:cycle_up_alive
     DTHBstate:
       field: DTHBstate
       value: DT_OFF
