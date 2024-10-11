@@ -519,9 +519,13 @@ class DTmqtt(object):
         
         statusRefBatt_dict ={}
         tagg=self.configDT['redis']['batt1']['RefBattDIM']
-        ind=int(self.redis.red.get(tagg).decode('utf-8'))-1
+        if self.redis.red.exists(tagg):   # Se esiste l'acquisizione dalla batteria vera ...
+            ind=int(self.redis.red.get(tagg).decode('utf-8'))-1
         #ind= self.r.aget(self.configDT['redis']['batt1']['RefBattDIM'])-1  # dato più recente
-        statusRefBatt_dict = self.redis.readstream(self.configDT['redis']['batt1']['RefBatt'], ind)
+            statusRefBatt_dict = self.redis.readstream(self.configDT['redis']['batt1']['RefBatt'], ind)
+        else:
+            statusRefBatt_dict={}
+            statusRefBatt_dict['Time']='NO DATA at '+status_dict['timestamp']
 
 
         currstatus_dict = {}
