@@ -1,3 +1,4 @@
+""" Simulator Mosaik che imposta invia a  DTSDA perturbazioni temporizzate e lette da un file csv """
 import pandas as pd
 
 import mosaik_api_v3 as mosaik_api
@@ -8,7 +9,9 @@ SENTINEL = object()
 
 
 class CSV(mosaik_api.Simulator):
+    """ Classe Mosaik per la gestione di perturbazioni lette da file """
     def __init__(self):
+        """ Costruttore della classe CSV """
         super().__init__({'models': {}})
         self.start_date = None
         self.data = None
@@ -27,6 +30,7 @@ class CSV(mosaik_api.Simulator):
         self.timereplay=0
         
     def init(self, sid, time_resolution, sim_start, datafile, date_format=None, type="time-based", delimiter=',',replay=False):
+        """ Inizializzazione dell'oggetto CSV"""
         self.type = type
         if self.type != "time-based" and self.type != "event-based":
             print("Please enter the correct type. The type can either be time-based or event-based")
@@ -90,6 +94,7 @@ class CSV(mosaik_api.Simulator):
         return self.meta
 
     def create(self, num, model):
+        """ Creazione oggetto di tipo model Mosaik  CSV"""
         if model != self.model_name:
             raise ValueError('Invalid model "%s" % model')
 
@@ -106,6 +111,7 @@ class CSV(mosaik_api.Simulator):
         return entities
 
     def step(self, time, inputs, max_advance):
+        """ esecuzione step di calcolo dell'oggetto Mosaik CSV"""
         data = self.data
         if self.next_index >= 0:
             current_row = data.iloc[self.next_index]
@@ -128,6 +134,7 @@ class CSV(mosaik_api.Simulator):
         return next_step
 
     def get_data(self, outputs):
+        """ lettura dati dell'oggetto Mosaik CSV"""
         data = {}
         for eid, attrs in outputs.items():
             if eid not in self.eids:

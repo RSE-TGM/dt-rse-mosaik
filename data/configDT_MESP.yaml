@@ -21,6 +21,8 @@ influx_url:   &INFLUXURL "http://172.25.102.102:8086"
 # aggiungo il "mesp token"
 influx_token: &INFLUXTOKEN "TrjEThE5TCvklWf93bKIGyX3a1Qp0JBg4y1gg60NvcedCNmGhr6ikfTIzEF7WCAaAu81VhZSYpiqVloSbcmIoA=="
 
+DT_input_data: 'data/input_data.csv'
+
 redis:
   redis_host: REDIS_HOST
   redis_host_default: *REDISHOST
@@ -37,75 +39,93 @@ redis:
     DTHBstate:
       field: DTHBstate
       value: DT_OFF
-      unit: 'dig'      
+      unit: 'dig'
+      OP: FALSE      
     DTmode:
       field: mode
       value: S_SIM
       unit: 'dig'
+      OP: True
     DTmode_set:
       field: mode_set
       value: S_SIM
       unit: 'dig'
+      OP: True
     DTSDA_State:
       field: state
       value: S_IDLE
       unit: 'dig'
+      OP: False
     tsim:
       field: tsim
       value: 0
       unit: 's'
+      OP: False
     timestamp:
       field: timestamp
       value: 0
       unit: 'datetime'
+      OP: False
     timestamp_ms:
       field: timestamp_ms
       value: 0
       unit: 'ms'
+      OP: False
     output_voltage:
       field: output_voltage[V]
       value: 0
       unit: 'V'
+      OP: False
     load_current:
       field: load_current[A]
       value: 0
       unit: 'V'
+      OP: False
     soc:
       field: soc[p.u.]
       value: 1.
       unit: 'p.u.'
+      OP: False
     soh:
       field: soh[p.u.]
       value: 1.
       unit: 'p.u.'
+      OP: False
     Vocv:
       field: Vocv[V]
       value: 0
-      unit: 'V'      
+      unit: 'V'
+      OP: True      
     power:
       field: power[W]
       value: 0
       unit: 'W'
+      OP: False
     temperature:
       field: temperature[K]
       value: 296.15
       unit: 'K'
+      OP: False
     heat:
       field: heat[kJ]
       value: 0
       unit: 'kJ'
+      OP: False
     C:
       field: Capacity[C]
       value: 10000
       unit: 'C'
+      OP: True
     R0:
       field: R0[Ω]
       value: 0.003
       unit: 'Ω'
+      OP: True
     R1:
       field: R1[Ω]
       value: 0.003
-      unit: 'Ω'      
+      unit: 'Ω'
+      OP: True      
 
 
 

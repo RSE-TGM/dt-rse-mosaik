@@ -1,6 +1,4 @@
-
-# DTSDA
-# definizioni di variabili e funzioni varie
+""" Definizioni di variabili globali e definizione di classi e funzioni per DTSDA """
 
 #import io
 import yaml
@@ -19,6 +17,7 @@ from minio.error import  S3Error
 from  DT_rdf import *
 
 def readConfig(config_path, namefile):
+        """ Legge file yaml """
         global TZONE
  # Read in memory a yalm file
         
@@ -45,10 +44,12 @@ def readConfig(config_path, namefile):
 
 
 class  redisDT(object):
+    """ API per connettersi a ad un server redis e utilizzarne le funzionalità """
     def __init__(self):
         self.config_data_path = CONFIG_DATA_PATH
-        self.configDT = CONFIGDT 
-        self.configDT = readConfig(self.config_data_path, self.configDT)
+#        self.configDT = CONFIGDT 
+#        self.configDT = readConfig(self.config_data_path, self.configDT)
+        self.configDT = CURR_CONFIG
 #        self.tags = self.configDT['redis']['DTSDA']
 
         self.redis_host = os.getenv(self.configDT['redis']['redis_host'])
@@ -61,6 +62,7 @@ class  redisDT(object):
 
     #self.redis = redis.Redis(host=redis_host, port=redis_port, ch
     def connect(self):
+        """ Connessione a redis """
         try:
             self.red  = redis.Redis(host=self.redis_host,port=self.redis_port)   
             print (self.red)
@@ -74,6 +76,7 @@ class  redisDT(object):
         return self.red
     
     def check(self):
+        """ Check per esistenza della connessione al redis server"""
         try:
             response = self.red.client_list()
             return (self)
@@ -82,6 +85,7 @@ class  redisDT(object):
             return (None)
 
     def aget(self, simbtag, id='batt1', hmode = False) :
+        """ interfaccia semplificata a redis get sia di tag semplici sia di hash"""
         htag= self.configDT['redis']['htags'][0]
         field= self.configDT['redis'][id][simbtag]['field']
         if (not hmode):
@@ -98,6 +102,7 @@ class  redisDT(object):
 #        return(self.red.get(tag).decode('utf-8') )
    
     def aset(self, simbtag, val, id='batt1', hmode = False) :
+        """ interfaccia semplificata a redis set sia di tag semplici sia di hash"""
         htag = self.configDT['redis']['htags'][0]           # è il tag del hash redis
         field = self.configDT['redis'][id][simbtag]['field']   # id è il tag della batteria, ad esempio 'batt1', simbtag è ad esempio 'DTmode'
         if (not hmode):
@@ -112,6 +117,7 @@ class  redisDT(object):
 
     
     def hhset(self, simbtag, val, id):
+        """ interfaccia semplificata a redis set di variabili hash"""
         htag = self.configDT['redis']['htags'][0]           # è il tag del hash redis
         field = self.configDT['redis'][id][simbtag]['field']   # id è il tag della batteria, ad esempio 'batt1', simbtag è ad esempio 'DTmode'
         #ret=self.red.hset(htag, field, val)
@@ -119,6 +125,7 @@ class  redisDT(object):
         return
 
     def hhget(self, simbtag, id):
+        """ interfaccia semplificata a redis get di variabili hash"""
         htag= self.configDT['redis']['htags'][0]
         field= self.configDT['redis'][id][simbtag]['field']               
         #ret=self.red.hget(htag, field).decode('utf-8')
@@ -126,6 +133,7 @@ class  redisDT(object):
         return
                  
     def esistetag(self,simbtag, id='batt1', hmode = False):
+        """ interfaccia semplificata a redis di esistenza sia di tag semplici sia di variabili hash"""
         htag= self.configDT['redis']['htags'][0]
         field= self.configDT['redis'][id][simbtag]['field']  
         if (not hmode):
@@ -142,14 +150,32 @@ class  redisDT(object):
 #        return(self.red.exists(tag))
     
     def gettags(self, id='batt1'):
+        """ ritorna la tag di base della batteria del DTwin DTSDA"""
 #        ret = self.configDT['redis']['DTSDA']
         ret = self.configDT['redis'][id]
         return(ret)
     
     def chiudi(self):
+        """ Chiude la connessione al server redis """
         return(self.red.close())
 
     def readstream(self, stream_name, ind) -> dict :
+        """Legge stream redis 
+
+        Args:
+            stream_name (str): Nome dello stream
+            ind (int): i-esimo elemento dello stream ( per uno stream di 100 elementi ind del più recente è 99)
+
+        Returns:
+            dict: Contenuto dello stream ad esempio:  {"Time":"21-10-2024 11:33:39.814245",
+            "Tdiff [s]":"1,003","VCEL1 Tensione Cella 1 [V]":"4,167","VCEL2 Tensione Cella 2 [V]":"4,166",
+            "VCEL3 Tensione Cella 3 [V]":"4,161","VCEL4 Tensione Cella 4 [V]":"4,161","CEL5 Tensione Cella 5 [V]":"4,153",
+            "VCEL6 Tensione Cella 6 [V]":"4,153","VCEL7 Tensione Cella 7 [V]":"4,162","VCEL8 Tensione Cella 8 [V]":"4,162","VCEL9 Tensione Cella 9 [V]":"4,154",
+            "VCEL10 Tensione Cella 10 [V]":"4,155","VCEL11 Tensione Cella 11 [V]":"4,155","VCEL12 Tensione Cella 12 [V]":"4,158","VCEL13 Tensione Cella 13 [V]":"4,158","VCEL14 Tensione Cella 14 [V]":"4,160",
+            "VMOD1 Tensione Modulo 1 [V]":"29,073","CURR1 Corrente Modulo 1 [A]":"-20,695","TMOD1 Temperatura Modulo 1 [�C]":"21,486","TAMB Temperatura Ambiente 1 [�C]":"21,673",
+            "TimestampFile":"2024-02-19 15:30:11"}
+        """        
+        """  interfaccia semplificata a redis di lettura di variabili stream """
                    #messages = r.xread({stream_name: "0-0"}, count=1, block=1000)
 #        messages = self.red.xread({stream_name: "0-0"}).decode('utf-8')
         messages = self.red.xread({stream_name: "0-0"}) # list di bytes
@@ -177,10 +203,15 @@ class  redisDT(object):
     
 
 class DTMinioClient(object):
+    """ API per connettersi a ad un DB objetc MinIO e utilizzarne le funzionalità """
     def __init__(self, endpoint="localhost:9000", access_key="4K10mbUN3FxVsDxtDYSh", secret_key="sI0zu0b4DlR2Vs0JyO6KhJZzws1w5eL1GzthLtPD", secure=False ):
         self.config_data_path = CONFIG_DATA_PATH
-        self.configDT = CONFIGDT 
-        self.configDT = readConfig(self.config_data_path, self.configDT)
+        """ Path del file di configurazione"""
+#        self.configDT = CONFIGDT 
+#        self.configDT = readConfig(self.config_data_path, self.configDT)
+        self.configDT = CURR_CONFIG
+        """ Contenuto del file di configurazione"""
+
         self.endpoint = self.configDT['minio']['ENDPOINT']
         self.access_key=self.configDT['minio']['ACCESS_KEY']
         self.secret_key=self.configDT['minio']['SECRET_KEY']
@@ -200,12 +231,14 @@ class DTMinioClient(object):
                              access_key = self.access_key,
                              secret_key = self.secret_key,
                              secure     = self.secure )
+        """ Id della connessione al server del client MinIO"""
         
         self.listaconf=""
 
         logger.info("MINIO: CONNECTED: {minio_host} !!", minio_host=self.endpoint ) 
 
     def object_exists(self, bucket, obj_path) -> bool:
+        """ test esitenza di oggetti salvati nel DB mInio """
         try:
             self.client.stat_object(bucket, obj_path)
             return True
@@ -213,6 +246,7 @@ class DTMinioClient(object):
             return False
 
     def upload_to_minio(self, local_path,  minio_path, indexFlag=False):
+        """ Salva oggetti nel DB Minio """
     #    assert os.path.isdir(local_path)
         for local_file in glob.glob(local_path + '/**'):
             local_file = local_file.replace(os.sep, "/") # Replace \ with / on Windows
@@ -228,6 +262,7 @@ class DTMinioClient(object):
             self.client.fput_object(self.indexbucket, minio_path+"/"+os.path.basename(INDEXPATHTMP), INDEXPATHTMP)
 
     def download_from_minio(self, minio_path,  dst_local_path):
+        """ Scarica oggiti dal DB Minio """
     # for bucket_name in client.list_buckets():
         for item in self.client.list_objects(self.indexbucket, prefix=minio_path, recursive=True):
 #        for item in self.client.list_objects(bucket_name, start_after=minio_path, recursive=True):
@@ -238,6 +273,7 @@ class DTMinioClient(object):
             self.client.fget_object(self.indexbucket,item.object_name,full_path)
 
     def deleteFolder_minio(self, bucket_name, minio_path):
+        """ cancella oggetti salvati nel DB  Minio """
     # Delete using "remove_objects"
         objects_to_delete = self.client.list_objects(self.indexbucket, prefix=minio_path, recursive=True)
         for obj in objects_to_delete:
@@ -252,9 +288,9 @@ class DTMinioClient(object):
 
 
     def getconflist_minio(self):
-        # trova nel bucket self.indexbucket tutti gli id delle configurazioni salvate
-        # per ogni conf legge il file di indice ( index.jsonId ?) e legge la descrizione, ad es. "conf1" e "descr conf1"
-        # ricava la lista che è un dict come stringa di caratteri. ad es: listaconf = '"conf1":"descr conf1", "conf2":"descr conf2","conf3":"descr conf3"'
+        """ Trova nel bucket self.indexbucket tutti gli id delle configurazioni salvate
+        Per ogni conf legge il file di indice ( index.jsonId ?) e legge la descrizione, ad es. "conf1" e "descr conf1"
+        Ricava la lista che è un dict come stringa di caratteri. ad es: listaconf = '"conf1":"descr conf1", "conf2":"descr conf2","conf3":"descr conf3"' """
         
         self.listaconf = []   # é una lista di liste
         self.listaconf_dict = {}   # é una dict di dict
@@ -273,6 +309,7 @@ class DTMinioClient(object):
         return (json.dumps(self.listaconf_dict))  # invio un json
 
     def read_index(self):
+        """ Legge il file index.jsonId """
         if  self.object_exists(self.indexbucket, self.indexname):
             findex = open(self.indexname)
             data_index = json.load(findex)
@@ -282,6 +319,7 @@ class DTMinioClient(object):
             return(None)
 
     def add_to_index(self, newconf, newdescr):
+        """ Aggiunge informazioni della nuova configurazione salavat nel DB Minio nel file index.jsonId """
         if  self.object_exists(self.indexbucket, self.indexname):
             # findex = open(self.indexname, "rw")
             # data_index = json.load(findex)
@@ -307,10 +345,12 @@ class DTMinioClient(object):
 
 
 class InfluxDBCli(object):
+    """ API per connettersi a ad un server InfluxDB e utilizzarne le funzionalità """
     def __init__(self, influx_sim):
         self.config_data_path = CONFIG_DATA_PATH
-        self.configDT = CONFIGDT 
-        self.configDT = readConfig(self.config_data_path, self.configDT)
+#        self.configDT = CONFIGDT 
+#        self.configDT = readConfig(self.config_data_path, self.configDT)
+        self.configDT = CURR_CONFIG
         self.url = self.configDT['influxdb']['URL']
         self.org = self.configDT['influxdb']['ORG']
         self.bucket = self.configDT['influxdb']['BUCKET']
@@ -341,12 +381,12 @@ else:
     CONFIGDT = "configDT_MESP.yaml"
 
 EXPERIMENT_CONFIG = "experiment_config.yaml" 
+#
+CURR_CONFIG = readConfig(CONFIG_DATA_PATH, CONFIGDT)
 
-ret = readConfig(CONFIG_DATA_PATH, CONFIGDT)
-
-if "rdf" in ret:
-    NAMESPACEDEF=ret['rdf']['NAMESPACE']
-    DTINDEX=ret['rdf']['INDEXNAME']
+if "rdf" in CURR_CONFIG:
+    NAMESPACEDEF=CURR_CONFIG['rdf']['NAMESPACE']
+    DTINDEX=CURR_CONFIG['rdf']['INDEXNAME']
 else:
     NAMESPACEDEF="https://www.rse-web.it/" 
     DTINDEX= "DTindex.json"  

@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
-#
-# Scenario Mosaik con loop MQTT
-#
-########################################
+""" DTSDA main implementato come scenario Mosaik """
+
 import sys
 import argparse
 from time import sleep, perf_counter
@@ -113,13 +111,14 @@ def heartbeat(dtime=1, cliMQTT=None, cliRedis=None):
 
 
 class DTmqtt(object):
+    """ Classe principale di DTSDA che implementa il loop MQTT di gestione dei messaggi """
     def __init__(self, broker="0.0.0.0", port=1883, cli="DTSDA", user="userDT", passw="userDT", confpath="mosaik/configuration/", confname="configDT.yaml" ):
 
 # lettura del file di configurazione per acquisire le tag mqtt
         self.config_data_path = CONFIG_DATA_PATH
-        self.configDT = CONFIGDT
-        self.configDT = readConfig(self.config_data_path, self.configDT)
-
+#        self.configDT = CONFIGDT
+#        self.configDT = readConfig(self.config_data_path, self.configDT)
+        self.configDT = CURR_CONFIG
            
         self.mqttBroker = self.configDT['mqtt']['SERVER']
         self.port = int(self.configDT['mqtt']['PORT'])
@@ -191,6 +190,7 @@ class DTmqtt(object):
 
 
     def run(self):
+        """ Start del loop MQTT con la gestione della variabile di Heart Beat"""
 #        while True:    # qui si ritenta la connessione, ma io escludo
 #            redisID=self.redis
            
@@ -203,8 +203,9 @@ class DTmqtt(object):
             self.client.disconnect()
         
 
-# vecchia versione senza herat beat, funzionanate !!
+# vecchia versione senza heart beat, funzionanate !!
     def run_noHB(self):
+            """ Start del loop MQTT SENZA la gestione della variabile di Heart Beat"""
 #        while True:    # qui si ritenta la connessione, ma io escludo
 #            redisID=self.redis
             logger.warning('-------------> dopo heartbeat: {server}', server=self.mqttBroker)
@@ -218,20 +219,24 @@ class DTmqtt(object):
 
 
     def on_connect(self, mosq, obj, msg, rc):
+        """ Eventuale gestione di eventi dopo la connessione con il brocker MQTT """
         logger.info('Connected to MQTT server: {server}. Wainting for commands...', server=self.mqttBroker)
         
     def on_disconnect(self, userdata, reason_code, properties):
+        """ Eventuale gestione di eventi dopo la disconnessione con il brocker MQTT """
         self.redis.aset('DTHBstate', DT_OFF, hmode=True)
         return(self.client.loop_stop(force=True))
     
     def subscribe(self, topic):
+        """  callback per la il subscribe MQTT di messaggi """
         return(self.client.subscribe(topic))
     
     def publish(self,tag,message):
+        """  callback per la la pubblicazione MQTT di messaggi """
         self.client.publish(tag,message)
 
     def on_message(self, client, userdata, message):
-        # callback per echo dei messaggi MQTT
+        """ callback per echo dei messaggi MQTT """
         global world, model, dtsdamng, tRun_on_message
         print(f'------------------------>on_message: Received con topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
 
@@ -270,6 +275,7 @@ class DTmqtt(object):
     
 
     def on_EndProg(self, client, userdata, message):
+        """ Ferma il main del digital twin DTwin"""
         print(f'------------------------>on_EndProg:  DISCONNET and END')
         if self.redis.aget('DTSDA_State', hmode=True) == S_RUNNING :
             self.on_StopSIM(client, userdata, message)
@@ -283,17 +289,21 @@ class DTmqtt(object):
 
 
     def on_SetModoSIM(self, client, userdata, message):
+        """ Imposta il modo simulazione """
         print(f'------------------------>on_SetModoSIM:  SetModoSIM')
         self.redis.aset('DTmode', S_SIM, hmode=True)
         self.redis.aset('DTmode_set', S_SIM, hmode=True)
 
     def on_SetModoLEARN(self, client, userdata, message):
+        """ Imposta il modo learning """
         print(f'------------------------>on_SetModoLEARN:  SetModoLEARN')
         self.redis.aset('DTmode', S_LEARN, hmode=True)
         self.redis.aset('DTmode_set', S_LEARN, hmode=True)
 
 
     def on_InitSIM(self, client, userdata, message):
+        """ Inizializza la simulazione, viene lanciato il costruttore dell'oggeto Mosaik con la configurazione delle task di DTwin 
+        Per inizializzare è necessario essere nel modo S_IDLE, ad inizializzazione eseguita con successo DTwin si troverà nello stato S_READY """
         global world, model, dtsdamng
         print(f'------------------------>on_InitSIM:   INIT DELLA SIMULAZIONE')
         if self.redis.aget('DTSDA_State', hmode=True) == S_IDLE :
@@ -306,6 +316,8 @@ class DTmqtt(object):
 
 
     def on_RunSIM(self, client, userdata, message):
+        """ Lancia la simulazione correttamente inizializzata che viene esuguita secondo le modalità impostate in fase di inizializzazione. 
+        Per lanciare la simulazione è necessario essere nel modo S_READY, al run il modo viene impostato a S_RUNNING"""
         global world, model, dtsdamng, tRun_on_message
         print(f'------------------------>on_RunSIM:  RUN DELLA SIMULAZIONE')
         
@@ -332,6 +344,7 @@ class DTmqtt(object):
         #-----------------------------------------
 
     def on_StopSIM(self, client, userdata, message):
+        """ Ferma il run della simulazione. Per essere esguito lo stop è necessario essere nel mpdo S_RUNNING. Allo stop lo stato verrà impostato a S_IDLE """
         global world, model, dtsdamng, tRun_on_message
         print(f'------------------------>on_StopSIM:  Simulation STOP request')
         try:
@@ -356,6 +369,7 @@ class DTmqtt(object):
                 print("{}: {}".format(type(e).__name__, e))
 
     def on_PlotGraf(self, client, userdata, message):
+        """ Visualizza alcune metriche di esecuzione di DTwin """
         global world, model, dtsdamng, tRun_on_message
         print(f'------------------------>on_PlotGraf:  PLOTGRAF per Debug')
         ## grafici attivati con il debug mode
@@ -365,6 +379,8 @@ class DTmqtt(object):
         mosaik.util.plot_execution_time_per_simulator(world, folder='util_figures')
     
     def on_SaveConf(self, client, userdata, message):
+        """ Salva nel object DB Minio la configurazione di DTwin contenuta nella directory dt-rse-mosaik/data 
+        Nome e descrizione dell'oggetto in DB è inviato nel payload del messaggio MQTT inviato dal HMI"""
         global cli_minio
         print(f'------------------------>on_SaveConf: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
         if self.redis.aget('DTSDA_State', hmode=True) != S_IDLE :
@@ -407,6 +423,7 @@ class DTmqtt(object):
 #             cli_minio.upload_to_minio(local_path=INDEXPATHTMP,  minio_path=key, indexFlag=True)
           
     def on_LoadConf(self, client, userdata, message):
+        """ Carica una configurazione del Dtwin DTSDA prelevando l'oggeto salvato nel DB Minio e scaricandolo nella directory dt-rse-mosaik/data """
         global cli_minio
         print(f'------------------------>on_LoadConf: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
         if self.redis.aget('DTSDA_State', hmode=True) != S_IDLE :
@@ -435,6 +452,8 @@ class DTmqtt(object):
         logger.info("Caricata la configurazione dal objDB  {nameActual}:{descrActual} in {dst_local_directory}", nameActual=nameActual, descrActual=descrActual, dst_local_directory=dst_local_directory)
 
     def on_DelConf(self, client, userdata, message):
+        """ Cancella una configurazione di DTSDA salvata nel object DB Minio 
+        Il comando e il nome dell'oggetto da cancellare è contenuto nel paylod del messaggio MQTT inviato da HMI """
         global cli_minio
         print(f'------------------------>on_deleteFolder_minio: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
         # if self.redis.aget('DTSDA_State') != S_IDLE :
@@ -453,6 +472,7 @@ class DTmqtt(object):
 
     
     def on_ListaConfReq(self, client, userdata, message):
+        """ A comando MQTT inviato dal HMI, genera e invia pubblicando un messaggio MQTT per HMI la lista delle configurazioni salvate nel DB Minio """
         global cli_minio
         print(f'------------------------>on_ListaConfReq: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
         id_minio_path='conf'
@@ -476,6 +496,7 @@ class DTmqtt(object):
         print(f'------------------------>on_ListaConfReq: nuova listaconf: {listaconf} pubblicata')
 
     def on_CurrConfReq(self, client, userdata, message):
+        """ A comando MQTT inviato dal HMI, genera e invia un messaggio MQTT per HMI con la descrizione della configurazione corrente in dt-rse-mosaik/data """
         global cli_minio
         print(f'------------------------>on_CurrConfReq: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
         confActual=rdfquery(indexpath=INDEXPATHDEF)  # è un dict
@@ -503,6 +524,8 @@ class DTmqtt(object):
         print(f'------------------------>on_CurrConfReq: currconf: {confActual} pubblicata')
 
     def on_StatusReq(self, client, userdata, message):
+        """ A comando MQTT inviato dal HMI, genera e invia un messaggio MQTT per HMI con lo stato corrente della simulzione e della batteria di riferimento salvato in redis """
+
         print(f'------------------------>on_StatusReq: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
         
         userdata=1
@@ -518,9 +541,11 @@ class DTmqtt(object):
        #  status =json.dumps(status_dict) # converto in json per inviare
         
         statusRefBatt_dict ={}
-        tagg=self.configDT['redis']['batt1']['RefBattDIM']
+        tagg=self.configDT['redis']['batt1']['RefBattDIM']  # cioè batt1:modulo1:config . Attenzione che in questo modo si testa l'esistenza dei dati non se è vivo l'aquisitore RefBattAlive cioè batt1:cycle_up_alive
         if self.redis.red.exists(tagg):   # Se esiste l'acquisizione dalla batteria vera ...
-            ind=int(self.redis.red.get(tagg).decode('utf-8'))-1
+            confdict: dict  = json.loads(self.redis.red.get(tagg).decode('utf-8'))
+            ind: int = int(confdict['max_records'])-1
+            #ind=int(self.redis.red.get(tagg).decode('utf-8'))-1
         #ind= self.r.aget(self.configDT['redis']['batt1']['RefBattDIM'])-1  # dato più recente
             statusRefBatt_dict = self.redis.readstream(self.configDT['redis']['batt1']['RefBatt'], ind)
         else:
@@ -537,6 +562,7 @@ class DTmqtt(object):
         self.client.publish(self.posts['status'],json.dumps(currstatus_dict))   
 
     def on_HealthReq(self, client, userdata, message):
+        """ Pubblica in MQTT lo stato alive o meno del DTwin DTSDA """
         print(f'------------------------>on_HealthReq: Received with topic:{message.topic} message: {str(message.payload.decode("utf-8"))}')
         
         userdata=1
@@ -555,6 +581,7 @@ class DTmqtt(object):
 
   
 def CheckForTmaxLoop(world, model, dtsdamng, tRun, TMAX):
+    """ Metodo non usato attualmente """
 #    DTmqtt_messloop()                                                                                                                                                                                                                                                                                                                                        c
     tRun.join(timeout=1) # mi aggancio al thread ed aspetto max 1 secondo, se ha finito esco, se non ha finito allora vado in loop 
     while tRun.is_alive():   # se il thread è vivo, vuol dire che ho aspettato un secondo e non ha finito perchè e vivo
@@ -569,6 +596,7 @@ def CheckForTmaxLoop(world, model, dtsdamng, tRun, TMAX):
         tRun.join(timeout=1)  # mi aggancio al thread ed aspetto max 1 secondo, se ha finito esco, se non ha finito allora vado in loop
  
 def CheckForTmax(world, model, dtsdamng, tRun, TMAX):
+    """ Metodo non usato attualmente """
     # tRun.join(timeout=1) # mi aggancio al thread ed aspetto max 1 secondo, se ha finito esco, se non ha finito allora vado in loop 
     if tRun.is_alive():   # se il thread è vivo, vuol dire che non ha finito
 #        tcurrent=model.sim.last_step*world.time_resolution
@@ -586,9 +614,8 @@ def CheckForTmax(world, model, dtsdamng, tRun, TMAX):
     
 
 def SIMtest( tfin, plotfig=False, rt_factor=1.):
-    #
-    # Viene eseguito un transitorio in batch e visulaizzati i plot di prestazione       
-    #
+    """ Viene eseguito un transitorio in batch e visulaizzati i plot di prestazione """
+    
     global world, model, dtsdamng , debug
 
     #carico la configurazione di default

@@ -1,3 +1,5 @@
+
+""" Gestione informazioni RDF per Knowledge Graph"""
 import datetime
 
 from rdflib import Graph, Namespace, Literal, URIRef
@@ -6,6 +8,7 @@ import pytz
 
 
 def rdfcreate(namespace="http://tgm-sda.rse-web.it/",indexpath="DTindex.json", name="MinioFolder1", description="Questa è una descrizione"):
+        """ Crea l'oggeto rdf """
         g = Graph()
         # add title to ontology
         sda = Namespace(namespace)
@@ -20,7 +23,7 @@ def rdfcreate(namespace="http://tgm-sda.rse-web.it/",indexpath="DTindex.json", n
         g.serialize(indexpath, format="json-ld")
 
 def rdfquery(namespace="http://tgm-sda.rse-web.it/",indexpath="DTindex.json") -> dict:
-        # get Diagrams Point to be converted to Position Points
+        """ get Diagrams Point to be converted to Position Points """
         g = Graph()
         g.parse( indexpath)
         sda = Namespace(namespace)
@@ -64,6 +67,7 @@ def rdfquery(namespace="http://tgm-sda.rse-web.it/",indexpath="DTindex.json") ->
 
 
 def rdfTest():
+    """ test per debug """
     rdfcreate(name="Config1", description=" Configurazione n. 1")
     rdfquery(indexpath="index.json")
 

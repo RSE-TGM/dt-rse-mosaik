@@ -1,9 +1,5 @@
 """
-Mosaik interface for the example simulator.
-
-It more complex than it needs to be to be more flexible and show off various
-features of the mosaik API.
-
+Mosaik simulator of the DTSDA manegemte task  
 """
 from loguru import logger
 import os
@@ -11,7 +7,7 @@ import mosaik_api_v3
 import redis
 from  DT_include import *
 
-
+# configurazione mosaik di DTSDAMng
 META_DTSDAMng = {
     'type': 'hybrid',
 #    'type': 'event-based',
@@ -27,6 +23,7 @@ META_DTSDAMng = {
 
 
 class DTSDA_Mng(mosaik_api_v3.Simulator):
+    """ Simulator DTSDAMng, modella alcune logiche di coordinamento di DTSDA """
     def __init__(self):
         super().__init__(META_DTSDAMng)
         self.sid = None

@@ -1,4 +1,4 @@
-
+""" inizializzazione del simulatore del DTwin """
 #import sys
 #import argparse
 from time import sleep, perf_counter
@@ -13,8 +13,10 @@ from pytz import timezone
 from  DT_include import *
 
 def DT_prepScenario():
-
-# inizializzazzione simulazione di test    
+    """ inizializzazione del simulatore del DTwin DTSDA In SIM_CONFIG sono definiti i componenti, le entity, di DTSDA 
+    In seguito vine inizializzate le strutture dati di Mosaik, iniizializzate le entity il simulatore complessivo e definite le connessioni tra le entity
+    """
+    
     SIM_CONFIG = {
             'ModelSim': {
                 'python': 'batt_model:ModelSim',
@@ -50,7 +52,7 @@ def DT_prepScenario():
     now = datetime.datetime.now(pytz.timezone(TZONE))
     START = f"{now}"
     ### INPUT_DATA = 'mosaik/configuration/data/input_data.csv' # .csv in your setup
-    INPUT_DATA = CONFIG_DATA_PATH + 'data/input_data.csv'
+    INPUT_DATA = CONFIG_DATA_PATH + CURR_CONFIG['DT_input_data']
     #INPUT_DATA = 'configuration/data/input_data.csv' # .csv in your setup
 
     # Start simulators

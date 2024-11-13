@@ -1,5 +1,5 @@
 """
-Mosaik interface for the example simulator.
+Mosaik interface del  modello della batteria nel DTwin DTSDA.
 
 """
 import os, sys;
@@ -55,6 +55,7 @@ META_Battmodel = {
 
 
 class ModelSim(mosaik_api.Simulator):
+    """ Modello della batteria nel DTwin DTSDA """
     def __init__(self):
         super().__init__(META_Battmodel)
         self.eid_prefix = 'Model_'

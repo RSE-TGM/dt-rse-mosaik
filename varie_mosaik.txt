@@ -68,4 +68,9 @@ sostiute nel container /usr/local/lib/python3.8/dist-packages/mosaik/scheduler.p
 
 aggiunto metodo "run_step" a src/digital_twin/orchestrator/sym_manager.py
 
-
+####
+Documentazione pydoctor
+Aggiornamento documentazione:
+pydoctor --make-html --html-output=docs/ app
+Per la consultazione aprire in un browser: 
+docs/index.html

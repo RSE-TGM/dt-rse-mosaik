@@ -1,3 +1,5 @@
+
+"""Mosaik interface alll'archivio InfluxDB2 del DTwin DTSDA """
 from __future__ import annotations
 
 from mosaik_api.datetime import Converter
@@ -26,7 +28,7 @@ META = {
         },
     },
 }
-
+""" Configurazione Mosaik simulator influxdb2 writer"""
 
 EID = "Database"
 
@@ -62,6 +64,7 @@ class Simulator(mosaik_api.Simulator):
         self._step_size = None
 
     def init(self, sid, time_resolution, start_date=None, step_size=900, printDebug=True):
+        """ Init oggetto influxdb2 """
         self.printDebug=printDebug
         if step_size is not None:
             self._step_size = step_size
@@ -77,6 +80,7 @@ class Simulator(mosaik_api.Simulator):
         return self.meta
 
     def create(self, num, model, **model_params):
+        """ Creazione oggetto influxdb2 """
         errmsg = (
             "The Influx store simulator only supports one entity. Create a second "
             "instance of the simulator if you need more."
@@ -97,6 +101,7 @@ class Simulator(mosaik_api.Simulator):
         return [{"eid": EID, "type": model}]
 
     def step(self, time, inputs, max_advance):
+        """ Esecuzione di save di un punto su DB influxdb2 """
 #        print(f"influxdb2_write: 1 time={time} inputs={inputs} type={type(time)}")
         data = inputs.get(EID, {})
         if "local_time" in data:
@@ -150,6 +155,7 @@ class Simulator(mosaik_api.Simulator):
         return {}
 
     def finalize(self):
+        """ chiusura connessione a influxdb """
         self._influx_writer.close()
         print("influxdb2_write: FINALIZE: ################-------------------------------------------> Influx connection close!")
 

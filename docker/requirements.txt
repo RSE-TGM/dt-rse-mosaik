@@ -71,6 +71,7 @@ ptyprocess==0.7.0
 pure-eval==0.2.2
 pycparser==2.21
 pycryptodome==3.20.0
+pydoctor
 Pygments==2.17.2
 pyparsing==3.1.1
 #PyQt5==5.15.10
